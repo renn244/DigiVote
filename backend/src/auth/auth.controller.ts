@@ -32,6 +32,11 @@ export class AuthController {
         return this.authService.resendEmail(body.email)
     }
 
+    @Post('refreshToken')
+    async refreshToken(@Body() body: any) {
+        return this.authService.refreshToken(body.refreshToken)
+    }
+    
     @UseGuards(JwtAuthGuard)
     @Get('check')
     async checkUser(@User() user: UserType) {

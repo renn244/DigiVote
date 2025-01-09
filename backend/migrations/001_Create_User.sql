@@ -11,7 +11,7 @@ CREATE TABLE emailVerify (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     code VARCHAR(255) NOT NULL
-)
+);
 
 CREATE TABLE userplaceholder (
     id SERIAL PRIMARY KEY,
@@ -25,4 +25,5 @@ CREATE TABLE userplaceholder (
 
     CONSTRAINT fk_email FOREIGN KEY (email) REFERENCES emailVerify(email) 
         ON DELETE CASCADE
-)
+);
+

@@ -2,17 +2,17 @@ import axiosFetch from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, PropsWithChildren, useContext } from "react";
 
-type authContextState = {
+type AuthContextState = {
     user: any | undefined,
     loading: boolean
 }
 
-const authContext = {
+const initialState  = {
     user: undefined,
     loading: true
 }
 
-const AuthContext = createContext<authContextState>(authContext);
+const AuthContext = createContext<AuthContextState>(initialState);
 
 export const useAuthContext = () => {
     const context = useContext(AuthContext)
@@ -36,7 +36,8 @@ const AuthProvider = ({
 
             return response.data
         },
-        refetchOnWindowFocus: false
+        refetchOnWindowFocus: false,
+        retry: false
     })
 
     const value = {

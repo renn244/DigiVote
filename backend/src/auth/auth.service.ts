@@ -1,7 +1,8 @@
-import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, GoneException, Inject, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { LoginDto, RegistrationDto } from './dto/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt'
+import { v4 as uuidv4 } from 'uuid'
 import { EmailSenderService } from 'src/email-sender/email-sender.service';
 import { UserType } from 'src/lib/decorator/User.decorator';
 
@@ -53,11 +54,16 @@ export class AuthService {
         const payload = {
             id: user.id,
             username: user.name,
+            branch: user.branch,
             email: user.email
         }
 
+        const access_token = this.jwtService.sign(payload, { expiresIn: '5m', secret: process.env.JWT_SECRET })
+        const refresh_token = await this.generateRefreshToken(user.id)
+
         return {
-            access_token: this.jwtService.sign(payload)
+            access_token: access_token,
+            refresh_token: refresh_token
         }
     }
 
@@ -197,5 +203,63 @@ export class AuthService {
         await this.emailSender.sendOtpEmail(email, code)
 
         return "email has been resent"
+    }
+
+    async generateRefreshToken(userId: string) {
+        if(!userId) {
+            throw new GoneException('userId is undefined!')
+        }
+
+        const deleteRefreshToken = await this.sql`
+            DELETE FROM refreshtokens 
+            WHERE userid = ${userId}
+        `
+
+        const refreshToken = uuidv4()
+        const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 28) // 4weeks 
+
+        const saveRefreshtoken = await this.sql`
+            INSERT INTO refreshtokens (userid, token, expiresAt)
+            VALUES (${userId}, ${refreshToken}, ${expiresAt})
+            RETURNING token;
+        `
+
+        if(!saveRefreshtoken.length) {
+            throw new InternalServerErrorException('failed to create refresh token')
+        }
+
+        return saveRefreshtoken[0].token
+    }
+
+    // the one verifying for refresh token
+    async refreshToken(refreshToken: string) {
+        if(!refreshToken) {
+            throw new GoneException({
+                name: 'refreshToken',
+                message: 'refresh toked does not exist'
+            })
+        }
+
+        const getRefreshToken = await this.sql`
+            SELECT * FROM refreshtokens
+            WHERE token = ${refreshToken} 
+            AND expiresat > ${new Date()}
+        `
+
+        // Handle case where no token is found
+        if (!getRefreshToken.length) {
+            throw new GoneException('Invalid or expired refresh token');
+        }
+
+        const user = await this.sql`
+            SELECT * FROM users
+            WHERE id = ${getRefreshToken[0].userid}
+        `
+
+        if(!user.length) {
+            throw new InternalServerErrorException('failed to find user!')
+        }
+
+        return this.login(user[0])
     }
 }

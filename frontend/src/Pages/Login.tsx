@@ -47,6 +47,7 @@ const Login = () => {
 
             // save access token in the local storage
             window.localStorage.setItem('access_token', response.data.access_token)
+            window.localStorage.setItem('refresh_token', response.data.refresh_token)
             window.location.assign('/')
         },
         onError: (error: any) => {
