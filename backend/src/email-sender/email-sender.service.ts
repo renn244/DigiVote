@@ -4,13 +4,13 @@ import * as sgMail from '@sendgrid/mail'
 @Injectable()
 export class EmailSenderService {
     constructor() {
-        sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY) 
     }
 
     async sendEmail(to: string, subject: string, title: string, content: string) {
         const msg = {
             to: to,
-            from: 'renatodsantosjr@gmail.com',
+            from: 'renatodsantosjr9@gmail.com',
             subject: subject,
             html: content
         }
@@ -24,6 +24,7 @@ export class EmailSenderService {
     }
 
     async sendOtpEmail(to: string, code: number) {
+       try {
         const content = `
         <div style="font-family: Helvetica,Arial,sans-serif;width:600px;overflow:auto;line-height:2">
             <div style="margin:50px auto;width:70%;padding:20px 0">
@@ -47,5 +48,8 @@ export class EmailSenderService {
         `
 
         await this.sendEmail(to, 'OTP', 'Verify Email', content)
+       } catch (error) {
+        console.log('error sending otp: ', error)
+       }
     }
 }

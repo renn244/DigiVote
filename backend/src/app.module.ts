@@ -1,21 +1,31 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { EmailSenderModule } from './email-sender/email-sender.module';
+import { DatabaseModuleModule } from './database-module/database-module.module';
+import { ConfigModule } from '@nestjs/config';
+import { CacheModule } from '@nestjs/cache-manager'
 
 // CONFIG MODULE NOT BEING LOADED FIRST!!!
 @Module({
-  imports: [ConfigModule.forRoot({
+  imports: [
+  ConfigModule.forRoot({
     isGlobal: true,
-  }), EmailSenderModule, AuthModule],
+  }), 
+  CacheModule.register({
+    isGlobal: true,
+    ttl: 60 * 1000 //60 seconds
+  }),
+  EmailSenderModule, 
+  AuthModule, 
+  DatabaseModuleModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
  
 export class AppModule {
   constructor() {
-    console.log(process.env.DATABASE_URL)
   }
 }

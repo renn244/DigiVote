@@ -15,7 +15,7 @@ type signUpStateType = {
 }
 
 const SignUp = () => {
-    const { register, setError, formState: { errors } } = useForm<signUpStateType>()
+    const { register, handleSubmit, setError, formState: { errors } } = useForm<signUpStateType>()
 
     const onSubmit: SubmitHandler<signUpStateType> = async (data) => {
         if(data.password !== data.confirmPassword) {
@@ -35,9 +35,8 @@ const SignUp = () => {
             return
         }
 
-        // send to email otp page 
         // send the email as search params
-        
+        window.location.assign(response.data.redirect_url)
     }
 
     return (
@@ -52,7 +51,7 @@ const SignUp = () => {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form>
+                    <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="grid gap-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="username">Username</Label>
@@ -69,6 +68,7 @@ const SignUp = () => {
                                         required: "first name is required"
                                     })}
                                     id="first-name" placeholder="Max" />
+                                    {errors.firstName && <p>{errors.firstName.message}</p>}
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="last-name">Last name</Label>
@@ -76,6 +76,7 @@ const SignUp = () => {
                                         required: "last name is required"
                                     })}
                                     id="last-name" placeholder="Robinson" />
+                                    {errors.lastName && <p>{errors.lastName.message}</p>}
                                 </div>
                             </div>
                             <div className="grid gap-2">
@@ -91,6 +92,7 @@ const SignUp = () => {
                                 type="email"
                                 placeholder="m@example.com"
                                 />
+                                {errors.email && <p>{errors.email.message}</p>}
                             </div>
                             {/* TODO: make this a component */}
                             <div className="grid gap-2">
@@ -99,6 +101,7 @@ const SignUp = () => {
                                     required: 'password is required',
                                 })}
                                 id="password" type="password" />
+                                {errors.password && <p>{errors.password.message}</p>}
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -106,6 +109,7 @@ const SignUp = () => {
                                     required: 'confirm password is required'
                                 })}
                                 id="confirmPassword" type="password" />
+                                {errors.confirmPassword && <p>{errors.confirmPassword.message}</p>}
                             </div>
                             <Button type="submit" className="w-full">
                                 Create an account
@@ -113,9 +117,9 @@ const SignUp = () => {
                         </div>
                     </form>
                     <div className="mt-4 text-center text-sm">
-                        Already have an account?
-                        <a href="#" className="underline">
-                        Sign in
+                        Already have an account? {" "}
+                        <a href="/login" className="underline">
+                            Login
                         </a>
                     </div>
                 </CardContent>

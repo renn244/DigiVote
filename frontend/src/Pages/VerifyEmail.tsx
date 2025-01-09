@@ -25,6 +25,11 @@ const VerifyEmail = () => {
       })
 
       // handle
+      if(response.status >= 400) {
+        throw new Error(response.data.message)
+      }
+
+      window.location.assign(response.data.redirect_url)
     },
     onError: (error: any) => {
       toast.error(error.message)
@@ -44,7 +49,7 @@ const VerifyEmail = () => {
       if(response.status >= 400) {
         throw new Error(response.data.message)
       }
-
+      
       return response.data
     },
     onError: (error: any) => {
@@ -87,7 +92,7 @@ const VerifyEmail = () => {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-2">
-          <Button disabled={isPending || otp.length !== 6} className="w-full">
+          <Button onClick={() => handleVerifyEmail()} disabled={isPending || otp.length !== 6} className="w-full">
             {isPending ? <LoadingSpinner /> : "Verify Email"}
           </Button>
           <Button onClick={() => handleResendEmail()} variant={'link'} className="text-sm">

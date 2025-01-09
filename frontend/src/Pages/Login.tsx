@@ -30,19 +30,24 @@ const Login = () => {
 
             const response = await axiosFetch.post('/auth/login', credentials)
 
-            if(response.status === 401) {
+            if(response.status === 400) {
                 setError({
                     type: response.data.name,
                     error: response.data.message
                 })
+
+                return
             }
 
-            if(response.status >= 400) {
+            if(response.status >= 401) {
                 throw new Error(response.data.message)
             }
 
-            // handle success
-            //
+            setError({ type: '', error: ''}) // just clean
+
+            // save access token in the local storage
+            window.localStorage.setItem('access_token', response.data.access_token)
+            window.location.assign('/')
         },
         onError: (error: any) => {
             toast.error(error.message)
@@ -64,9 +69,12 @@ const Login = () => {
                             <div className="grid gap-6">
                                 <div className="grid gap-2">
                                     <Label htmlFor="username">Username</Label>
-                                    <Input value={credentials.username} 
-                                    onChange={(e) => setCredentials({...credentials, username: e.target.value})}
-                                    id="username" type="text" />
+                                    <div>
+                                        <Input value={credentials.username} 
+                                        onChange={(e) => setCredentials({...credentials, username: e.target.value})}
+                                        id="username" type="text" />
+                                        {error.type === 'username' && <span className="text-red-500 font-medium text-sm">{error.error}</span>}
+                                    </div>
                                 </div>
                                 <div className="grid gap-2">
                                     <div className="flex items-center">
@@ -78,9 +86,12 @@ const Login = () => {
                                         Forgot your password?
                                         </a>
                                     </div>
-                                    <Input value={credentials.password}
-                                    onChange={(e) => setCredentials({...credentials, password: e.target.value})}
-                                    id="password" type="password" />
+                                    <div>
+                                        <Input value={credentials.password}
+                                        onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+                                        id="password" type="password" />
+                                        {error.type === 'password' && <span className="text-red-500 font-medium text-sm">{error.error}</span>}
+                                    </div>
                                 </div>
                                 <Button disabled={isPending} type="submit" className="w-full">
                                     {isPending ? <LoadingSpinner /> : "Login"}
@@ -91,7 +102,7 @@ const Login = () => {
                 </Card>
                 <div className="text-center text-sm">
                     Don&apos;t have an account?{" "}
-                    <a href="#" className="underline underline-offset-4">
+                    <a href="/register" className="underline underline-offset-4">
                     Sign up
                     </a>
                 </div>

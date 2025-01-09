@@ -1,8 +1,9 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { LoginDto, RegistrationDto } from './dto/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt'
 import { EmailSenderService } from 'src/email-sender/email-sender.service';
+import { UserType } from 'src/lib/decorator/User.decorator';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +12,11 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly emailSender: EmailSenderService
     ) {}
+
+    async checkUser(user: UserType) {
+        // might want to get into the database later and cache if more data is needed
+        return user
+    }
 
     async validateUser(body: LoginDto) {
         const getUser = await this.sql`
@@ -43,7 +49,6 @@ export class AuthService {
         }
     }
 
-    // jwt
     async login(user: any) {
         const payload = {
             id: user.id,
@@ -84,13 +89,22 @@ export class AuthService {
         const branch = body.email.split('@')[1].split('.')[0]
 
         const sendEmail = await this.createEmail(body.email);
-
         const result = await this.sql`
             INSERT INTO userplaceholder (username, name, email, password, branch) 
-            VALUES (${body.username}, ${name}, ${body.email}, ${hashedPassword}, ${branch});
+            VALUES (${body.username}, ${name}, ${body.email}, ${hashedPassword}, ${branch})
+            RETURNING *;
         `
 
-        return result[0]; 
+        if(!result.length) {
+            throw new InternalServerErrorException('failed to create user try again')
+        }
+
+        return {
+            success: true,
+            message: 'successfully created account',
+            next_action: 'redirect',
+            redirect_url: `${process.env.CLIENT_BASE_URL}/verifyEmail?email=${result[0].email}`
+        }
     }
 
     async createEmail(email: string) {
@@ -105,11 +119,12 @@ export class AuthService {
         }
 
         const result = await this.sql`
-            INSERT INTO emailVerify (email, code) VALUES (${email}, ${code});
+            INSERT INTO emailVerify (email, code) 
+            VALUES (${email}, ${code})
+            RETURNING *;
         `
-
         // send email to user with code
-        await this.emailSender.sendOtpEmail(result[0].email, code)
+        await this.emailSender.sendOtpEmail(email, code)
 
         return result[0]
     }
@@ -119,23 +134,47 @@ export class AuthService {
             SELECT * FROM emailVerify WHERE email = ${email}
         `
 
+        // Check if a record was found
+        if (!getVerification.length) {
+            throw new BadRequestException('No verification record found for this email!');
+        }
+
         if(getVerification[0].code !== token) {
             throw new BadRequestException('Invalid Code!')
         }
-
+        
         // create the user if the code is correct
         const getUser = await this.sql`
             SELECT * FROM userplaceholder WHERE email = ${email}
         `
 
+        if(!getUser.length) {
+            throw new InternalServerErrorException('user is not defined!')
+        }
+
         const user = getUser[0]
 
         const createUser = await this.sql`
             INSERT INTO users (username, name, email, password, branch)
-            VALUES (user.username, user.name, user.email, user.password, user.branch)
+            VALUES (${user.username}, ${user.name}, ${user.email}, ${user.password}, ${user.branch});
         `
 
-        return createUser[0] // maybe jwt?? so taht it is not needed to login
+        // delete placeholder and verifyUser
+        const deleteVerifyEmail = await this.sql`
+            DELETE FROM emailVerify 
+            WHERE email = ${email};
+        `
+        const deleteUserPlaceholder = await this.sql`
+            DELETE FROM userplaceholder
+            WHERE id = ${user.id}
+        `
+
+        return {
+            success: true,
+            message: 'successfully verify email',
+            next_action: 'redirect',
+            redirect_url: `${process.env.CLIENT_BASE_URL}/login`
+        }
     }
 
     async resendEmail(email: string) {
@@ -156,7 +195,6 @@ export class AuthService {
 
         // send email
         await this.emailSender.sendOtpEmail(email, code)
-
 
         return "email has been resent"
     }

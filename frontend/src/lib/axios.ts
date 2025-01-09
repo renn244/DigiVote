@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 const axiosFetch = axios.create({
-    baseURL: 'http://localhost:5000/api'
+    baseURL: 'http://localhost:5000/api',
+    validateStatus: () => true
 })
 
 axiosFetch.interceptors.request.use((config) => {
