@@ -10,5 +10,7 @@ export const User = createParamDecorator(
 export type UserType = {
     id: string,
     username: string,
-    email: string
+    email: string,
+    branch: string,
+    role: 'user' | 'admin'
 }

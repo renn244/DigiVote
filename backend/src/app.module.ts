@@ -6,6 +6,7 @@ import { EmailSenderModule } from './email-sender/email-sender.module';
 import { DatabaseModuleModule } from './database-module/database-module.module';
 import { ConfigModule } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager'
+import { PollModule } from './poll/poll.module';
 
 // CONFIG MODULE NOT BEING LOADED FIRST!!!
 @Module({
@@ -19,7 +20,7 @@ import { CacheModule } from '@nestjs/cache-manager'
   }),
   EmailSenderModule, 
   AuthModule, 
-  DatabaseModuleModule
+  DatabaseModuleModule, PollModule
   ],
   controllers: [AppController],
   providers: [AppService],
