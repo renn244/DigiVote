@@ -1,7 +1,12 @@
+CREATE TYPE roles 
+AS ENUM ('admin', 'user');
+
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
+    role roles NOT NULL DEFAULT 'user',
     username VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
+    profile VARCHAR(255),
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     branch VARCHAR(255) NOT NULL

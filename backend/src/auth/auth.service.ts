@@ -1,10 +1,10 @@
-import { BadRequestException, GoneException, Inject, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { LoginDto, RegistrationDto } from './dto/auth.dto';
+import { BadRequestException, GoneException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt'
-import { v4 as uuidv4 } from 'uuid'
+import * as bcrypt from 'bcrypt';
 import { EmailSenderService } from 'src/email-sender/email-sender.service';
 import { UserType } from 'src/lib/decorator/User.decorator';
+import { v4 as uuidv4 } from 'uuid';
+import { LoginDto, RegistrationDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -55,7 +55,8 @@ export class AuthService {
             id: user.id,
             username: user.name,
             branch: user.branch,
-            email: user.email
+            email: user.email,
+            role: user.role
         }
 
         const access_token = this.jwtService.sign(payload, { expiresIn: '5m', secret: process.env.JWT_SECRET })
