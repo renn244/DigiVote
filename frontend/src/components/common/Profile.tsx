@@ -1,4 +1,4 @@
-import { ComponentProps } from "react"
+import { ComponentProps, forwardRef } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { cn } from "@/lib/utils"
 
@@ -8,18 +8,21 @@ type ProfileProps = {
     username: string,
 } & ComponentProps<typeof Avatar>
 
-const Profile = ({
+const Profile = forwardRef<
+    React.ElementRef<typeof Avatar>,
+    ProfileProps
+>(({
     className,
     src,
     username,
     ...props
-}: ProfileProps) => {
+}: ProfileProps, ref) => {
     return (
-        <Avatar {...props} className={cn("h-10 w-10", className)}>
+        <Avatar {...props} ref={ref}  className={cn("h-10 w-10", className)}>
             <AvatarImage src={src} alt={username} />
             <AvatarFallback className="cursor-pointer">{username[0].toUpperCase()}</AvatarFallback>
         </Avatar>
     )
-}
+})
 
 export default Profile

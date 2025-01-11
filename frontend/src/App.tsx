@@ -1,12 +1,13 @@
 import { Navigate, Route, Routes } from "react-router"
+import Navbar from "./components/common/Navbar"
+import ProtectedRoute from "./components/common/ProtectedRoute"
+import { useAuthContext } from "./context/AuthContext"
+import Admin from "./Pages/admin/Admin"
+import Forbidden from "./Pages/Forbidden"
 import Login from "./Pages/Login"
+import NotFound from "./Pages/NotFound"
 import SignUp from "./Pages/SignUp"
 import VerifyEmail from "./Pages/VerifyEmail"
-import { useAuthContext } from "./context/AuthContext"
-import Navbar from "./components/common/Navbar"
-import Forbidden from "./Pages/Forbidden"
-import ProtectedRoute from "./components/common/ProtectedRoute"
-import Admin from "./Pages/admin/Admin"
 
 function App() {
   const { loading , user } = useAuthContext()
@@ -24,6 +25,7 @@ function App() {
         <Route path="/register" element={user ? <Navigate to={'/'} /> : <SignUp />} />
         <Route path="/verifyEmail" element={user ? <Navigate to={'/'} /> : <VerifyEmail />} />
         <Route path="/forbidden" element={<Forbidden />} />
+        <Route path="/notfound" element={<NotFound />} />
 
         <Route path="/admin/*" element={
           <ProtectedRoute roles={['admin']}><Admin /></ProtectedRoute>

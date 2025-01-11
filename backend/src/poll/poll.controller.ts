@@ -22,7 +22,7 @@ export class PollController {
     }
 
     @Get(':id')
-    async getPoll(@User() user: UserType, @Query('id') pollId: string) {
+    async getPoll(@User() user: UserType, @Param('id') pollId: string) {
         return this.pollService.getPoll(user, pollId)
     }
 

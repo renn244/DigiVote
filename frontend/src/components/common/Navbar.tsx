@@ -1,6 +1,6 @@
 import { useAuthContext } from "@/context/AuthContext"
 import { cn } from "@/lib/utils"
-import { BarChart3, HelpCircle, Info, LogIn, Menu, UserCircle, Vote, X } from "lucide-react"
+import { BarChart3, HelpCircle, Info, LogIn, Menu, UserCircle, Vote, X, UserRoundCog } from "lucide-react"
 import { ComponentProps, PropsWithChildren, useState } from "react"
 import { Link } from "react-router"
 import { Button } from "../ui/button"
@@ -29,6 +29,9 @@ const Navbar = () => {
                     <div className="hidden md:block">
                         <div className="ml-4 flex items-center md:ml-6">
                             <NavLink href="/help" icon={<HelpCircle className="h-5 w-5 mr-1" />} >Help</NavLink>
+                            {user?.role === 'admin' && (
+                                <NavLink href="/admin" icon={<UserRoundCog className="h-5 w-5 mr-1" />}>Admin</NavLink>
+                            )}
                             {!user ? (
                                 <Link to={'/login'}>
                                     <Button variant={'outline'} className="ml-2">
