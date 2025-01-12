@@ -174,7 +174,7 @@ const PollForm = ({
                                     selected={field.value}
                                     onSelect={field.onChange}
                                     disabled={(date) => 
-                                        date < addDays(new Date(), 7)
+                                        date < addDays(new Date(form.getValues('start_date')), 7)
                                     }
                                     />
                                 </PopoverContent>
@@ -218,8 +218,7 @@ const PollForm = ({
                         </FormControl>
                         <FormMessage />
                     </FormItem>
-                  )}
-                />
+                )} />
                 <div>
                     <Button disabled={isLoading} type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-white w-full mt-4">
                         {isLoading ? <LoadingSpinner /> : "Create Poll"}

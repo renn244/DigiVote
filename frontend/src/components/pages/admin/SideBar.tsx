@@ -1,10 +1,11 @@
-import { LayoutDashboard, LogOut, Settings, Users, ChartNoAxesColumn } from "lucide-react"
+import { LayoutDashboard, LogOut, Settings, Users, ChartNoAxesColumn, Flag } from "lucide-react"
 import { Link } from "react-router"
 
 const sidebarItems = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
     { icon: Users, label: 'Users', href: '/admin/users' },
     { icon: ChartNoAxesColumn, label: 'Polls', href: '/admin/polls' },
+    { icon: Flag, label: 'Parties', href: '/admin/parties' },
     { icon: Settings, label: 'Settings', href: '/admin/settings' },
 ]
 

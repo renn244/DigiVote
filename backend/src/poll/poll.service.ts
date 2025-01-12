@@ -54,7 +54,7 @@ export class PollService {
 
     async updatePoll(user: UserType, pollId: string, body: CreatePollDto) {
         const getPoll = await this.sql`
-            SELECT * FROM poll
+            SELECT branch FROM poll
             WHERE id = ${pollId}
         `
 
@@ -92,7 +92,7 @@ export class PollService {
     // should i delete or archive the poll?
     async deletePoll(user: UserType, pollId: string) {
         const getPoll = await this.sql`
-            SELECT * FROM poll
+            SELECT branch FROM poll
             WHERE id = ${pollId}
         `
 

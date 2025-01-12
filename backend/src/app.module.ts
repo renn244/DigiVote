@@ -7,20 +7,22 @@ import { DatabaseModuleModule } from './database-module/database-module.module';
 import { ConfigModule } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager'
 import { PollModule } from './poll/poll.module';
+import { PartiesModule } from './parties/parties.module';
+import { FileUploadModule } from './file-upload/file-upload.module';
 
 // CONFIG MODULE NOT BEING LOADED FIRST!!!
 @Module({
   imports: [
-  ConfigModule.forRoot({
-    isGlobal: true,
-  }), 
-  CacheModule.register({
-    isGlobal: true,
-    ttl: 60 * 1000 //60 seconds
-  }),
-  EmailSenderModule, 
-  AuthModule, 
-  DatabaseModuleModule, PollModule
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }), 
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 60 * 1000 //60 seconds
+    }),
+    EmailSenderModule, 
+    AuthModule, 
+    DatabaseModuleModule, PollModule, PartiesModule, FileUploadModule
   ],
   controllers: [AppController],
   providers: [AppService],

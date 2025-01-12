@@ -1,45 +1,44 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import axiosFetch from "@/lib/axios";
-import { poll } from "@/types/poll";
+import { partyTable } from "@/types/party";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-type DeletePollProps =  {
-    pollId: number;
+type DeletePartyProps = {
+    partyId: number;
 }
 
-const DeletePoll = ({
-    pollId
-}: DeletePollProps) => {
+const DeleteParties = ({
+    partyId
+}: DeletePartyProps) => {
     const queryClient = useQueryClient();
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
 
     const { mutate, isPending } = useMutation({
-        mutationKey: ['delete', 'polls'],
         mutationFn: async () => {
-            const response = await axiosFetch.delete(`/poll/${pollId}`);
+            const response = await axiosFetch.delete(`/parties/${partyId}`)
 
             if(response.status >= 400) {
-               toast.error(response.data.message)
-               return
+                toast.error(response.data.message);
+                return
             }
 
-            toast.success('Poll deleted successfully!');
-            queryClient.setQueryData(['polls'], (old: poll[]) => {
-                return old.filter(poll => 
-                    poll.id !== pollId
+            toast.success('Parties deleted successfully');
+            queryClient.setQueryData(['parties'], (old: partyTable[]) => {
+                return old.filter(party => 
+                    party.id !== partyId
                 )
             })
-        }
+        }        
     })
-
+    
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button onClick={(e) => e.stopPropagation()} 
+                <Button 
                 className="bg-yellow-500 hover:bg-yellow-600 text-white" variant="outline" size="sm">
                     <Trash2 className="h-4 w-4" />
                 </Button>
@@ -47,17 +46,17 @@ const DeletePoll = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        Are you sure you want to delete this poll?
+                        Are you sure you want to delete this party?
                     </DialogTitle>
                     <DialogDescription>
-                        This action cannot be undone and all data will be lost.
+                        This action cannot be undone and all the data will be lost.
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                    <Button onClick={(e) => { e.stopPropagation(); setIsOpen(false); }} variant="outline">
+                    <Button onClick={() => setIsOpen(false)} variant="outline">
                         Cancel
                     </Button>
-                    <Button onClick={(e) => {e.stopPropagation(); mutate(); }} variant="destructive" disabled={isPending}>
+                    <Button onClick={() => mutate()} variant="destructive" disabled={isPending}>
                         Delete
                     </Button>
                 </DialogFooter>
@@ -66,4 +65,4 @@ const DeletePoll = ({
     )
 }
 
-export default DeletePoll
+export default DeleteParties

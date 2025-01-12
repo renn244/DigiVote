@@ -26,7 +26,7 @@ const UpdatePoll = () => {
                 return
             }
 
-            return response.data;
+            return response.data as poll;
         },
         refetchOnWindowFocus: false
     })
@@ -35,20 +35,20 @@ const UpdatePoll = () => {
         const response = await axiosFetch.patch(`/poll/${id}`, data);
 
         if(response.status >= 400) {
-            throw new Error(response.data.message);
+            throw new Error(response.data.message); // this will be caught by the form
         }
 
         toast.success('Poll updated successfully!');
         
-        // updating the poll
-        queryClient.setQueryData(['polls'], (old: poll[]) => {
-            return old.map(poll => {
-                if(poll.id === response.data.id) {
-                    return response.data
-                }
-                return poll
-            })
-        })
+        // // updating the poll
+        // queryClient.setQueryData(['polls'], (old: poll[]) => {
+        //     return old.map(poll => {
+        //         if(poll.id === response.data.id) {
+        //             return response.data
+        //         }
+        //         return poll
+        //     })
+        // })
 
         // updating the get poll query
         queryClient.setQueryData(['update', 'polls', id], () => response.data)
@@ -62,8 +62,8 @@ const UpdatePoll = () => {
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-gray-800">Update Poll</h1>
             </div>
-            <div className="flex justify-center items">
-                <PollForm className="w-full max-w-[550px]" 
+            <div className="flex justify-center">
+                <PollForm className="w-full max-w-[550px]"
                 initialData={data} onsubmit={onSubmit} />
             </div>
         </div>
