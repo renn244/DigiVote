@@ -1,3 +1,4 @@
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import axiosFetch from "@/lib/axios";
@@ -58,7 +59,7 @@ const DeletePoll = ({
                         Cancel
                     </Button>
                     <Button onClick={(e) => {e.stopPropagation(); mutate(); }} variant="destructive" disabled={isPending}>
-                        Delete
+                        { isPending ? <LoadingSpinner /> : "Delete" }
                     </Button>
                 </DialogFooter>
             </DialogContent>

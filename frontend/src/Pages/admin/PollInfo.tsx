@@ -1,3 +1,4 @@
+import Positions from "@/components/pages/admin/Position/Positions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +13,7 @@ const PollInfo = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-gray-800">COMSOC ELECTIONS</h1>
+                
                 <Button variant={'outline'} asChild>
                     <Link to={'/admin/polls'}>
                         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Elections
@@ -33,7 +35,7 @@ const PollInfo = () => {
             <div className="grid gap-6 md:grid-cols-2">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Still don't know what to put as stats</CardTitle>
+                        <CardTitle>Parties Votes or voters on days they voted</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {/* <ResponsiveContainer width="100%" height={300}>
@@ -48,34 +50,7 @@ const PollInfo = () => {
                         </ResponsiveContainer> */}
                     </CardContent>
                 </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>
-                            Party Distributions
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {/* <ResponsiveContainer width="100%" height={300}>
-                            <PieChart>
-                                <Pie
-                                data={election.parties}
-                                dataKey="votes"
-                                nameKey="name"
-                                cx="50%"
-                                cy="50%"
-                                outerRadius={80}
-                                label
-                                >
-                                    {election.parties.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer> */}
-                    </CardContent>
-                </Card>
+                <Positions />
             </div>
         </div>
     )

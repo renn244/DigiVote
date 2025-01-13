@@ -90,9 +90,9 @@ const PollForm = ({
                     </FormItem>
                 )} />
                 <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
+                control={form.control}
+                name="description"
+                render={({ field }) => (
                     <FormItem>
                         <FormLabel>Description</FormLabel>
                         <FormControl>

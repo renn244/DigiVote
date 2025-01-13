@@ -9,6 +9,7 @@ import { CacheModule } from '@nestjs/cache-manager'
 import { PollModule } from './poll/poll.module';
 import { PartiesModule } from './parties/parties.module';
 import { FileUploadModule } from './file-upload/file-upload.module';
+import { PositionsModule } from './positions/positions.module';
 
 // CONFIG MODULE NOT BEING LOADED FIRST!!!
 @Module({
@@ -22,7 +23,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
     }),
     EmailSenderModule, 
     AuthModule, 
-    DatabaseModuleModule, PollModule, PartiesModule, FileUploadModule
+    DatabaseModuleModule, PollModule, PartiesModule, FileUploadModule, PositionsModule
   ],
   controllers: [AppController],
   providers: [AppService],

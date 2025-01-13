@@ -21,7 +21,7 @@ export class PartiesService {
 
         if(!getPoll.length) throw new NotFoundException('poll does not exist!')
 
-        if(getPoll[0].branch !== user.branch) throw new ForbiddenException('only admin branch are allowed to update this poll')
+        if(getPoll[0].branch !== user.branch) throw new ForbiddenException('only admin branch are allowed to create this poll')
 
         // upload to cloudinary
         if(!banner) throw new BadRequestException('banner is required')
@@ -114,7 +114,7 @@ export class PartiesService {
             UPDATE parties SET
                 name = ${body.name},
                 description = ${body.description},
-                banner = ${bannerUrl}
+                banner = COALESCE(${bannerUrl}, banner)
             WHERE id = ${partyId}
             RETURNING *;
         `
