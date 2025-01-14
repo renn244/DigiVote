@@ -6,7 +6,6 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Textarea } from '@/components/ui/textarea'
 import axiosFetch from '@/lib/axios'
 import { cn } from '@/lib/utils'
-import { poll } from '@/types/poll'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import { ComponentProps, useState } from 'react'
@@ -15,77 +14,80 @@ import toast from 'react-hot-toast'
 import * as z from 'zod'
 
 export const formSchema = z.object({
-    name: z.string().min(3, {
-        message: "Name must be at least 3 characters"
+    photo: z.instanceof(FileList),
+    name: z
+        .string({ required_error: 'name is required' })
+        .min(1, { message: 'you must enter a name' }),
+    description: z.string(),
+    party_id: z.string({
+        required_error: 'partyId is required'
     }),
-    description: z.string().min(10, {
-        message: "Description must be at least 10 characters"
-    }),
-    poll_id: z.string({
-        required_error: "poll is required"
-    }),
-    banner: z
-        .instanceof(FileList)
+    position_id: z.string({
+        required_error: 'positionId is required'
+    }).min(1, { message: 'you must pick a position'})
 })
 
-type PartiesFormProps = {
+type CandidateFormProps = {
     initialData?: any,
     onsubmit: (data: z.infer<typeof formSchema>) => Promise<void>,
     className?: string,
-    initialPollId?: number,
-    isUpdate?: boolean,
+    partyId: string,
+    pollId: string,
+    isUpdate?: boolean, // for photo file upload look at parties form for reference
 } & ComponentProps<'form'>
 
-const PartiesForm = ({
+const CandidateForm = ({
     initialData,
     onsubmit,
     className,
-    initialPollId,
+    partyId,
+    pollId,
     isUpdate,
     ...props
-}: PartiesFormProps) => {
+}: CandidateFormProps) => {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            banner: undefined,
+            photo: undefined,
             name: initialData?.name || "",
             description: initialData?.description || "",
-            poll_id: initialData?.poll_id?.toString() || initialPollId?.toString()
+            party_id: initialData?.party_id.toString() || partyId,
+            position_id: initialData?.position_id.toString() || "",
         }
     })
-    const fileRef = form.register('banner')
-    
-    // get the polls
-    const { data: polls } = useQuery({
-        queryKey: ['getpolls'],
+    const fileRef = form.register('photo')
+
+    const { data:positions } = useQuery({
+        queryKey: ['positions', pollId],
         queryFn: async () => {
-            const response = await axiosFetch.get('/poll')
+            const response = await axiosFetch.get(`/positions/getPositionOptions/${pollId}`)
 
             if(response.status >= 400) {
-                toast.error(response.data.message)
+                toast.error(response.data.message);
                 return
             }
 
             return response.data
         },
-        refetchOnWindowFocus: false
+        refetchOnWindowFocus: false,
+        refetchOnMount: false
     })
-    
+
     const handleSubmit = async (data: z.infer<typeof formSchema>) => {
         setIsLoading(true)
         try {
-            // validation
-            if(!data.banner.length && !isUpdate) {
-                form.setError('banner', {
+            if(!data.photo.length && !isUpdate) {
+                form.setError('photo', {
                     type: 'required',
-                    message: 'banner is required'
+                    message: 'photo is required'
                 })
-                return;
+                return
             }
-            
-            // calling the submit callback
+
             await onsubmit(data)
+            
+            // should handle the error in the unique constraints 
         } catch (error: any) {
             toast.error(error.message)
         } finally {
@@ -98,17 +100,15 @@ const PartiesForm = ({
             <form {...props} onSubmit={form.handleSubmit(handleSubmit)} className={cn("space-y-4", className)}>
                 <FormField 
                 control={form.control}
-                name="banner"
+                name="photo"
                 render={(_) => (
                     <FormItem>
-                        <FormLabel>Banner</FormLabel>
+                        <FormLabel>Photo</FormLabel>
                         <FormControl>
-                            <Input type="file" 
-                            placeholder='Enter images' 
-                            {...fileRef} />
+                            <Input type='file' placeholder='Enter image' {...fileRef} />
                         </FormControl>
                         <FormDescription>
-                            Banner of your partylist. Eg. photo of all of you with some designs
+                            Photo for you so that you will be recognized by people you meet personally.
                         </FormDescription>
                         <FormMessage />
                     </FormItem>
@@ -116,64 +116,62 @@ const PartiesForm = ({
                 <FormField 
                 control={form.control}
                 name="name"
-                render={({ field }) => (
+                render={({  field }) => (
                     <FormItem>
                         <FormLabel>Name</FormLabel>
                         <FormControl>
                             <Input placeholder="Enter Name" {...field} />
                         </FormControl>
                         <FormDescription>
-                            This is the partylist name that will be displayed to voters
+                            this is the candidate full name. any format just be consistent
                         </FormDescription>
                         <FormMessage />
                     </FormItem>
                 )} />
-                <FormField 
+                <FormField
                 control={form.control}
                 name="description"
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>Description</FormLabel>
                         <FormControl>
-                            <Textarea 
-                            placeholder="Enter party description"
-                            className="resize-none"
-                            {...field}
-                            />
+                            <Textarea placeholder="Enter candidate description" className="resize-none" {...field} />
                         </FormControl>
                         <FormDescription>
-                            Provide a bried description of the poll
+                            Provide a brief description of the candidate and their reform agenda
                         </FormDescription>
                         <FormMessage />
                     </FormItem>
                 )} />
                 <FormField 
                 control={form.control}
-                name="poll_id"
+                name="position_id"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>poll</FormLabel>
-                        <Select disabled={isUpdate} value={field.value} onValueChange={field.onChange} >
+                        <FormLabel>Position</FormLabel>
+                        <Select value={field.value} onValueChange={field.onChange}>
                             <SelectTrigger className='w-[200px]'>
-                                <SelectValue placeholder="Select a poll" />
+                                <SelectValue placeholder="Select Position" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    <SelectLabel>Poll</SelectLabel>
-                                    {polls?.map((poll: poll) => (
-                                        <SelectItem key={poll.id} value={poll.id.toString()}>{poll.title}</SelectItem>
+                                    <SelectLabel>Positions</SelectLabel>
+                                    {positions?.map((position: any) => (
+                                        <SelectItem key={position.id} value={position.id.toString()}>{position.position}</SelectItem>
                                     ))}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
-                        <FormDescription>this is where the parties are being voted</FormDescription>
+                        <FormDescription>
+                            This is the position that the candidate is running for.
+                        </FormDescription>
                         <FormMessage />
                     </FormItem>
                 )} />
                 <div>
-                    <Button disabled={isLoading} type="submit" 
+                    <Button disabled={isLoading} type="submit"
                     className="bg-yellow-500 hover:bg-yellow-600 text-white w-full mt-4">
-                        {isLoading ? <LoadingSpinner /> : "Create Poll"}
+                        {isLoading ? <LoadingSpinner /> : "Create Candidate"}
                     </Button>
                 </div>
             </form>
@@ -181,4 +179,4 @@ const PartiesForm = ({
     )
 }
 
-export default PartiesForm
+export default CandidateForm

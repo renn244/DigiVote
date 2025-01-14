@@ -41,6 +41,15 @@ export class PositionsService {
         return getPositionResult;
     }
 
+    async getPositionOptions(pollId: string) {
+        const getPositionsOptions = await this.sql`
+            SELECT id, position FROM positions
+            WHERE poll_id = ${pollId}
+        `
+
+        return getPositionsOptions;
+    }
+
     async updatePosition(user: UserType, body: CreatePositionDto, positionId:string) {
         if(user.role !== 'admin') throw new ForbiddenException('only admin are allowed to update positions')
 

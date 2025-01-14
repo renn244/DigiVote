@@ -5,6 +5,7 @@ import UpdatePoll from "@/components/pages/admin/Poll/UpdatePoll"
 import PollInfo from "./PollInfo"
 import Parties from "./Parties"
 import UpdateParties from "@/components/pages/admin/Parties/UpdateParties"
+import PartiesInfo from "./PartiesInfo"
 
 const Admin = () => {
     return (
@@ -17,6 +18,7 @@ const Admin = () => {
                     <Route path="/polls/update/:id" element={<UpdatePoll />} />
 
                     <Route path="/parties" element={<Parties />} />
+                    <Route path="/parties/:id" element={<PartiesInfo />} />
                     <Route path="/parties/update/:id" element={<UpdateParties />} />
                 </Routes>
             </main>

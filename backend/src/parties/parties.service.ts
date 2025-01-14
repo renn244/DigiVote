@@ -2,6 +2,7 @@ import { BadRequestException, ForbiddenException, GoneException, Inject, Injecta
 import { UserType } from 'src/lib/decorator/User.decorator';
 import { CreatePartiesDto } from './dto/parties.dto';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
+import photoFolder from 'src/lib/enum/photoFolder.enum';
 
 @Injectable()
 export class PartiesService {
@@ -25,7 +26,7 @@ export class PartiesService {
 
         // upload to cloudinary
         if(!banner) throw new BadRequestException('banner is required')
-        const uploadedBanner = await this.fileUploadService.upload(banner, { folder: 'sti-voting/banner' })
+        const uploadedBanner = await this.fileUploadService.upload(banner, { folder: photoFolder.BANNER })
 
         const createParty = await this.sql`
             INSERT INTO parties (name, description, banner, poll_id)
@@ -69,6 +70,19 @@ export class PartiesService {
         if(!party.length) throw new NotFoundException('party not found!')
 
         return party[0]
+    }
+
+    async getOverviewParty(partyId: string) {
+
+        // get stats later
+        const party = await this.sql`
+            SELECT * FROM parties
+            WHERE id = ${partyId}
+        `
+
+        if(!party.length) throw new NotFoundException('party not found')
+
+        return party[0];
     }
 
     // if banner file exist then upload to cloudinary and delete the updatedParties

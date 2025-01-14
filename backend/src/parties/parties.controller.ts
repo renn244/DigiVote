@@ -31,6 +31,11 @@ export class PartiesController {
         return this.partiesService.getParty(partyId)
     }
 
+    @Get('getOverview/:partyId')
+    async getOverviewParty(@Param('partyId') partyId: string) {
+        return this.partiesService.getOverviewParty(partyId)
+    }
+    
     @Patch(':partyId')
     @UseInterceptors(FileInterceptor('banner', {
         storage: multer.memoryStorage()

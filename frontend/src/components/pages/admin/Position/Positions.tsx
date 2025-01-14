@@ -39,15 +39,15 @@ const Positions = () => {
                 <CardTitle>Positions</CardTitle>
                 <CreatePosition />
             </CardHeader>
-            <CardContent>
-                <ScrollArea className="h-96">
+            <CardContent className="px-0">
+                <ScrollArea className="h-96 p-6 pt-0">
                     <div className="space-y-3">
                         {data?.map((position: any) => (
                             <div key={position.id} className="flex items-center">
                                 <div className="space-y-1 flex-1">
                                     <p className="text-lg font-bold">{position.position}</p>
                                 </div>
-                                <div>
+                                <div className="space-x-2">
                                     <UpdatePosition initialData={position} poll_id={pollId} />
                                     <DeletePosition poll_id={pollId} positionId={position.id} />
                                 </div>

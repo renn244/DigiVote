@@ -21,6 +21,11 @@ export class PositionsController {
         return this.positionService.getPositions(pollId);
     }
     
+    @Get('getPositionOptions/:pollId')
+    async getPositionOptions(@Param('pollId') pollId: string) {
+        return this.positionService.getPositionOptions(pollId)
+    }
+
     @Patch(':positionId')
     async updatePosition(@User() user: UserType, @Body() body: CreatePositionDto, @Param('positionId') positionId: string) {
         return this.positionService.updatePosition(user, body, positionId)

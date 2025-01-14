@@ -8,9 +8,10 @@ import { useQuery } from "@tanstack/react-query"
 import { format } from "date-fns"
 import { Edit } from "lucide-react"
 import toast from "react-hot-toast"
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
 
 const Parties = () => {
+    const navigate = useNavigate()
 
     const { data: parties, isLoading } = useQuery({
         queryKey: ['parties'],
@@ -49,7 +50,7 @@ const Parties = () => {
                 </TableHeader>
                 <TableBody>
                     {parties.map((party: any) => (
-                        <TableRow key={party.id} onClick={() => undefined}>
+                        <TableRow key={party.id} onClick={() => navigate(`/admin/parties/${party.id}`)}>
                             <TableCell className="">
                                 {party.name}
                             </TableCell>
@@ -66,7 +67,7 @@ const Parties = () => {
                             </TableCell>
                             <TableCell>
                                 <div className="flex space-x-2 justify-end z-50">
-                                    <Link 
+                                    <Link onClick={(e) => e.stopPropagation()}
                                     to={`/admin/parties/update/${party.id}`}>
                                         <Button className="bg-yellow-500 hover:bg-yellow-600 text-white" variant="outline" size="sm">
                                             <Edit className="h-4 w-4" />

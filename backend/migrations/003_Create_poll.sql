@@ -59,7 +59,7 @@ CREATE TABLE CANDIDATES (
     FOREIGN KEY (position_id) REFERENCES POSITIONS(id) ON DELETE CASCADE,
 
     UNIQUE(party_id, position_id), -- a candidate can only have one position in a party
-    UNIQUE(name, party_id), -- a candidate can only be in a party once
+    UNIQUE(name, party_id), -- a candidate can only apply in position for party once
 
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()

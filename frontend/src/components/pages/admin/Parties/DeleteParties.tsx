@@ -38,7 +38,7 @@ const DeleteParties = ({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button 
+                <Button onClick={(e) => e.stopPropagation()}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white" variant="outline" size="sm">
                     <Trash2 className="h-4 w-4" />
                 </Button>
