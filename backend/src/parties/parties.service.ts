@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, GoneException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, GoneException, HttpException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { UserType } from 'src/lib/decorator/User.decorator';
 import { CreatePartiesDto } from './dto/parties.dto';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
@@ -13,33 +13,40 @@ export class PartiesService {
 
     async createParties(user: UserType, body: CreatePartiesDto, banner: Express.Multer.File) {
         // check if the one making the parties is actually admin and in branch
-        if(user.role !== 'admin') throw new ForbiddenException('only admin are allowed to create parties')   
-        
-        const getPoll = await this.sql`
-            SELECT branch, title FROM poll
-            WHERE id = ${body.poll_id}
-        `
-
-        if(!getPoll.length) throw new NotFoundException('poll does not exist!')
-
-        if(getPoll[0].branch !== user.branch) throw new ForbiddenException('only admin branch are allowed to create this poll')
-
-        // upload to cloudinary
-        if(!banner) throw new BadRequestException('banner is required')
-        const uploadedBanner = await this.fileUploadService.upload(banner, { folder: photoFolder.BANNER })
-
-        const createParty = await this.sql`
-            INSERT INTO parties (name, description, banner, poll_id)
-            VALUES (${body.name}, ${body.description}, ${uploadedBanner.secure_url}, ${body.poll_id})
-            RETURNING *;
-        `
-
-        if(!createParty.length) throw new GoneException('failed to create parties!')
-
-        return {
-            ...createParty[0],
-            branch: getPoll[0].branch,
-            title: getPoll[0].title
+        try {
+            if(user.role !== 'admin') throw new ForbiddenException('only admin are allowed to create parties')   
+    
+            const getPoll = await this.sql`
+                SELECT branch, title FROM poll
+                WHERE id = ${body.poll_id}
+            `
+    
+            if(!getPoll.length) throw new NotFoundException('poll does not exist!')
+    
+            if(getPoll[0].branch !== user.branch) throw new ForbiddenException('only admin branch are allowed to create this poll')
+    
+            // upload to cloudinary
+            if(!banner) throw new BadRequestException('banner is required')
+            const uploadedBanner = await this.fileUploadService.upload(banner, { folder: photoFolder.BANNER })
+    
+            const createParty = await this.sql`
+                INSERT INTO parties (name, description, banner, poll_id)
+                VALUES (${body.name}, ${body.description}, ${uploadedBanner.secure_url}, ${body.poll_id})
+                RETURNING *;
+            `
+    
+            if(!createParty.length) throw new GoneException('failed to create parties!')
+    
+            return {
+                ...createParty[0],
+                branch: getPoll[0].branch,
+                title: getPoll[0].title
+            }
+        } catch (error) {
+            if(error.code === 'parties_name_poll_id_key') {
+                throw new ConflictException('there is already a party with the same name')
+            }
+            throw error
         }
     }
 
@@ -87,21 +94,28 @@ export class PartiesService {
 
     // if banner file exist then upload to cloudinary and delete the updatedParties
     async updatePartyBanner(partyId: string, banner: Express.Multer.File | undefined) {
+        try {
+            const bannerResult = await this.fileUploadService.upload(banner, {
+                folder: 'sti-voting/banner'
+            })
 
-        const bannerResult = await this.fileUploadService.upload(banner, {
-            folder: 'sti-voting/banner'
-        })
+            const getParty = await this.sql`
+                SELECT banner FROM parties
+                WHERE id = ${partyId}
+            `
 
-        const getParty = await this.sql`
-            SELECT banner FROM parties
-            WHERE id = ${partyId}
-        `
+            if(getParty.length && getParty[0].banner) {
+                await this.fileUploadService.deleteFile(getParty[0].banner)
+            }
 
-        if(getParty.length && getParty[0].banner) {
-            await this.fileUploadService.deleteFile(getParty[0].banner)
+            return bannerResult
+
+        } catch (error) {
+            if(error.code === 'parties_name_poll_id_key') {
+                throw new ConflictException('there is already a party with the same name')
+            }
+            throw error
         }
-
-        return bannerResult
     }
 
     async updateParty(user: UserType, body: CreatePartiesDto, partyId: string, banner: Express.Multer.File | undefined) {

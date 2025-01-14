@@ -47,7 +47,7 @@ export class CandidatesService {
                 } 
             }
 
-            throw new InternalServerErrorException()
+            throw error
         }
     }
 
@@ -74,39 +74,51 @@ export class CandidatesService {
     }
 
     async updateCandidate(user: UserType, body: UpdateCandidateDto, candidateId: string, photo: Express.Multer.File | undefined) {
-        // check if he is admin within the branch
-        let photoUrl = undefined;
-        if(photo) {
-            const getCandidate = await this.getCandidate(candidateId);
+        try {
+            // check if he is admin within the branch
+            let photoUrl = undefined;
+            if(photo) {
+                const getCandidate = await this.getCandidate(candidateId);
 
-            // if there is an existing photo delete it
-            if(getCandidate.photo) await this.fileUploadService.deleteFile(getCandidate.photo);
+                // if there is an existing photo delete it
+                if(getCandidate.photo) await this.fileUploadService.deleteFile(getCandidate.photo);
 
-            const photoUpload = await this.fileUploadService.upload(photo);
-            photoUrl = photoUpload.secure_url;
-        }
+                const photoUpload = await this.fileUploadService.upload(photo);
+                photoUrl = photoUpload.secure_url;
+            }
 
-        const updateCandidateResult = await this.sql`
-            UPDATE candidates SET
-                name = COALESCE(${body.name}, name),
-                description = ${body.description},
-                position_id = COALESCE(${body.position_id}, position_id),
-                photo = COALESCE(${photoUrl}, photo)
-            WHERE id = ${candidateId}
-            RETURNING *;
-        `
+            const updateCandidateResult = await this.sql`
+                UPDATE candidates SET
+                    name = COALESCE(${body.name}, name),
+                    description = ${body.description},
+                    position_id = COALESCE(${body.position_id}, position_id),
+                    photo = COALESCE(${photoUrl}, photo)
+                WHERE id = ${candidateId}
+                RETURNING *;
+            `
 
-        // so that it can be updated in the client
-        const getPosition = await this.sql`
-            SELECT position FROM positions
-            WHERE id = ${body.position_id}
-        `
-        
-        if(!updateCandidateResult.length) throw new GoneException('failed to update candidate')
+            // so that it can be updated in the client
+            const getPosition = await this.sql`
+                SELECT position FROM positions
+                WHERE id = ${body.position_id}
+            `
+            
+            if(!updateCandidateResult.length) throw new GoneException('failed to update candidate')
 
-        return {
-            position: getPosition[0].position,
-            ...updateCandidateResult[0]
+            return {
+                position: getPosition[0].position,
+                ...updateCandidateResult[0]
+            }
+        } catch (error) {
+            if(error.code === '23505') {
+                if(error.constraint === 'candidates_party_id_position_id_key') {
+                    throw new ConflictException('the position is already occupied')
+                } else if(error.constraint === 'candidates_name_party_id_key') {
+                    throw new ConflictException('a candidate can only apply to position once')
+                } 
+            }
+
+            throw error
         }
     }
 
