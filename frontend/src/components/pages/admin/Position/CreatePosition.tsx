@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { useParams } from "react-router";
 import * as z from 'zod';
 import PositionForm, { formSchema } from "./PositionForm";
+import { position } from "@/types/position";
 
 const CreatePosition = () => {
     const queryClient = useQueryClient();
@@ -25,7 +26,7 @@ const CreatePosition = () => {
         setDialogOpen(false);
 
         // update positions
-        queryClient.setQueryData(['positions', pollId], (old: any) => {
+        queryClient.setQueryData(['positions', pollId], (old: position[]) => {
             return [...old, response.data]
         })
     }

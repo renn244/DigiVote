@@ -1,13 +1,14 @@
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { PlusCircle } from 'lucide-react';
-import { useState } from 'react'
-import * as z from 'zod'
-import CandidateForm, { formSchema } from './CandidateForm';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import axiosFetch from '@/lib/axios';
-import { toFormData } from 'axios';
+import { candidateWithPosition } from '@/types/candidate';
 import { useQueryClient } from '@tanstack/react-query';
+import { toFormData } from 'axios';
+import { PlusCircle } from 'lucide-react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
+import * as z from 'zod';
+import CandidateForm, { formSchema } from './CandidateForm';
 
 type CreateCandidatesProps = {
     partyId: string,
@@ -39,7 +40,7 @@ const CreateCandidates = ({
         toast.success('Candidate created successfully')
         setDialogOpen(false)
 
-        queryClient.setQueryData(['candidates', partyId], (old: any[]) => {
+        queryClient.setQueryData(['candidates', partyId], (old: candidateWithPosition[]) => {
             return [...old, response.data]
         })
     }

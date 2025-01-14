@@ -2,7 +2,8 @@ import LoadingSpinner from "@/components/common/LoadingSpinner"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import axiosFetch from "@/lib/axios"
-import {  useMutation, useQueryClient } from "@tanstack/react-query"
+import { candidateWithPosition } from "@/types/candidate"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Trash2 } from "lucide-react"
 import { useState } from "react"
 import toast from "react-hot-toast"
@@ -31,7 +32,7 @@ const DeleteCandidate = ({
             
             setDialogOpen(false)
             toast.success('Candidate deleted successfully')
-            queryClient.setQueryData(['candidates', id], (old: any) => {
+            queryClient.setQueryData(['candidates', id], (old: candidateWithPosition[]) => {
                 return old.filter((candidate: any) => 
                     candidate.id !== response.data.id
                 )

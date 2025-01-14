@@ -7,6 +7,7 @@ import CreateCandidates from "./CreateCandidates"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import DeleteCandidate from "./DeleteCandidate"
 import UpdateCandidate from "./UpdateCandidate"
+import { candidateWithPosition } from "@/types/candidate"
 
 type CandidatesProps = {
     pollId: number
@@ -16,7 +17,7 @@ const Candidates = ({
    pollId 
 }: CandidatesProps) => {
     const { id: partyId } = useParams()
-
+    // add pagination
     const { data: parties, isLoading } = useQuery({
         queryKey: ['candidates', partyId],
         queryFn: async () => {
@@ -26,7 +27,7 @@ const Candidates = ({
                 return
             }
 
-            return response.data
+            return response.data as candidateWithPosition[]
         },
         refetchOnWindowFocus: false
     })
@@ -39,7 +40,7 @@ const Candidates = ({
     if(isLoading) return <LoadingSpinner />
 
     return (
-        <Card>
+        <Card className="h-[590px]">
             <CardHeader className="flex-row items-center justify-between space-y-0" >
                 <CardTitle>Candidates</CardTitle>
                 <CreateCandidates partyId={partyId} pollId={pollId} />
@@ -55,7 +56,7 @@ const Candidates = ({
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {parties?.map((candidate: any) => (
+                        {parties?.map((candidate) => (
                             <TableRow key={candidate.id}>
                                 <TableCell className="font-medium">{candidate.name}</TableCell>
                                 <TableCell>{candidate.position}</TableCell>

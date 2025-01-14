@@ -1,13 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import axiosFetch from "@/lib/axios";
+import { candidateWithPosition } from "@/types/candidate";
 import { useQueryClient } from "@tanstack/react-query";
+import { toFormData } from "axios";
 import { Edit } from "lucide-react";
 import { useState } from "react";
-import * as z from 'zod'
-import CandidateForm, { formSchema } from "./CandidateForm";
-import axiosFetch from "@/lib/axios";
 import toast from "react-hot-toast";
-import { toFormData } from "axios";
+import * as z from 'zod';
+import CandidateForm, { formSchema } from "./CandidateForm";
 
 type UpdateCandidateProps = {
     initialData: any,
@@ -40,7 +41,8 @@ const UpdateCandidate = ({
 
         toast.success('candidate updated successfully')
         setDialogOpen(false)
-        queryClient.setQueryData(['candidates', initialData.party_id.toString()], (old: any) => {
+        queryClient.setQueryData(['candidates', initialData.party_id.toString()], 
+        (old: candidateWithPosition[]) => {
             return old.map((candidate: any) => {
                 if(candidate.id === response.data.id) {
                     return response.data

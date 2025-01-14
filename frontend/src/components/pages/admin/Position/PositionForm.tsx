@@ -5,6 +5,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
+import { position } from '@/types/position'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ComponentProps, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -24,7 +25,7 @@ export const formSchema = z.object({
 })
 
 type PositionFormProps = {
-    initialData?: any,
+    initialData?: position,
     onsubmit: (data: z.infer<typeof formSchema>) => Promise<void>,
     className?: string,
     poll_id: number

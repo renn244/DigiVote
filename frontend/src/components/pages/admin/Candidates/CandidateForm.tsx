@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Textarea } from '@/components/ui/textarea'
 import axiosFetch from '@/lib/axios'
 import { cn } from '@/lib/utils'
+import { candidate } from '@/types/candidate'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import { ComponentProps, useState } from 'react'
@@ -28,7 +29,7 @@ export const formSchema = z.object({
 })
 
 type CandidateFormProps = {
-    initialData?: any,
+    initialData?: candidate,
     onsubmit: (data: z.infer<typeof formSchema>) => Promise<void>,
     className?: string,
     partyId: string,

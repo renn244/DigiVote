@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { useState } from "react"
-import PositionForm, { formSchema } from "./PositionForm"
-import { Edit } from "lucide-react"
-import * as z from 'zod'
 import axiosFetch from "@/lib/axios"
-import toast from "react-hot-toast"
+import { position } from "@/types/position"
 import { useQueryClient } from "@tanstack/react-query"
+import { Edit } from "lucide-react"
+import { useState } from "react"
+import toast from "react-hot-toast"
+import * as z from 'zod'
+import PositionForm, { formSchema } from "./PositionForm"
 
 type UpdatePositionProps = {
     initialData: any,
@@ -31,8 +32,8 @@ const UpdatePosition = ({
         setDialogOpen(false)
 
         // update positions
-        queryClient.setQueryData(['positions', poll_id], (old: any) => {
-            return old.map((position: any) => {
+        queryClient.setQueryData(['positions', poll_id], (old: position[]) => {
+            return old.map((position) => {
                 if(position.id === initialData.id) {
                     return response.data
                 }

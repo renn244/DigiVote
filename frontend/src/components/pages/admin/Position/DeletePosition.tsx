@@ -2,6 +2,7 @@ import LoadingSpinner from "@/components/common/LoadingSpinner"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import axiosFetch from "@/lib/axios"
+import { position } from "@/types/position"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Trash2 } from "lucide-react"
 import { useState } from "react"
@@ -31,7 +32,7 @@ const DeletePosition = ({
 
             toast.success('Position deleted successfully')
             setDialogOpen(false)
-            queryClient.setQueryData(['positions', poll_id], (old: any[]) => {
+            queryClient.setQueryData(['positions', poll_id], (old: position[]) => {
                 return old.filter((position) => 
                     position.id !== positionId
                 )

@@ -7,6 +7,7 @@ import CreatePosition from "./CreatePosition"
 import DeletePosition from "./DeletePosition"
 import UpdatePosition from "./UpdatePosition"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { position } from "@/types/position"
 
 const Positions = () => {
     const { id: pollId } = useParams();
@@ -21,7 +22,7 @@ const Positions = () => {
                 return
             }
 
-            return response.data
+            return response.data as position[]
         },
         refetchOnWindowFocus: false
     })
