@@ -1,4 +1,5 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner"
+import PasswordInput from "@/components/common/PasswordInput"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -7,6 +8,7 @@ import axiosFetch from "@/lib/axios"
 import { useMutation } from "@tanstack/react-query"
 import { FormEvent, useState } from "react"
 import toast from "react-hot-toast"
+import { Link } from "react-router"
 
 type LoginStateType = {
     username: string,
@@ -80,17 +82,17 @@ const Login = () => {
                                 <div className="grid gap-2">
                                     <div className="flex items-center">
                                         <Label htmlFor="password">Password</Label>
-                                        <a
-                                        href="#"
-                                        className="ml-auto text-sm underline-offset-4 hover:underline"
+                                        <Link
+                                        to="/forgot-password"
+                                        className="ml-auto text-sm underline-offset-4 hover:underline text-blue-700 font-medium"
                                         >
                                         Forgot your password?
-                                        </a>
+                                        </Link>
                                     </div>
                                     <div>
-                                        <Input value={credentials.password}
+                                        <PasswordInput value={credentials.password} 
                                         onChange={(e) => setCredentials({...credentials, password: e.target.value})}
-                                        id="password" type="password" />
+                                        id="password" />
                                         {error.type === 'password' && <span className="text-red-500 font-medium text-sm">{error.error}</span>}
                                     </div>
                                 </div>
@@ -103,9 +105,9 @@ const Login = () => {
                 </Card>
                 <div className="text-center text-sm">
                     Don&apos;t have an account?{" "}
-                    <a href="/register" className="underline underline-offset-4">
+                    <Link to="/register" className="underline underline-offset-4 text-blue-700">
                     Sign up
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>

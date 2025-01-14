@@ -1,9 +1,11 @@
+import PasswordInput from "@/components/common/PasswordInput"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import axiosFetch from "@/lib/axios"
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { Link } from "react-router"
 
 type signUpStateType = {
     username: string,
@@ -59,7 +61,7 @@ const SignUp = () => {
                                     required: "username is required"
                                 })}
                                 id="username" type="text" placeholder="renn44" />
-                                {errors.username && <p>{errors.username.message}</p>}
+                                {errors.username && <p className="text-red-500 font-medium text-sm">{errors.username.message}</p>}
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
@@ -68,7 +70,7 @@ const SignUp = () => {
                                         required: "first name is required"
                                     })}
                                     id="first-name" placeholder="Max" />
-                                    {errors.firstName && <p>{errors.firstName.message}</p>}
+                                    {errors.firstName && <p className="text-red-500 font-medium text-sm">{errors.firstName.message}</p>}
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="last-name">Last name</Label>
@@ -76,7 +78,7 @@ const SignUp = () => {
                                         required: "last name is required"
                                     })}
                                     id="last-name" placeholder="Robinson" />
-                                    {errors.lastName && <p>{errors.lastName.message}</p>}
+                                    {errors.lastName && <p className="text-red-500 font-medium text-sm">{errors.lastName.message}</p>}
                                 </div>
                             </div>
                             <div className="grid gap-2">
@@ -92,24 +94,22 @@ const SignUp = () => {
                                 type="email"
                                 placeholder="m@example.com"
                                 />
-                                {errors.email && <p>{errors.email.message}</p>}
+                                {errors.email && <p className="text-red-500 font-medium text-sm">{errors.email.message}</p>}
                             </div>
                             {/* TODO: make this a component */}
                             <div className="grid gap-2">
                                 <Label htmlFor="password">Password</Label>
-                                <Input {...register('password', {
+                                <PasswordInput {...register('password', {
                                     required: 'password is required',
-                                })}
-                                id="password" type="password" />
-                                {errors.password && <p>{errors.password.message}</p>}
+                                })} id="password" />
+                                {errors.password && <p className="text-red-500 font-medium text-sm">{errors.password.message}</p>}
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="confirmPassword">Confirm Password</Label>
-                                <Input {...register('confirmPassword', {
+                                <PasswordInput {...register('confirmPassword', {
                                     required: 'confirm password is required'
-                                })}
-                                id="confirmPassword" type="password" />
-                                {errors.confirmPassword && <p>{errors.confirmPassword.message}</p>}
+                                })} id="confirmPassword" type="password" />
+                                {errors.confirmPassword && <p className="text-red-500 font-medium text-sm">{errors.confirmPassword.message}</p>}
                             </div>
                             <Button type="submit" className="w-full">
                                 Create an account
@@ -118,9 +118,9 @@ const SignUp = () => {
                     </form>
                     <div className="mt-4 text-center text-sm">
                         Already have an account? {" "}
-                        <a href="/login" className="underline">
+                        <Link to="/login" className="underline underline-offset-4 text-blue-700">
                             Login
-                        </a>
+                        </Link>
                     </div>
                 </CardContent>
             </Card>
