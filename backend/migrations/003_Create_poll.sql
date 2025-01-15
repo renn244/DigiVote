@@ -31,7 +31,7 @@ CREATE TABLE  PARTIES (
     UNIQUE(name, poll_id), -- a party can only be in a poll once
 
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
+    updated_at TIMESTAMPTZ DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE POSITIONS (
@@ -43,7 +43,7 @@ CREATE TABLE POSITIONS (
     FOREIGN KEY (poll_id) REFERENCES POLL(id) ON DELETE CASCADE,
 
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
+    updated_at TIMESTAMPTZ DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE CANDIDATES (
@@ -62,7 +62,7 @@ CREATE TABLE CANDIDATES (
     UNIQUE(name, party_id), -- a candidate can only apply in position for party once
 
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
+    updated_at TIMESTAMPTZ DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- DO LATER:

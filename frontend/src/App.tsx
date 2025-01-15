@@ -8,6 +8,7 @@ import Login from "./Pages/Login"
 import NotFound from "./Pages/NotFound"
 import SignUp from "./Pages/SignUp"
 import VerifyEmail from "./Pages/VerifyEmail"
+import Elections from "./Pages/Elections"
 
 function App() {
   const { loading , user } = useAuthContext()
@@ -25,10 +26,15 @@ function App() {
         <Route path="/register" element={user ? <Navigate to={'/'} /> : <SignUp />} />
         <Route path="/verifyEmail" element={user ? <Navigate to={'/'} /> : <VerifyEmail />} />
         <Route path="/forbidden" element={<Forbidden />} />
-        <Route path="/notfound" element={<NotFound />} />
+        <Route path="/notfound" element={<NotFound />}   />
+
+        <Route path="/elections" element={<Elections />} />
+        <Route path="/elections/:id" element={undefined} />        
 
         <Route path="/admin/*" element={
-          <ProtectedRoute roles={['admin']}><Admin /></ProtectedRoute>
+          <ProtectedRoute roles={['admin']}>
+            <Admin />
+          </ProtectedRoute>
         } />
       </Routes>
     </div>

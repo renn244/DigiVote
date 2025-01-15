@@ -30,7 +30,7 @@ const PollInfo = () => {
                 <DashboardCard icon={Flag} title="Participating Parties" value={3} />
                 <DashboardCard icon={Clock} title="Start-End Date" value={
                     "2025-1-15" + " to " + "2025-1-25"
-                } />
+                } className="text-lg" />
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
