@@ -30,8 +30,15 @@ export class PollService {
         const branch = user.branch;
 
         const getPollsForUser = await this.sql`
-            SELECT * FROM poll
+            SELECT p.*, 
+            COALESCE(
+                JSON_AGG(pa.name) FILTER (WHERE pa.name IS NOT NULL),
+                '[]'
+            ) AS parties
+            FROM poll p
+            LEFT JOIN parties pa ON p.id = pa.poll_id
             WHERE branch = ${branch}
+            GROUP BY p.id;
         `
 
         return getPollsForUser
@@ -41,8 +48,36 @@ export class PollService {
         const branch = user.branch; 
         
         const getPollForUser = await this.sql`
-            SELECT * FROM poll
-            WHERE branch = ${branch} AND id = ${pollId}
+            SELECT p.*, 
+            COALESCE(
+                JSON_AGG(
+                    DISTINCT JSON_BUILD_OBJECT(
+                        'id', pa.id,
+                        'name', pa.name,
+                        'description', pa.description,
+                        'banner', pa.banner
+                    )::jsonb
+                ) FILTER (WHERE pa.id IS NOT NULL),
+                '[]'
+            ) as parties,
+            COALESCE(
+                JSON_AGG(
+                    DISTINCT JSON_BUILD_OBJECT(
+                        'id', po.id,
+                        'position', po.position,
+                        'description', po.description
+                    )::jsonb
+                ) FILTER (WHERE po.id IS NOT NULL),
+                '[]'
+            ) as positions,
+            COALESCE(COUNT(v.id), 0)::INT as votesCast,
+            p.end_date::DATE - NOW()::DATE as daysRemaining -- get day remaining
+            FROM poll p
+            LEFT JOIN parties pa ON p.id = pa.poll_id
+            LEFT JOIN votes v ON p.id = v.poll_id
+            LEFT JOIN positions po ON p.id = po.poll_id
+            WHERE p.branch = ${branch} AND p.id = ${pollId} 
+            GROUP BY p.id;
         `
 
         if(!getPollForUser.length) {

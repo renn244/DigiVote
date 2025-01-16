@@ -1,69 +1,60 @@
+import LoadingSpinner from "@/components/common/LoadingSpinner"
 import ElectionCard from "@/components/pages/ElectionCard"
+import { Card, CardContent } from "@/components/ui/card"
+import axiosFetch from "@/lib/axios"
+import { pollsView } from "@/types/poll"
+import { useQuery } from "@tanstack/react-query"
+import { VoteIcon } from "lucide-react"
+import toast from "react-hot-toast"
 
-const elections = [
-  {
-    id: 1,
-    title: "2024 Presidential Election",
-    description: "National election to choose the next president of the United States. This election will determine the country's leadership for the next four years.",
-    branch: "Federal",
-    start_date: "2024-11-03T00:00:00Z",
-    end_date: "2024-11-03T23:59:59Z",
-    vote_type: "single",
-    location: "Nationwide",
-    parties: ["Democratic Party", "Republican Party", "Green Party", "Libertarian Party"]
-  },
-  {
-    id: 2,
-    title: "2024 Senate Election",
-    description: "Election for Senate seats in various states. The outcome will influence the balance of power in the upper chamber of Congress.",
-    branch: "Federal",
-    start_date: "2024-11-03T00:00:00Z",
-    end_date: "2024-11-03T23:59:59Z",
-    vote_type: "multiple",
-    location: "Multiple States",
-    parties: ["Democratic Party", "Republican Party", "Independent"]
-  },
-  {
-    id: 3,
-    title: "Local School Board Election",
-    description: "Election for local school board members who will make important decisions about education policies and budgets in your community.",
-    branch: "Local",
-    start_date: "2023-09-15T00:00:00Z",
-    end_date: "2023-09-15T20:00:00Z",
-    vote_type: "multiple",
-    location: "Your City",
-    parties: ["Community First", "Education Forward", "Taxpayers Alliance"]
-  },
-  {
-    id: 4,
-    title: "State Governor Election",
-    description: "Election for the state governor who will lead the executive branch of your state government and shape state-wide policies.",
-    branch: "State",
-    start_date: "2024-03-01T00:00:00Z",
-    end_date: "2024-03-01T21:00:00Z",
-    vote_type: "single",
-    location: "Your State",
-    parties: ["Democratic Party", "Republican Party", "Independent"]
-  },
-]
 
 const Elections = () => {
 
   // request data for available election in your branch
+  const { data:elections, isLoading } = useQuery({
+    queryKey: ['elections'],
+    queryFn: async () => {
+      const response = await axiosFetch.get(`/poll`)
+
+      if(response.status >= 400) {
+        toast.error(response.data.message)
+        return
+      }
+
+      return response.data as pollsView
+    },
+    refetchOnWindowFocus: false
+  })
+
+  if(isLoading) {
+    return <LoadingSpinner />
+  }
 
   return (
-      <div className="min-h-[855px] bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-              <h1 className="text-4xl font-bold text-blue-900 mb-8">
-                  Upcoming Elections
-              </h1>
-              <div className="grid gap-8 md:grid-cols-2">
-                  {elections.map((election) => (
-                      <ElectionCard key={election.id} election={election} />
-                  ))}
-              </div>
-          </div>
+    <div className="min-h-[855px] bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 className="text-4xl font-bold text-blue-900 mb-8">
+          Upcoming Elections
+        </h1>
+          {elections && elections?.length > 0 ? (
+            <div className="grid gap-8 md:grid-cols-2">
+              {elections?.map((election) => (
+                <ElectionCard key={election.id} election={election} />
+              ))}
+            </div>
+          ) : (
+            <Card className="bg-yellow-50 border-yellow-200">
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <VoteIcon className="w-16 h-16 text-yellow-400 mb-4" />
+                <h2 className="text-2xl font-semibold text-yellow-800 mb-2">No Elections Available</h2>
+                <p className="text-yellow-600 text-center max-w-md">
+                  Sorry, there are currently no elections available in your branch. Please check back later for upcoming elections.
+                </p>
+              </CardContent>
+            </Card>
+          )}
       </div>
+    </div>
   )
 }
 

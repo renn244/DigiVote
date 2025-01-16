@@ -15,3 +15,10 @@ export type partyTable = {
     branch: poll['branch'],
     title: poll['title']
 } & party
+
+export type partyBasicInfo = {
+    id: party['id'],
+    name: party['name'],
+    description: party['description'],
+    banner: party['banner'],
+}

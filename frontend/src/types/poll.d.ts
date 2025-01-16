@@ -1,3 +1,4 @@
+import { party } from "./party";
 
 export const vote_type = {
     single = "single",
@@ -14,3 +15,9 @@ export type poll = {
     end_date: string,
     vote_type: vote_type
 }
+
+export type pollView = {
+    parties: party['name'][],
+} & poll
+
+export type pollsView = pollView[]

@@ -9,6 +9,7 @@ import NotFound from "./Pages/NotFound"
 import SignUp from "./Pages/SignUp"
 import VerifyEmail from "./Pages/VerifyEmail"
 import Elections from "./Pages/Elections"
+import Election from "./Pages/Election"
 
 function App() {
   const { loading , user } = useAuthContext()
@@ -29,7 +30,7 @@ function App() {
         <Route path="/notfound" element={<NotFound />}   />
 
         <Route path="/elections" element={<Elections />} />
-        <Route path="/elections/:id" element={undefined} />        
+        <Route path="/elections/:id" element={<Election />} />        
 
         <Route path="/admin/*" element={
           <ProtectedRoute roles={['admin']}>

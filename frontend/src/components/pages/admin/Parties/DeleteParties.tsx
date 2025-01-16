@@ -53,10 +53,16 @@ const DeleteParties = ({
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                    <Button onClick={() => setIsOpen(false)} variant="outline">
+                    <Button onClick={(e) => {
+                        e.stopPropagation();
+                        setIsOpen(false)
+                    }} variant="outline">
                         Cancel
                     </Button>
-                    <Button onClick={() => mutate()} variant="destructive" disabled={isPending}>
+                    <Button onClick={(e) => {
+                        e.stopPropagation();
+                        mutate();
+                    }} variant="destructive" disabled={isPending}>
                         Delete
                     </Button>
                 </DialogFooter>

@@ -2,51 +2,13 @@ import LoadingSpinner from "@/components/common/LoadingSpinner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import axiosFetch from "@/lib/axios"
+import { partyBasicInfo } from "@/types/party"
 import { useQuery } from "@tanstack/react-query"
-import { ArrowLeft, CalendarIcon, Percent, Users, VoteIcon } from "lucide-react"
+import { AlertTriangle, ArrowLeft, CalendarIcon, Percent, Users, VoteIcon } from "lucide-react"
 import { Link, Navigate, useParams } from "react-router"
 
-const elections = [
-    {
-        id: "1",
-        title: "2024 Presidential Election",
-        description: "National election to choose the next president of the United States. This election will determine the country's leadership for the next four years.",
-        longDescription: "The 2024 United States presidential election will be the 60th quadrennial presidential election. Voters will select presidential electors who in turn will elect a new president and vice president through the Electoral College. The election will likely be held on November 5, 2024, as part of the 2024 United States elections.",
-        branch: "Federal",
-        start_date: "2024-11-03T00:00:00Z",
-        end_date: "2024-11-03T23:59:59Z",
-        vote_type: "single",
-        location: "Nationwide",
-        parties: [
-        {
-            name: "Democratic Party",
-            banner: "/democratic-party-banner.jpg",
-            description: "Center-left political party that promotes social liberal policies and a mixed economy."
-        },
-        {
-            name: "Republican Party",
-            banner: "/republican-party-banner.jpg",
-            description: "Center-right political party that supports lower taxes, free market capitalism, and a strong national defense."
-        },
-        {
-            name: "Green Party",
-            banner: "/green-party-banner.jpg",
-            description: "Left-wing party that emphasizes environmentalism, non-violence, social justice, and grassroots organizing."
-        },
-        {
-            name: "Libertarian Party",
-            banner: "/libertarian-party-banner.jpg",
-            description: "Party that promotes civil liberties, non-interventionism, laissez-faire capitalism, and limiting the size and scope of government."
-        }
-        ],
-        eligibility: "U.S. citizens aged 18 and older",
-        votingMethods: ["In-person", "Mail-in ballots", "Early voting"],
-        registeredVoters: 200000000,
-        votesCast: 150000000,
-        voterTurnout: 75,
-        daysRemaining: 140
-    },
-]
 
 const Election = () => {
     const { id } = useParams()
@@ -54,7 +16,17 @@ const Election = () => {
     const { data: election, isLoading } = useQuery({
         queryKey: ['election', id],
         queryFn: async () => {
-            return elections.find((election) => election.id === id)
+            const response = await axiosFetch.get(`/poll/${id}`)
+
+            if(response.status === 404) {
+                return undefined
+            }
+
+            if(response.status >= 400) {
+                throw new Error(response.data.message);
+            }
+
+            return response.data
         },
         refetchOnWindowFocus: false
     })
@@ -82,38 +54,36 @@ const Election = () => {
 
     return (
         <div className="min-h-[855px] bg-white">
-            <div className="bg-yellow-400 text-yellow-900 py-8">
+            <div className="text-yellow-900 pt-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
                         <div className="flex items-center space-x-4">
                             <Button variant="outline" asChild className="bg-white hover:bg-yellow-100">
                                 <Link to="/elections" className="flex items-center">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
-                                <span className="font-semibold">&gt;&gt; Back to Elections</span>
+                                <span className="font-semibold">Back to Elections</span>
                                 </Link>
                             </Button>
-                            <h1 className="text-2xl sm:text-3xl font-bold">{election.title}</h1>
                         </div>
-                        <Badge 
-                        variant={status === "active" ? "default" : "secondary"}
-                        className={`${status === "active" ? "bg-green-500" : "bg-yellow-200 text-yellow-800"} text-lg px-4 py-2`}
-                        >
-                            {status}
-                        </Badge>
                     </div>
                 </div>
             </div>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 pt-4">
                 <div className="grid gap-8 md:grid-cols-3">
-                    <div className="md:cols-span-2 space-y-6">
+                    <div className="md:col-span-2 space-y-6">
                         <Card>
-                            <CardHeader>
-                                <CardTitle>
-                                    About this Election
+                            <CardHeader className="flex-row justify-between items-center space-y-0">
+                                <CardTitle className="text-2xl sm:text-3xl">
+                                    {election.title}
                                 </CardTitle>
+                                <Badge 
+                                variant={status === "active" ? "default" : "secondary"}
+                                className={`${status === "active" ? "bg-green-500" : "bg-yellow-200 text-yellow-800"} text-lg`}>
+                                    {status}
+                                </Badge>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-gray-600">{election.longDescription}</p>
+                                <p className="text-gray-600">{election.description}</p>
                             </CardContent>
                         </Card>
                         <Card>
@@ -126,22 +96,30 @@ const Election = () => {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="flex flex-col items-center justify-center p-4 bg-blue-50 rounded-lg">
                                         <Users className="h-8 w-8 text-blue-600 mb-2" />
-                                        <span className="text-2xl font-bold text-blue-600">{election.registeredVoters.toLocaleString()}</span>
+                                        <span className="text-2xl font-bold text-blue-600">
+                                            {/* {election.registeredVoters.toLocaleString()} */}
+                                            NOT YET IMPLEMENTED
+                                        </span>
                                         <span className="text-sm text-blue-600">Registered Voters</span>
                                     </div>
                                     <div className="flex flex-col items-center justify-center p-4 bg-green-50 rounded-lg">
-                                        <VoteIcon className="h-8 w-8 text-blue-600 mb-2" />
-                                        <span className="text-2xl font-bold text-green-600">{election.votesCast.toLocaleString()}</span>
+                                        <VoteIcon className="h-8 w-8 text-green-600 mb-2" />
+                                        <span className="text-2xl font-bold text-green-600">
+                                            {election.votescast.toLocaleString()}
+                                        </span>
                                         <span className="text-sm text-green-600">Votes Cast</span>
                                     </div>
                                     <div className="flex flex-col items-center justify-center p-4 bg-yellow-50 rounded-lg">
                                         <Percent className="h-8 w-8 text-yellow-600 mb-2" />
-                                        <span className="text-2xl font-bold text-yellow-600">{election.voterTurnout}%</span>
+                                        <span className="text-2xl font-bold text-yellow-600">
+                                            {/* {election.voterTurnout}% */}
+                                            NOT YET IMPLEMENTED
+                                        </span>
                                         <span className="text-sm text-yellow-600">Voter Turnout</span>
                                     </div>
                                     <div className="flex flex-col items-center justify-center p-4 bg-red-50 rounded-lg">
                                         <CalendarIcon className="h-8 w-8 text-red-600 mb-2" />
-                                        <span className="text-2xl font-bold text-red-600">{election.daysRemaining}</span>
+                                        <span className="text-2xl font-bold text-red-600">{election.daysremaining}</span>
                                         <span className="text-sm text-red-600">Days Remaining</span>
                                     </div>
                                 </div>
@@ -152,19 +130,29 @@ const Election = () => {
                                 <CardTitle>Participating Parties</CardTitle>
                             </CardHeader>
                             <CardContent>
+                                {election.parties && election.parties.length > 0 ? (
                                 <div className="grid gap-6 sm:grid-cols-2">
-                                    {election.parties.map((party, index) => (
-                                        <div key={index} className="border rounded-lg overflow-hidden">
-                                            <div className="relative h-32">
-                                                <img src={party.banner} alt={party.name + 'banner'} />
-                                            </div>
-                                            <div className="p-4">
-                                                <h3 className="font-semibold text-lg mb-2">{party.name}</h3>
-                                                <p className="text-sm text-gray-600">{party.description}</p>
-                                            </div>
-                                        </div>
+                                    {election?.parties?.map((party: partyBasicInfo, index: number) => (
+                                        <Card key={index}>
+                                            <CardHeader className="p-0">
+                                                <img className="rounded-t-lg w-[366.33px] h-[168.16px]" src={party.banner} alt={party.name + 'banner'} />
+                                                <CardTitle className="px-6 py-2">
+                                                    {party.name}
+                                                </CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <p>{party.description}</p>
+                                            </CardContent>
+                                        </Card>
                                     ))}
                                 </div>
+                                ) : (
+                                    <div className="flex items-center justify-center bg-yellow-100 rounded-lg p-4">
+                                        <AlertTriangle className="mr-2 h-6 w-6 text-yellow-600" />
+                                        <p className="text-yellow-700 font-medium">No parties have registered for this election yet.</p>
+                                    </div>
+                                )
+                                }
                             </CardContent>
                         </Card>
                     </div>
@@ -199,16 +187,50 @@ const Election = () => {
                             <CardContent className="space-y-4">
                                 <div>
                                     <h3 className="font-semibold">Eligibility:</h3>
-                                    <p>{election.eligibility}</p>
+                                    <p>FROM STI</p>
                                 </div>
                                 <div>
                                     <h3 className="font-bold">Voting Methods:</h3>
                                     <ul className="font-semibold list-inside">
-                                        {election.votingMethods.map((method, idx) => (
+                                        {election?.votingMethods?.map((method: string, idx: number) => (
                                             <li key={idx}>{method}</li>
                                         ))}
                                     </ul>
                                 </div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>
+                                    Positions
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="px-0">
+                                {election.postions && election.positions.length > 0 ? (
+                                    <ScrollArea className="h-96 p-6 pb-3 pt-0">
+                                    <div className="space-y-3">
+                                        {election.positions?.map((position: any) => (
+                                            <div key={position.id}>
+                                                <div className="space-y-1 flex-1">
+                                                    <p className="text-lg font-bold">{position.position}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {position.description}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </ScrollArea>
+                                ) : (
+                                    <div className="mx-3">
+                                        <div className="flex items-center justify-center bg-yellow-100 rounded-lg px-6 py-3">
+                                            <AlertTriangle className="mr-2 h-8 w-8 text-yellow-600" />
+                                            <p className="text-yellow-700 font-medium">No positions have been added to this election yet.</p>
+                                        </div>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </div>
