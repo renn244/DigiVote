@@ -11,6 +11,8 @@ import VerifyEmail from "./Pages/VerifyEmail"
 import Elections from "./Pages/Elections"
 import Election from "./Pages/Election"
 import PollVote from "./Pages/PollVote"
+import FinishedVote from "./Pages/FinishedVote"
+import ViewYourVote from "./Pages/ViewYourVote"
 
 function App() {
   const { loading , user } = useAuthContext()
@@ -33,6 +35,8 @@ function App() {
 
         <Route path="/elections" element={<Elections />} />
         <Route path="/elections/:id" element={<Election />} />
+        <Route path="/viewFinishVote/:id" element={<ViewYourVote />} />
+        <Route path="/finishVote" element={<FinishedVote />} />
 
         <Route path="/pollVote/:id" element={<PollVote />} />  
 

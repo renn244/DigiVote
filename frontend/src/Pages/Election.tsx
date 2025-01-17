@@ -157,11 +157,11 @@ const Election = () => {
                         </Card>
                     </div>
                     <div className="space-y-6">
-                        <Button asChild className="w-full">
+                        {status === "active" && <Button asChild className="w-full">
                             <Link to={`/pollVote/${id}`}>
                                 Vote Now
                             </Link>
-                        </Button>
+                        </Button>}
                         <Card>
                             <CardHeader>
                                 <CardTitle>

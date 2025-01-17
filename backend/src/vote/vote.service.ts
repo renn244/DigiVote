@@ -32,10 +32,10 @@ export class VoteService {
         }
 
         const createVote = await this.sql`
-                INSERT INTO votes (poll_id, user_id)
-                VALUES (${pollId}, ${user.id})
-                RETURNING *;
-         `
+            INSERT INTO votes (poll_id, user_id)
+            VALUES (${pollId}, ${user.id})
+            RETURNING *;
+        `
 
         if(!createVote.length) {
             throw new Error('failed to create vote')
@@ -66,7 +66,7 @@ export class VoteService {
             throw error
         }
 
-        return 'vote created'
+        return createVote[0];
     }
 
     async getVotes(user: UserType) {
@@ -78,10 +78,79 @@ export class VoteService {
         return getVotesResult;;
     }
 
+    async getReviewVotes(user: UserType, pollId: string) {
+        const branch = user.branch;
+
+        const getVote = await this.sql`
+            SELECT id FROM votes
+            WHERE poll_id = ${pollId} AND user_id = ${user.id}
+        `
+
+        if(!getVote.length) throw new NotFoundException('vote does not exist')
+
+        const getPollResult = await this.sql`
+            WITH candidate_data AS (
+                SELECT 
+                    c.position_id,
+                    (
+                        SELECT JSON_AGG(sub.obj)
+                        FROM (
+                            SELECT JSON_BUILD_OBJECT(
+                                'id', c2.id,
+                                'photo', c2.photo,
+                                'name', c2.name,
+                                'description', c2.description,
+                                'party_id', c2.party_id,
+                                'voted', (
+                                    SELECT EXISTS(
+                                        SELECT 1 FROM candidatesvoted cv
+                                        WHERE cv.candidate_id = c2.id
+                                        AND cv.vote_id = ${getVote[0].id}
+                                    )
+                                )
+                            )::jsonb AS obj
+                            FROM candidates c2
+                            WHERE c2.position_id = c.position_id
+                            ORDER BY party_id
+                        ) sub
+                    ) AS candidates
+                FROM candidates c
+                GROUP BY c.position_id
+            ),
+            position_data AS (
+                SELECT 
+                    po.poll_id,
+                    JSON_AGG(
+                        DISTINCT JSON_BUILD_OBJECT(
+                            'id', po.id,
+                            'description', po.description,
+                            'position', po.position,
+                            'candidates', COALESCE(cd.candidates, '[]')
+                        )::jsonb
+                    ) AS positions
+                FROM positions po
+                LEFT JOIN candidate_data cd ON po.id = cd.position_id
+                GROUP BY po.poll_id
+            )
+            SELECT 
+                p.*,
+                COALESCE(pd.positions, '[]') as positions
+            FROM poll p
+            LEFT JOIN position_data pd ON p.id = pd.poll_id
+            WHERE p.branch = ${branch} AND p.id = ${pollId};
+        `
+
+        if(!getPollResult.length) {
+            throw new NotFoundException('poll does not exist')
+        }
+
+        return getPollResult[0];
+    }
+
     async getVote(user: UserType, pollId: string) {
         const getVoteResult = await this.sql`
             SELECT * FROM votes
-            WHERE poll_id = ${pollId}
+            WHERE poll_id = ${pollId} AND user_id = ${user.id}
         `
 
         if(!getVoteResult.length) {

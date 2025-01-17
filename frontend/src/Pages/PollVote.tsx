@@ -1,15 +1,16 @@
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ElectionVotingInfo from '@/components/pages/election/ElectionVotingInfo';
+import PositionCard from '@/components/pages/election/PositionCard';
 import YouAlreadyVoted from '@/components/pages/election/YouAlreadyVoted';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import axiosFetch from '@/lib/axios'
 import { pollVote } from '@/types/poll';
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { ArrowLeft, CalendarIcon, Users, VoteIcon } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Link, Navigate, useParams } from 'react-router'
+import { Link, Navigate, useNavigate, useParams } from 'react-router'
 
 type voteState = {
     positionId: number,
@@ -18,6 +19,7 @@ type voteState = {
 
 const PollVote = () => {
     const { id:pollId } = useParams();
+    const navigate = useNavigate();
     const [votedAlready, setVotedAlready] = useState(false)
     const [votes, setVotes] = useState<voteState>()
 
@@ -65,6 +67,7 @@ const PollVote = () => {
             }
 
             // if successfull redirect
+            navigate(`/finishVote?pollId=${pollId}`)
             
             return response.data
         }
@@ -86,6 +89,8 @@ const PollVote = () => {
     }
 
     const isVoted = (positionId: number, candidateId: number) => {
+        if(!votes) return false // if there is no votes then return false for all
+
         return votes?.some((vote) => vote.positionId === positionId && vote.candidateId === candidateId)
     }
 
@@ -118,68 +123,12 @@ const PollVote = () => {
                 </div>
             </div>
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 pt-4'>
-                <Card className='mb-8'>
-                    <CardHeader>
-                        <CardTitle>
-                            {election.title}
-                        </CardTitle>
-                        <CardDescription>
-                            {election.description}
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <h2 className='text-xl font-semibold'>Election Information</h2>
-                        <Separator className='mt-2 mb-4' />
-                        <div className='grid grid-cols-3 gap-2 justify-around'>
-                            <div className='flex items-center justify-center'>
-                                <CalendarIcon className="mr-2 h-5 w-5 text-yellow-600" />
-                                <span>
-                                    {new Date(election.start_date).toLocaleDateString()} - {new Date(election.end_date).toLocaleDateString()}
-                                </span>
-                            </div>
-                            <div className='flex items-center justify-center'>
-                                <Users className='mr-2 h-5 w-5 text-yellow-600' />
-                                <span>
-                                    {election.branch} Branch
-                                </span>
-                            </div>
-                            <div className='flex items-center justify-center'>
-                                <VoteIcon className='mr-2 h-5 w-5 text-yellow-600' />
-                                <span>
-                                    {election.vote_type === "single" ? "Single Vote" : "Multiple Votes"}
-                                </span>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+
+                <ElectionVotingInfo title={election.title} description={election.description} start_date={election.start_date} 
+                end_date={election.end_date} branch={election.branch} vote_type={election.vote_type} />
+
                 {election.positions.map((position) => (
-                    <Card key={position.id} className='mb-8'>
-                        <CardHeader>
-                            <CardTitle>
-                                {position.position}
-                            </CardTitle>
-                            <CardDescription>
-                                {position.description}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${position.candidates.length} gap-4`}>
-                                {position.candidates.map((candidate) => (
-                                    <div onClick={() => handleVote(position.id, candidate.id)}
-                                    key={candidate.id} className={`flex flex-col items-start p-4 border rounded-lg 
-                                    ${isVoted(position.id, candidate.id) ? "bg-yellow-50" : ""} cursor-pointer`}>
-                                        <div className='relative flex-shrink-0 flex justify-center w-full mb-2'>
-                                            <img src={candidate.photo} className='rounded-lg h-[300px] w-[300px]' />
-                                        </div>
-                                        <div className='flex-grow px-4'>
-                                            <h2 className='text-2xl font-bold my-2'>{candidate.name}</h2>
-                                            <p className="text-sm mt-1">{candidate.description}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <PositionCard position={position} handleClick={handleVote} isVoted={isVoted} />
                 ))}
 
                 <Separator className="my-8" />
