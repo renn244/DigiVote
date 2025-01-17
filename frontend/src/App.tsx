@@ -23,12 +23,13 @@ function App() {
     <div>
       <Navbar />
       <Routes>
-        <Route path={'/'} element={user ? undefined : <Navigate to={'/login'} />} />
+        <Route path="/" element={user ? undefined : <Navigate to={'/login'} />} />
         <Route path="/login" element={user ? <Navigate to={'/'} /> : <Login />}   />
         <Route path="/register" element={user ? <Navigate to={'/'} /> : <SignUp />} />
         <Route path="/verifyEmail" element={user ? <Navigate to={'/'} /> : <VerifyEmail />} />
         <Route path="/forbidden" element={<Forbidden />} />
         <Route path="/notfound" element={<NotFound />}   />
+        <Route path="*" element={<Navigate to={'/notfound'} />} />
 
         <Route path="/elections" element={<Elections />} />
         <Route path="/elections/:id" element={<Election />} />

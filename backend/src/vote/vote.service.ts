@@ -7,7 +7,7 @@ export class VoteService {
         @Inject('POSTGRES_POOL') private readonly sql: any
     ) {}
 
-    async createVote(user: UserType, pollId: string, votes: { vote_id: string, candidate_id: string }[]) {
+    async createVote(user: UserType, pollId: string, votes: { candidate_id: number }[]) {
         const getPollResult = await this.sql`
             SELECT * FROM poll
             WHERE id = ${pollId}
@@ -17,12 +17,12 @@ export class VoteService {
             throw new NotFoundException('poll does not exist')
         }
 
-        if(getPollResult[0].status === 'closed') {
+        if(new Date(getPollResult[0].end_date) < new Date() ) {
             throw new ForbiddenException('poll is closed')
         }
 
         const getVoteResult = await this.sql`
-            SELECT * FROM vote
+            SELECT * FROM votes
             WHERE poll_id = ${pollId}
             AND user_id = ${user.id}
         `
@@ -31,25 +31,40 @@ export class VoteService {
             throw new ForbiddenException('you have already voted')
         }
 
-        // is this a transaction??
-        await this.sql.begin(async (sql: any) => {
-            const createVote = await sql`
+        const createVote = await this.sql`
                 INSERT INTO votes (poll_id, user_id)
                 VALUES (${pollId}, ${user.id})
                 RETURNING *;
-            `
+         `
 
-            if(!createVote.length) {
-                throw new Error('failed to create vote')
+        if(!createVote.length) {
+            throw new Error('failed to create vote')
+        }
+        
+        try {
+
+            for (const vote of votes) {
+                await this.sql`
+                    INSERT INTO candidatesvoted (vote_id, candidate_id)
+                    VALUES (${createVote[0].id}, ${vote.candidate_id})
+                `;
             }
 
-            await sql`
-                INSERT INTO candidatesvoted (vote_id, candidate_id)
-                VALUES ${votes.map((vote, idx) => 
-                    `(${createVote[0].id}, ${vote.candidate_id})${idx === votes.length - 1 ? '' : ','}`
-                )}
+        } catch (error) {
+            // delete all the candidates voted associated with createVote
+            await this.sql`
+                DELETE FROM candidatesvoted
+                WHERE vote_id = ${createVote[0].id}
             `
-        })
+            
+            // delete the vote
+            await this.sql`
+                DELETE FROM votes
+                WHERE id = ${createVote[0].id}
+            `
+            
+            throw error
+        }
 
         return 'vote created'
     }

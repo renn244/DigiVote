@@ -70,11 +70,14 @@ export class PollService {
                 ) FILTER (WHERE po.id IS NOT NULL),
                 '[]'
             ) as positions,
-            COALESCE(COUNT(v.id), 0)::INT as votesCast,
+            (
+                SELECT COUNT(DISTINCT v2.id) 
+                FROM votes v2 
+                WHERE v2.poll_id = p.id
+            )::INT as votesCast,
             p.end_date::DATE - NOW()::DATE as daysRemaining -- get day remaining
             FROM poll p
             LEFT JOIN parties pa ON p.id = pa.poll_id
-            LEFT JOIN votes v ON p.id = v.poll_id
             LEFT JOIN positions po ON p.id = po.poll_id
             WHERE p.branch = ${branch} AND p.id = ${pollId} 
             GROUP BY p.id;
@@ -88,10 +91,19 @@ export class PollService {
     }
 
     async getPollForVoting(user: UserType, pollId: string) {
-        try {
-            const branch = user.branch;
+        const branch = user.branch;
 
-            const getPoll = await this.sql`
+        const getVotes = await this.sql`
+            SELECT id, poll_id, user_id 
+            FROM votes
+            WHERE poll_id = ${pollId} AND user_id = ${user.id};
+        `
+
+        if(getVotes.length) {
+            throw new ForbiddenException('You have already voted')
+        }
+
+        const getPoll = await this.sql`
             WITH candidate_data AS (
                 SELECT 
                     c.position_id,
@@ -141,9 +153,6 @@ export class PollService {
         }
 
         return getPoll[0];
-        } catch (error) {
-            console.error(error)
-        }
     }
 
     async updatePoll(user: UserType, pollId: string, body: CreatePollDto) {

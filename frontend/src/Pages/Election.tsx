@@ -9,7 +9,6 @@ import { useQuery } from "@tanstack/react-query"
 import { AlertTriangle, ArrowLeft, CalendarIcon, Percent, Users, VoteIcon } from "lucide-react"
 import { Link, Navigate, useParams } from "react-router"
 
-
 const Election = () => {
     const { id } = useParams()
 
@@ -28,7 +27,8 @@ const Election = () => {
 
             return response.data
         },
-        refetchOnWindowFocus: false
+        refetchOnWindowFocus: false,
+        retry: false
     })
 
     if(isLoading) {
@@ -157,6 +157,11 @@ const Election = () => {
                         </Card>
                     </div>
                     <div className="space-y-6">
+                        <Button asChild className="w-full">
+                            <Link to={`/pollVote/${id}`}>
+                                Vote Now
+                            </Link>
+                        </Button>
                         <Card>
                             <CardHeader>
                                 <CardTitle>

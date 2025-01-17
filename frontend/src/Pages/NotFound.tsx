@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { FileQuestion } from "lucide-react"
+import { FileQuestion, HelpCircle, House } from "lucide-react"
 import { Link } from "react-router"
 
 const NotFound = () => {
@@ -14,10 +14,12 @@ const NotFound = () => {
                             Oops! The page you're looking for doesn't exist. It might have been moved or deleted.
                         </p>
                     <div className="space-y-4">
-                    <Button asChild className="w-full">
+                    <Button className="w-full gap-0">
+                        <House className="h-5 w-5 mr-1" />
                         <Link to="/">Return to Home</Link>
                     </Button>
-                    <Button variant="outline" asChild className="w-full">
+                    <Button variant="outline" className="w-full gap-0">
+                        <HelpCircle className="h-5 w-5 mr-1" />
                         <Link to="/help">Get Help</Link>
                     </Button>
                 </div>

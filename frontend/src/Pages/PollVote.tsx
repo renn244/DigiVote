@@ -1,34 +1,100 @@
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import YouAlreadyVoted from '@/components/pages/election/YouAlreadyVoted';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import axiosFetch from '@/lib/axios'
 import { pollVote } from '@/types/poll';
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { ArrowLeft, CalendarIcon, Users, VoteIcon } from 'lucide-react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, Navigate, useParams } from 'react-router'
 
+type voteState = {
+    positionId: number,
+    candidateId: number | undefined
+}[]
+
 const PollVote = () => {
     const { id:pollId } = useParams();
-    
+    const [votedAlready, setVotedAlready] = useState(false)
+    const [votes, setVotes] = useState<voteState>()
+
     const { data: election, isLoading } = useQuery({
-        queryKey: ['pollVote', ], 
+        queryKey: ['pollVote', pollId],
         queryFn: async () => {
             const response = await axiosFetch.get(`/poll/getPollForVoting/${pollId}`)
 
-            if(response.status !== 200) {
+            if(response.status === 403) {
+                setVotedAlready(true)
+                return
+            }
+            
+            if(response.status >= 400) {
                 toast.error(response.data.message);
                 return
             }
 
-            return response.data as pollVote
+            const poll = response.data as pollVote
+            // setting up the state for voting
+            setVotes([...poll.positions.map((position) => {
+                return {
+                    positionId: position.id,
+                    candidateId: undefined,
+                }   
+            })])
+            return poll
         },
         refetchOnWindowFocus: false
     })
 
+    const { mutate: submitVote, isPending } = useMutation({
+        mutationKey: ['submitVote'],
+        mutationFn: async () => {
+            if(votes?.some((vote) => vote.candidateId === undefined)) {
+                toast.error("Please vote for all positions")
+                return
+            }
+            const votesData = votes?.map(vote => ({ candidate_id: vote.candidateId}))
+            const response = await axiosFetch.post(`/vote?pollId=${pollId}`, votesData)
+
+            if(response.status >= 400) {
+                toast.error(response.data.message)
+                return
+            }
+
+            // if successfull redirect
+            
+            return response.data
+        }
+    })
+
+    const handleVote = (positionId: number, candidateId: number) => {
+        setVotes((prevVotes) => {
+            return prevVotes?.map((vote) => {
+                if(vote.positionId === positionId) {
+                    return {
+                        ...vote,
+                        candidateId: candidateId
+                    }
+                }
+
+                return vote
+            })
+        })
+    }
+
+    const isVoted = (positionId: number, candidateId: number) => {
+        return votes?.some((vote) => vote.positionId === positionId && vote.candidateId === candidateId)
+    }
+
     if(isLoading) {
         return <LoadingSpinner />
+    }
+
+    if(votedAlready) {
+        return <YouAlreadyVoted pollId={pollId} />
     }
 
     if(!election) {
@@ -99,7 +165,9 @@ const PollVote = () => {
                         <CardContent>
                             <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${position.candidates.length} gap-4`}>
                                 {position.candidates.map((candidate) => (
-                                    <div key={candidate.id} className='flex flex-col items-start p-4 border rounded-lg'>
+                                    <div onClick={() => handleVote(position.id, candidate.id)}
+                                    key={candidate.id} className={`flex flex-col items-start p-4 border rounded-lg 
+                                    ${isVoted(position.id, candidate.id) ? "bg-yellow-50" : ""} cursor-pointer`}>
                                         <div className='relative flex-shrink-0 flex justify-center w-full mb-2'>
                                             <img src={candidate.photo} className='rounded-lg h-[300px] w-[300px]' />
                                         </div>
@@ -117,8 +185,9 @@ const PollVote = () => {
                 <Separator className="my-8" />
 
                 <div className='flex justify-end'>
-                    <Button size="lg" className='bg-green-500 hover:bg-green-600 text-white'>
-                        Submit Vote
+                    <Button onClick={() => submitVote()} disabled={isPending}
+                    size="lg" className='bg-green-500 hover:bg-green-600 text-white'>
+                        {isPending ? <LoadingSpinner /> : "Submit Vote"}
                     </Button>
                 </div>
             </div>
