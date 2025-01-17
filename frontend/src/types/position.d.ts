@@ -1,5 +1,4 @@
 
-
 export type position = {
     id: number,
     position: string,

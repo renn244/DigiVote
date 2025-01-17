@@ -87,6 +87,65 @@ export class PollService {
         return getPollForUser[0]
     }
 
+    async getPollForVoting(user: UserType, pollId: string) {
+        try {
+            const branch = user.branch;
+
+            const getPoll = await this.sql`
+            WITH candidate_data AS (
+                SELECT 
+                    c.position_id,
+                    (
+                        SELECT JSON_AGG(sub.obj)
+                        FROM (
+                            SELECT JSON_BUILD_OBJECT(
+                                'id', c2.id,
+                                'photo', c2.photo,
+                                'name', c2.name,
+                                'description', c2.description,
+                                'party_id', c2.party_id
+                            )::jsonb AS obj
+                            FROM candidates c2
+                            WHERE c2.position_id = c.position_id
+                            ORDER BY party_id
+                        ) sub
+                    ) AS candidates
+                FROM candidates c
+                GROUP BY c.position_id
+            ),
+            position_data AS (
+                SELECT 
+                    po.poll_id,
+                    JSON_AGG(
+                        DISTINCT JSON_BUILD_OBJECT(
+                            'id', po.id,
+                            'description', po.description,
+                            'position', po.position,
+                            'candidates', COALESCE(cd.candidates, '[]')
+                        )::jsonb
+                    ) AS positions
+                FROM positions po
+                LEFT JOIN candidate_data cd ON po.id = cd.position_id
+                GROUP BY po.poll_id
+            )
+            SELECT 
+                p.*,
+                COALESCE(pd.positions, '[]') as positions
+            FROM poll p
+            LEFT JOIN position_data pd ON p.id = pd.poll_id
+            WHERE p.branch = ${branch} AND p.id = ${pollId};
+        `
+
+        if(!getPoll.length) {
+            throw new NotFoundException('Poll not found')
+        }
+
+        return getPoll[0];
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     async updatePoll(user: UserType, pollId: string, body: CreatePollDto) {
         const getPoll = await this.sql`
             SELECT branch FROM poll

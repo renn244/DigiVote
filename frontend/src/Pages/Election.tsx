@@ -60,8 +60,8 @@ const Election = () => {
                         <div className="flex items-center space-x-4">
                             <Button variant="outline" asChild className="bg-white hover:bg-yellow-100">
                                 <Link to="/elections" className="flex items-center">
-                                <ArrowLeft className="mr-2 h-4 w-4" />
-                                <span className="font-semibold">Back to Elections</span>
+                                    <ArrowLeft className="mr-2 h-4 w-4" />
+                                    <span className="font-semibold">Back to Elections</span>
                                 </Link>
                             </Button>
                         </div>
@@ -131,21 +131,21 @@ const Election = () => {
                             </CardHeader>
                             <CardContent>
                                 {election.parties && election.parties.length > 0 ? (
-                                <div className="grid gap-6 sm:grid-cols-2">
-                                    {election?.parties?.map((party: partyBasicInfo, index: number) => (
-                                        <Card key={index}>
-                                            <CardHeader className="p-0">
-                                                <img className="rounded-t-lg w-[366.33px] h-[168.16px]" src={party.banner} alt={party.name + 'banner'} />
-                                                <CardTitle className="px-6 py-2">
-                                                    {party.name}
-                                                </CardTitle>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <p>{party.description}</p>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
-                                </div>
+                                    <div className="grid gap-6 sm:grid-cols-2">
+                                        {election?.parties?.map((party: partyBasicInfo, index: number) => (
+                                            <Card key={index}>
+                                                <CardHeader className="p-0">
+                                                    <img className="rounded-t-lg w-[366.33px] h-[168.16px]" src={party.banner} alt={party.name + 'banner'} />
+                                                    <CardTitle className="px-6 py-2">
+                                                        {party.name}
+                                                    </CardTitle>
+                                                </CardHeader>
+                                                <CardContent>
+                                                    <p>{party.description}</p>
+                                                </CardContent>
+                                            </Card>
+                                        ))}
+                                    </div>
                                 ) : (
                                     <div className="flex items-center justify-center bg-yellow-100 rounded-lg p-4">
                                         <AlertTriangle className="mr-2 h-6 w-6 text-yellow-600" />
@@ -206,7 +206,7 @@ const Election = () => {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="px-0">
-                                {election.postions && election.positions.length > 0 ? (
+                                {election.positions && election.positions.length > 0 ? (
                                     <ScrollArea className="h-96 p-6 pb-3 pt-0">
                                     <div className="space-y-3">
                                         {election.positions?.map((position: any) => (

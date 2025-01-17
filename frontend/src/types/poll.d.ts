@@ -21,3 +21,18 @@ export type pollView = {
 } & poll
 
 export type pollsView = pollView[]
+
+export type pollVote = {
+    positions: {
+        id: number,
+        position: string,
+        description?: string,
+        candidates: {
+            id: number,
+            name: string,
+            photo: string,
+            description?: string,
+            party_id: number
+        }[]
+    }[]
+} & poll
