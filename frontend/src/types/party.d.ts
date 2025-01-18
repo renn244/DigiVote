@@ -22,3 +22,9 @@ export type partyBasicInfo = {
     description: party['description'],
     banner: party['banner'],
 }
+
+export type partyOverview = {
+    votes_count: number,
+    candidates_count: number,
+    branch: poll['branch'],
+} & party

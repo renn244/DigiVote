@@ -40,7 +40,7 @@ const Candidates = ({
     if(isLoading) return <LoadingSpinner />
 
     return (
-        <Card className="h-[590px]">
+        <Card className="">
             <CardHeader className="flex-row items-center justify-between space-y-0" >
                 <CardTitle>Candidates</CardTitle>
                 <CreateCandidates partyId={partyId} pollId={pollId} />
@@ -60,8 +60,7 @@ const Candidates = ({
                             <TableRow key={candidate.id}>
                                 <TableCell className="font-medium">{candidate.name}</TableCell>
                                 <TableCell>{candidate.position}</TableCell>
-                                <TableCell>100</TableCell>
-                                {/* <TableCell>{candidate.votes.toLocaleString()}</TableCell> */}
+                                <TableCell>{candidate.votes.toLocaleString()}</TableCell>
                                 <TableCell className="text-right">
                                     <UpdateCandidate initialData={candidate} pollId={pollId} candidateId={candidate.id} />
                                     <DeleteCandidate candidateId={candidate.id} />

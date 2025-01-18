@@ -14,4 +14,5 @@ export type candidate = {
 
 export type candidateWithPosition = {
     position: string,
+    votes: number
 } & candidate

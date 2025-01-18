@@ -83,8 +83,23 @@ export class PartiesService {
 
         // get stats later
         const party = await this.sql`
-            SELECT * FROM parties
-            WHERE id = ${partyId}
+            SELECT 
+                p.*,
+                po.branch,
+                (
+                    SELECT COUNT(c.id)
+                    FROM candidates c
+                    WHERE c.party_id = p.id
+                )::INT as candidates_count,
+                (
+                    SELECT COUNT(cv.id)
+                    FROM candidatesvoted cv
+                    JOIN candidates c ON cv.candidate_id = c.id
+                    WHERE c.party_id = p.id
+                )::INT as votes_count
+            FROM parties p
+            LEFT JOIN poll po ON p.poll_id = po.id
+            WHERE p.id = ${partyId}
         `
 
         if(!party.length) throw new NotFoundException('party not found')

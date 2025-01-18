@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, GoneException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, GoneException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UserType } from 'src/lib/decorator/User.decorator';
 import photoFolder from 'src/lib/enum/photoFolder.enum';
@@ -53,9 +53,17 @@ export class CandidatesService {
 
     async getCandidates(partyId: string) {
         const getCandidatesResults = await this.sql`
-            SELECT c.*, p.position FROM candidates c
+            SELECT 
+                c.*, 
+                p.position,
+                (
+                    SELECT COUNT(ca.id) 
+                    FROM candidatesvoted ca
+                    WHERE ca.candidate_id = c.id
+                )::INT as votes
+            FROM candidates c
             LEFT JOIN positions p ON p.id = c.position_id
-            WHERE party_id = ${partyId}
+            WHERE party_id = ${partyId};
         `
 
         return getCandidatesResults;

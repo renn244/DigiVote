@@ -38,12 +38,12 @@ const DeleteParties = ({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button onClick={(e) => e.stopPropagation()}
+                <Button
                 className="bg-yellow-500 hover:bg-yellow-600 text-white" variant="outline" size="sm">
                     <Trash2 className="h-4 w-4" />
                 </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent >
                 <DialogHeader>
                     <DialogTitle>
                         Are you sure you want to delete this party?
@@ -53,16 +53,10 @@ const DeleteParties = ({
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                    <Button onClick={(e) => {
-                        e.stopPropagation();
-                        setIsOpen(false)
-                    }} variant="outline">
+                    <Button onClick={(e) => setIsOpen(false) } variant="outline">
                         Cancel
                     </Button>
-                    <Button onClick={(e) => {
-                        e.stopPropagation();
-                        mutate();
-                    }} variant="destructive" disabled={isPending}>
+                    <Button onClick={(e) => mutate() } variant="destructive" disabled={isPending}>
                         Delete
                     </Button>
                 </DialogFooter>

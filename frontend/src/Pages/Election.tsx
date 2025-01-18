@@ -157,11 +157,26 @@ const Election = () => {
                         </Card>
                     </div>
                     <div className="space-y-6">
-                        {status === "active" && <Button asChild className="w-full">
-                            <Link to={`/pollVote/${id}`}>
-                                Vote Now
-                            </Link>
-                        </Button>}
+                        {
+                            status === "active"  ? 
+                                election.hasVoted ? (
+                                    <Button asChild className="w-full">
+                                        <Link to={`/pollVote/${id}`}>
+                                            Vote Now
+                                        </Link> 
+                                    </Button> 
+                                ) : (
+                                    <div className="space-y-1">
+                                        <h2 className="text-lg font-medium">You already voted!</h2>
+                                        <Button asChild className="w-full">
+                                            <Link to={`/viewFinishVote/${id}`}>
+                                                View Your Vote
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                )
+                            : null
+                        }
                         <Card>
                             <CardHeader>
                                 <CardTitle>

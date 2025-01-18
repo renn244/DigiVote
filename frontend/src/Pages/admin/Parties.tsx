@@ -6,13 +6,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import axiosFetch from "@/lib/axios"
 import { useQuery } from "@tanstack/react-query"
 import { format } from "date-fns"
-import { Edit } from "lucide-react"
+import { ChartNoAxesColumnIncreasingIcon, Edit } from "lucide-react"
 import toast from "react-hot-toast"
-import { Link, useNavigate } from "react-router"
+import { Link } from "react-router"
 
 const Parties = () => {
-    const navigate = useNavigate()
-
     const { data: parties, isLoading } = useQuery({
         queryKey: ['parties'],
         queryFn: async () => {
@@ -50,7 +48,7 @@ const Parties = () => {
                 </TableHeader>
                 <TableBody>
                     {parties.map((party: any) => (
-                        <TableRow key={party.id} onClick={() => navigate(`/admin/parties/${party.id}`)}>
+                        <TableRow key={party.id}>
                             <TableCell className="">
                                 {party.name}
                             </TableCell>
@@ -67,7 +65,12 @@ const Parties = () => {
                             </TableCell>
                             <TableCell>
                                 <div className="flex space-x-2 justify-end z-50">
-                                    <Link onClick={(e) => e.stopPropagation()}
+                                    <Link to={`/admin/parties/${party.id}`}>
+                                        <Button className="bg-yellow-500 hover:bg-yellow-600 text-white" variant="outline" size="sm">
+                                            <ChartNoAxesColumnIncreasingIcon className="h-4 w-4" />
+                                        </Button>
+                                    </Link>
+                                    <Link
                                     to={`/admin/parties/update/${party.id}`}>
                                         <Button className="bg-yellow-500 hover:bg-yellow-600 text-white" variant="outline" size="sm">
                                             <Edit className="h-4 w-4" />

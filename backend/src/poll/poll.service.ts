@@ -75,6 +75,14 @@ export class PollService {
                 FROM votes v2 
                 WHERE v2.poll_id = p.id
             )::INT as votesCast,
+            (
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM votes v2 
+                    WHERE v2.user_id = ${user.id} 
+                    AND v2.poll_id = p.id 
+                )
+            ) as hasVoted,
             p.end_date::DATE - NOW()::DATE as daysRemaining -- get day remaining
             FROM poll p
             LEFT JOIN parties pa ON p.id = pa.poll_id
@@ -142,7 +150,7 @@ export class PollService {
             )
             SELECT 
                 p.*,
-                COALESCE(pd.positions, '[]') as positions
+                COALESCE(pd.positions, '[]') as positions,
             FROM poll p
             LEFT JOIN position_data pd ON p.id = pd.poll_id
             WHERE p.branch = ${branch} AND p.id = ${pollId};

@@ -78,6 +78,18 @@ export class VoteService {
         return getVotesResult;;
     }
 
+    async getVotesStatistics(user: UserType, partyId: string) {
+        const getCandidatesWithVotes = await this.sql`
+            SELECT c.id, c.name, COUNT(cv.id)::INT as votes
+            FROM candidates c
+            LEFT JOIN candidatesvoted cv ON c.id = cv.candidate_id
+            WHERE c.party_id = ${partyId}
+            GROUP BY c.id
+        `
+
+        return getCandidatesWithVotes;
+    }
+
     async getReviewVotes(user: UserType, pollId: string) {
         const branch = user.branch;
 
