@@ -16,6 +16,11 @@ export class VoteController {
         return this.voteService.createVote(user, pollId, votes);
     }
 
+    @Get('getVoteHistory')
+    async getVoteHistory(@User() user: UserType, @Query() query: { page: string, search: string }) {
+        return this.voteService.getVoteHistory(user, query);
+    }
+
     @Get('getVotesStats')
     async getVotesStats(@User() user: UserType, @Query('partyId') partyId: string) {
         return this.voteService.getVotesStatistics(user, partyId);

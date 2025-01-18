@@ -13,6 +13,7 @@ import Election from "./Pages/Election"
 import PollVote from "./Pages/PollVote"
 import FinishedVote from "./Pages/FinishedVote"
 import ViewYourVote from "./Pages/ViewYourVote"
+import VoteHistory from "./Pages/VoteHistory"
 
 function App() {
   const { loading , user } = useAuthContext()
@@ -38,7 +39,9 @@ function App() {
         <Route path="/viewFinishVote/:id" element={<ViewYourVote />} />
         <Route path="/finishVote" element={<FinishedVote />} />
 
-        <Route path="/pollVote/:id" element={<PollVote />} />  
+        <Route path="/history" element={<VoteHistory />} />
+
+        <Route path="/pollVote/:id" element={<PollVote />} />
 
         <Route path="/admin/*" element={
           <ProtectedRoute roles={['admin']}>

@@ -69,13 +69,40 @@ export class VoteService {
         return createVote[0];
     }
 
-    async getVotes(user: UserType) {
+    async getVoteHistory(user: UserType, query: { page: string, search: string }) {
+        const limit = 10;
+        const offset = ((parseInt(query.page) || 1) - 1) * limit;
+
         const getVotesResult = await this.sql`
-            SELECT * FROM votes
-            WHERE user_id = ${user.id}
+            SELECT 
+                v.id, 
+                p.title as election_name,
+                v.created_at, 
+                p.vote_type as vote_type,
+                p.id as poll_id
+            FROM votes v
+            LEFT JOIN poll p ON v.poll_id = p.id
+            WHERE user_id = ${user.id} 
+            AND p.title ILIKE ${`%${query.search}%`}
+            ORDER BY v.created_at DESC
+            LIMIT ${limit}
+            OFFSET ${offset};
         `
 
-        return getVotesResult;;
+        const hasNext = await this.sql`
+            SELECT EXISTS(
+                SELECT 1 FROM votes v
+                WHERE user_id = ${user.id}
+                ORDER BY created_at DESC
+                OFFSET ${offset + limit}
+                LIMIT 1
+            ) as has_next;
+        `
+
+        return {
+            votes: getVotesResult,
+            hasNext: hasNext[0].has_next
+        };
     }
 
     async getVotesStatistics(user: UserType, partyId: string) {

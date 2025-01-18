@@ -1,7 +1,7 @@
 import { useAuthContext } from "@/context/AuthContext"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet"
 import Profile from "./Profile"
-import { LogOut, Settings2 } from "lucide-react"
+import { LogOut, Settings2, History } from "lucide-react"
 import { Link } from "react-router"
 
 const ProfileSheet = () => {
@@ -31,6 +31,12 @@ const ProfileSheet = () => {
                     </div>
                 </SheetHeader>
                 <nav className="flex flex-col gap-3 px-4 mt-9 font-semibold text-lg">
+                    <div className="flex justify-start gap-3">
+                        <History />
+                        <Link to={'/history'}>
+                            Vote history
+                        </Link>
+                    </div>
                     <div className="flex justify-start gap-3">
                         <Settings2 />
                         <Link to={'/settings'}>
