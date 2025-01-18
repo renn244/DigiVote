@@ -159,13 +159,7 @@ const Election = () => {
                     <div className="space-y-6">
                         {
                             status === "active"  ? 
-                                election.hasVoted ? (
-                                    <Button asChild className="w-full">
-                                        <Link to={`/pollVote/${id}`}>
-                                            Vote Now
-                                        </Link> 
-                                    </Button> 
-                                ) : (
+                                election.hasvoted ? (
                                     <div className="space-y-1">
                                         <h2 className="text-lg font-medium">You already voted!</h2>
                                         <Button asChild className="w-full">
@@ -174,6 +168,12 @@ const Election = () => {
                                             </Link>
                                         </Button>
                                     </div>
+                                ) : (
+                                    <Button asChild className="w-full">
+                                        <Link to={`/pollVote/${id}`}>
+                                            Vote Now
+                                        </Link> 
+                                    </Button> 
                                 )
                             : null
                         }
