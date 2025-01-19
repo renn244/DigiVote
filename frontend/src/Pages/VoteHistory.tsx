@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
 import axiosFetch from "@/lib/axios"
 import useDebounce from "@/lib/useDebounce"
@@ -24,9 +23,9 @@ const VoteHistoryHeader = () => {
     }, [debounceSearch])
 
     return (
-        <div className="mb-4 flex items-center">
+        <div className=" flex items-center w-auto">
             <Input value={search} onChange={(e) => setSearch(e.target.value)}
-            type="text" placeholder="Search election name" className="mr-2" />
+            type="text" placeholder="Search election name" className="mr-2 w-full max-w-[500px]" />
             <Button variant="outline">
                 <Search className="h-4 w-4 mr-2" />
                 Search
@@ -72,12 +71,12 @@ const VoteHistory = () => {
 
     return (
         <div className="container mx-auto py-10">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+                <h1 className="text-2xl font-semibold leading-none tracking-tight ml-5">Your Vote History</h1>
+                <VoteHistoryHeader />
+            </div>
             <Card>
-                <CardHeader>
-                    <CardTitle>Your Voting History</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <VoteHistoryHeader />
+                <CardContent className="pt-3">
 
                     {/* Table */}
                     <div className="h-[561px]">
@@ -109,34 +108,35 @@ const VoteHistory = () => {
                         </Table>
                     </div>
 
-                    {/* Pagination */}
-                    <div className="mt-4">
-                        <div className="flex items-center space-x-4">
-                            <Button
-                            variant="outline"
-                            size="lg"
-                            onClick={() => handlePagination('previous')}
-                            disabled={page <= 1}
-                            >
-                                <ChevronLeft className="h-5 w-5 mr-2" />
-                                Previous
-                            </Button>
-                            <p className="text-base text-muted-foreground">
-                                Page {page}
-                            </p>
-                            <Button
-                            variant="outline"
-                            size="lg"
-                            onClick={() => handlePagination('next')}
-                            disabled={voteHistory?.hasNext === false}
-                            >
-                                Next
-                                <ChevronRight className="h-5 w-5 ml-2" />
-                            </Button>
-                        </div>
-                    </div>
                 </CardContent>
             </Card>
+            
+            {/* Pagination */}
+            <div className="mt-4">
+                <div className="flex items-center space-x-4">
+                    <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => handlePagination('previous')}
+                    disabled={page <= 1}
+                    >
+                        <ChevronLeft className="h-5 w-5 mr-2" />
+                        Previous
+                    </Button>
+                    <p className="text-base text-muted-foreground">
+                        Page {page}
+                    </p>
+                    <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => handlePagination('next')}
+                    disabled={voteHistory?.hasNext === false}
+                    >
+                        Next
+                        <ChevronRight className="h-5 w-5 ml-2" />
+                    </Button>
+                </div>
+            </div>
         </div>
     )
 }
