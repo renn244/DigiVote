@@ -79,16 +79,24 @@ export class AuthService {
             SELECT * FROM users WHERE username = ${body.username};
         `
 
-        if(checkUsername[0]?.username === 'bodyUsername') {
-            throw new BadRequestException('Username already exists');
+        if(checkUsername[0]?.username === body.username) {
+            throw new BadRequestException({ name: 'username', message: 'Username already exists' });
         }
 
         const checkEmail = await this.sql`
             SELECT * FROM users WHERE email = ${body.email};
         `
 
-        if(checkEmail[0]?.email === 'bodyEmail') {
-            throw new BadRequestException('Email already exists');
+        if(checkEmail[0]?.email === body.email) {
+            throw new BadRequestException({name: 'email', message: 'Email already exists'});
+        }
+
+        const checkStudentId = await this.sql`
+            SELECT * FROM users WHERE student_id = ${body.student_id};
+        `
+
+        if(checkStudentId[0]?.student_id === body.student_id) {
+            throw new BadRequestException({ name: 'student_id', message: 'Student ID already exists'});
         }
 
         const name = body.firstName + ' ' + body.lastName;
@@ -97,8 +105,9 @@ export class AuthService {
 
         const sendEmail = await this.createEmail(body.email);
         const result = await this.sql`
-            INSERT INTO userplaceholder (username, name, email, password, branch) 
-            VALUES (${body.username}, ${name}, ${body.email}, ${hashedPassword}, ${branch})
+            INSERT INTO userplaceholder (username, name, email, password, branch, education_level, student_id, year_level, course) 
+            VALUES (${body.username}, ${name}, ${body.email}, ${hashedPassword}, ${branch}, 
+            ${body.education_level}, ${body.student_id}, ${body.year_level}, ${body.course})
             RETURNING *;
         `
 
@@ -162,8 +171,9 @@ export class AuthService {
         const user = getUser[0]
 
         const createUser = await this.sql`
-            INSERT INTO users (username, name, email, password, branch)
-            VALUES (${user.username}, ${user.name}, ${user.email}, ${user.password}, ${user.branch});
+            INSERT INTO users (username, name, email, password, branch, education_level, student_id, year_level, course)
+            VALUES (${user.username}, ${user.name}, ${user.email}, ${user.password}, ${user.branch}, 
+            ${user.education_level}, ${user.student_id}, ${user.year_level}, ${user.course});
         `
 
         // delete placeholder and verifyUser

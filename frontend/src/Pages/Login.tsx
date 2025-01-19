@@ -58,7 +58,7 @@ const Login = () => {
     })
 
     return (
-        <div className="flex justify-center items-center w-full min-h-screen">
+        <div className="flex justify-center items-center w-full min-h-[855px]">
             <div className="flex flex-col gap-6 w-full max-w-[400px]">
                 <Card>
                     <CardHeader className="text-center">

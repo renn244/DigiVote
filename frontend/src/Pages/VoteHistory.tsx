@@ -71,8 +71,8 @@ const VoteHistory = () => {
 
     return (
         <div className="container mx-auto py-10">
-            <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-                <h1 className="text-2xl font-semibold leading-none tracking-tight ml-5">Your Vote History</h1>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2 md:gap-0">
+                <h1 className="text-2xl font-semibold leading-none tracking-tight ml-2 md:ml-5">Your Vote History</h1>
                 <VoteHistoryHeader />
             </div>
             <Card>

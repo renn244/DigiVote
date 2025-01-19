@@ -14,6 +14,18 @@ export class RegistrationDto {
     
     @IsString()
     password: string;
+
+    @IsString()
+    education_level: string;
+
+    @IsString()
+    student_id: string;
+
+    @IsString()
+    course: string;
+
+    @IsString()
+    year_level: string;
 }
 
 export class LoginDto {
