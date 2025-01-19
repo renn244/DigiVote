@@ -9,9 +9,6 @@ export class PollService {
     ) {}
 
     async createPoll(user: UserType, body: CreatePollDto) {
-        if(user.role !== 'admin') {
-            throw new ForbiddenException('only admin are allowed to create polls')
-        }
 
         const pollCreate = await this.sql`
             INSERT INTO poll (title, description, branch, start_date, end_date, vote_type)
@@ -164,22 +161,6 @@ export class PollService {
     }
 
     async updatePoll(user: UserType, pollId: string, body: CreatePollDto) {
-        const getPoll = await this.sql`
-            SELECT branch FROM poll
-            WHERE id = ${pollId}
-        `
-
-        if(!getPoll.length) {
-            throw new NotFoundException('Poll not found')
-        }
-
-        if(user.role !== 'admin') {
-            throw new ForbiddenException('only admin are allowed to update polls')
-        }
-
-        if(user.branch !== getPoll[0].branch) {
-            throw new ForbiddenException('only admin branch are allowed to update this poll')
-        }
 
         const updatePoll = await this.sql`
             UPDATE poll 
@@ -202,22 +183,6 @@ export class PollService {
 
     // should i delete or archive the poll?
     async deletePoll(user: UserType, pollId: string) {
-        const getPoll = await this.sql`
-            SELECT branch FROM poll
-            WHERE id = ${pollId}
-        `
-
-        if(!getPoll.length) {
-            throw new NotFoundException('Poll not found')
-        }
-
-        if(user.branch !== getPoll[0].branch) {
-            throw new ForbiddenException('only admin branch are allowed to delete this poll')
-        }  
-        
-        if(user.role !== 'admin') {
-            throw new ForbiddenException('only admin are allowed to delete polls')
-        }
 
         const deletePoll = await this.sql`
             DELETE FROM poll

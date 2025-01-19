@@ -20,7 +20,7 @@ const CreateParties = () => {
         formData.append('poll_id', data.poll_id)
         formData.append('banner', data.banner?.[0])
 
-        const response = await axiosFetch.post('parties', formData, {
+        const response = await axiosFetch.post(`parties?pollId=${data.poll_id}`, formData, {
             headers: {
                 "Content-Type" : "multipart/form-data"
             }

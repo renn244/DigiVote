@@ -8,17 +8,8 @@ export class PositionsService {
         @Inject('POSTGRES_POOL') private readonly sql: any
     ) {}
 
+
     async createPositions(user: UserType, { position, poll_id, description }: CreatePositionDto) {
-        if(user.role !== 'admin') throw new ForbiddenException('only admin are allowed to create positions')
-
-        const getPoll = await this.sql`
-            SELECT branch FROM poll
-            WHERE id = ${poll_id}
-        `
-
-        if(!getPoll.length) throw new NotFoundException('poll does not exist!')
-
-        if(getPoll[0].branch !== user.branch) throw new ForbiddenException('only admin branch are allowed to create this position')
 
         const createPositionResult = await this.sql`
             INSERT INTO positions (position, description, poll_id)
@@ -51,16 +42,6 @@ export class PositionsService {
     }
 
     async updatePosition(user: UserType, body: CreatePositionDto, positionId:string) {
-        if(user.role !== 'admin') throw new ForbiddenException('only admin are allowed to update positions')
-
-        const getPoll = await this.sql`
-            SELECT branch FROM poll
-            WHERE id = ${body.poll_id}
-        `
-
-        if(!getPoll.length) throw new NotFoundException('poll does not exist')
-
-        if(getPoll[0].branch !== user.branch) throw new ForbiddenException('only admin branch are allowed to update this position')
         
         const updatePositionResult = await this.sql`
             UPDATE positions SET
@@ -76,16 +57,6 @@ export class PositionsService {
     }
 
     async deletePosition(user: UserType, positionId: string, poll_id: string) {
-        if(user.role !== 'admin') throw new ForbiddenException('only admin are allowed to delete positions')
-
-        const getPoll = await this.sql`
-            SELECT branch FROM poll
-            WHERE id = ${poll_id}
-        `
-
-        if(!getPoll.length) throw new NotFoundException('poll does not exist')
-
-        if(getPoll[0].branch !== user.branch) throw new ForbiddenException('only admin branch are allowed to delete this position')
     
         const deletePositionResult = await this.sql`
             DELETE FROM positions

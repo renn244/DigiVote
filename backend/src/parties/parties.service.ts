@@ -13,17 +13,11 @@ export class PartiesService {
 
     async createParties(user: UserType, body: CreatePartiesDto, banner: Express.Multer.File) {
         // check if the one making the parties is actually admin and in branch
-        try {
-            if(user.role !== 'admin') throw new ForbiddenException('only admin are allowed to create parties')   
-    
+        try {    
             const getPoll = await this.sql`
                 SELECT branch, title FROM poll
                 WHERE id = ${body.poll_id}
             `
-    
-            if(!getPoll.length) throw new NotFoundException('poll does not exist!')
-    
-            if(getPoll[0].branch !== user.branch) throw new ForbiddenException('only admin branch are allowed to create this poll')
     
             // upload to cloudinary
             if(!banner) throw new BadRequestException('banner is required')
@@ -107,7 +101,6 @@ export class PartiesService {
         return party[0];
     }
 
-    // if banner file exist then upload to cloudinary and delete the updatedParties
     async updatePartyBanner(partyId: string, banner: Express.Multer.File | undefined) {
         try {
             const bannerResult = await this.fileUploadService.upload(banner, {
@@ -134,17 +127,6 @@ export class PartiesService {
     }
 
     async updateParty(user: UserType, body: CreatePartiesDto, partyId: string, banner: Express.Multer.File | undefined) {
-        if(user.role !== 'admin') throw new ForbiddenException('only admin are allowed to update parties')
-
-        // might be vunerable because the poll_id is relying on the frontend // might want to ahve better query
-        const getPoll = await this.sql`
-            SELECT id, branch FROM poll
-            WHERE id = ${body.poll_id}
-        `
-
-        if(!getPoll.length) throw new NotFoundException('failed to found poll!')
-
-        if(getPoll[0].branch !== user.branch) throw new ForbiddenException('only admin branch are allowed to update this parties')
         
         let bannerUrl: string | undefined = undefined;
         if(banner) {
@@ -168,18 +150,6 @@ export class PartiesService {
     }
 
     async deleteParty(user: UserType, partyId: string) {
-        if(user.role !== 'admin') throw new ForbiddenException('only admin are allowed to delete parties')
-
-        const getPoll = await this.sql`
-            SELECT p.branch
-            FROM parties pa
-            JOIN poll p ON pa.poll_id = p.id
-            WHERE pa.id = ${partyId}
-        `;
-
-        if(!getPoll.length) throw new NotFoundException('Poll or Party Not Found')
-
-        if(getPoll[0].branch !== user.branch) throw new ForbiddenException('only admin branch are allowed to delete this parties')
     
         const deletedParty = await this.sql`
             DELETE FROM parties

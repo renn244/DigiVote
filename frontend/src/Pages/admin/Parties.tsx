@@ -76,7 +76,7 @@ const Parties = () => {
                                             <Edit className="h-4 w-4" />
                                         </Button>
                                     </Link>
-                                    <DeleteParties partyId={party.id} />
+                                    <DeleteParties partyId={party.id} pollId={party.poll_id} />
                                 </div>
                             </TableCell>
                         </TableRow>

@@ -14,7 +14,7 @@ const UpdateParties = () => {
 
     if(!id) return // redirect
 
-    const { data, isLoading } = useQuery({
+    const { data: initialData, isLoading } = useQuery({
         queryKey: ['update', 'parties', id],
         queryFn: async () => {
             const response = await axiosFetch.get(`/parties/${id}`);
@@ -40,7 +40,7 @@ const UpdateParties = () => {
         formData.append('poll_id', data.poll_id);
         formData.append('banner', data.banner?.[0])
 
-        const response = await axiosFetch.patch(`/parties/${id}`, formData);
+        const response = await axiosFetch.patch(`/parties/${id}?pollId=${initialData?.poll_id}`, formData);
 
         if(response.status >= 400) {
             throw new Error(response.data.message) // this will be caught by the form
@@ -63,8 +63,8 @@ const UpdateParties = () => {
                 <h1 className="text-3xl font-bold text-gray-800">Update Party</h1>
             </div>
             <div className="flex justify-center">
-                <PartiesForm className="w-full max-w-[550px]" initialData={data}
-                initialPollId={data?.poll_id} onsubmit={onSubmit} isUpdate={true}
+                <PartiesForm className="w-full max-w-[550px]" initialData={initialData}
+                initialPollId={initialData?.poll_id} onsubmit={onSubmit} isUpdate={true}
                 />
             </div>
         </div>

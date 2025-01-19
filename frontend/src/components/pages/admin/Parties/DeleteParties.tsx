@@ -9,17 +9,18 @@ import toast from "react-hot-toast";
 
 type DeletePartyProps = {
     partyId: number;
+    pollId: number;
 }
 
 const DeleteParties = ({
-    partyId
+    partyId,
+    pollId
 }: DeletePartyProps) => {
     const queryClient = useQueryClient();
     const [isOpen, setIsOpen] = useState<boolean>(false);
-
     const { mutate, isPending } = useMutation({
         mutationFn: async () => {
-            const response = await axiosFetch.delete(`/parties/${partyId}`)
+            const response = await axiosFetch.delete(`/parties/${partyId}?pollId=${pollId}`)
 
             if(response.status >= 400) {
                 toast.error(response.data.message);
