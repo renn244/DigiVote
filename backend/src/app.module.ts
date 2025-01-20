@@ -12,6 +12,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
 import { PositionsModule } from './positions/positions.module';
 import { CandidatesModule } from './candidates/candidates.module';
 import { VoteModule } from './vote/vote.module';
+import { UserModule } from './user/user.module';
 
 // CONFIG MODULE NOT BEING LOADED FIRST!!!
 @Module({
@@ -25,7 +26,7 @@ import { VoteModule } from './vote/vote.module';
     }),
     EmailSenderModule, 
     AuthModule, 
-    DatabaseModuleModule, PollModule, PartiesModule, FileUploadModule, PositionsModule, CandidatesModule, VoteModule
+    DatabaseModuleModule, PollModule, PartiesModule, FileUploadModule, PositionsModule, CandidatesModule, VoteModule, UserModule
   ],
   controllers: [AppController],
   providers: [AppService],
