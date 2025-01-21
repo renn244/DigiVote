@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components
 import axiosFetch from "@/lib/axios"
 import useDebounce from "@/lib/useDebounce"
 import { useQuery } from "@tanstack/react-query"
-import { ChevronLeft, ChevronRight, Search } from "lucide-react"
+import { ChevronLeft, ChevronRight, SearchIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { Link, useSearchParams } from "react-router"
@@ -23,13 +23,12 @@ const VoteHistoryHeader = () => {
     }, [debounceSearch])
 
     return (
-        <div className=" flex items-center w-auto">
-            <Input value={search} onChange={(e) => setSearch(e.target.value)}
-            type="text" placeholder="Search election name" className="mr-2 w-full max-w-[500px]" />
-            <Button variant="outline">
-                <Search className="h-4 w-4 mr-2" />
-                Search
-            </Button>
+        <div className="flex items-center mr-7 w-full max-w-[400px]">
+            <div className="relative w-full">
+                <SearchIcon className="w-4 h-4 absolute left-2.5 top-3 text-gray-500 dark:text-gray-400" />
+                <Input value={search} onChange={(e) => setSearch(e.target.value)}
+                type="text" placeholder="Search election name" className="mr-2 w-full max-w-[500px] pl-8" />
+            </div>
         </div>
     )
 }

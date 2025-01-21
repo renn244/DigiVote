@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/lib/guards/jwt-auth.guard';
 import { User, UserType } from 'src/lib/decorator/User.decorator';
@@ -14,8 +14,8 @@ export class UserController {
     ) {}
 
     @Get()
-    async getUsers(@User() user: UserType) {
-        return this.userService.getUsers(user);
+    async getUsers(@User() user: UserType, @Query() query: { page: string, search: string }) {
+        return this.userService.getUsers(user, query);
     }
 
     @Get('getInitialUserInfo')

@@ -11,15 +11,31 @@ export class UserService {
         private readonly fileUploadService: FileUploadService
     ) {}
 
-    async getUsers(user: UserType) {
+    async getUsers(user: UserType, query: { page: string, search: string }) {
+        const limit = 12;
+        const offset = ((parseInt(query.page) || 1) - 1) * limit;
 
         const users = await this.sql`
             SELECT id, name, student_id, year_level, course
             FROM users
             WHERE branch = ${user.branch}
+            AND student_id ILIKE ${`%${query.search}%`}
+            LIMIT ${limit} OFFSET ${offset}
+        `;
+
+        const hasNext = await this.sql`
+            SELECT EXISTS(
+                SELECT 1 FROM users
+                WHERE branch = ${user.branch}
+                AND student_id ILIKE ${`%${query.search}%`}
+                OFFSET ${offset + limit}
+            ) as has_next;
         `
 
-        return users
+        return {
+            users: users,
+            hasNext: hasNext[0].has_next
+        }
     }
 
     // for settings page

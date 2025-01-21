@@ -6,7 +6,6 @@ const sidebarItems = [
     { icon: Users, label: 'Users', href: '/admin/users' },
     { icon: ChartNoAxesColumn, label: 'Polls', href: '/admin/polls' },
     { icon: Flag, label: 'Parties', href: '/admin/parties' },
-    { icon: Settings, label: 'Settings', href: '/admin/settings' },
 ]
 
 const SideBar = () => {

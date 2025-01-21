@@ -98,28 +98,23 @@ export class AuthService {
             throw new BadRequestException('Invalid email format');
         }
 
-        const checkUsername = await this.sql`
-            SELECT * FROM users WHERE username = ${body.username};
+        const checkIfExist = await this.sql`
+            SELECT username, email, student_id FROM users 
+            WHERE username = ${body.username} OR email = ${body.email} OR student_id = ${body.student_id};
         `
 
-        if(checkUsername[0]?.username === body.username) {
-            throw new BadRequestException({ name: 'username', message: 'Username already exists' });
-        }
-
-        const checkEmail = await this.sql`
-            SELECT * FROM users WHERE email = ${body.email};
-        `
-
-        if(checkEmail[0]?.email === body.email) {
-            throw new BadRequestException({name: 'email', message: 'Email already exists'});
-        }
-
-        const checkStudentId = await this.sql`
-            SELECT * FROM users WHERE student_id = ${body.student_id};
-        `
-
-        if(checkStudentId[0]?.student_id === body.student_id) {
-            throw new BadRequestException({ name: 'student_id', message: 'Student ID already exists'});
+        for (const record of checkIfExist) {
+            if(record?.username === body.username) {
+                throw new BadRequestException({ name: 'username', message: 'Username already exists' });
+            }
+    
+            if(record?.email === body.email) {
+                throw new BadRequestException({name: 'email', message: 'Email already exists'});
+            }
+    
+            if(record?.student_id === body.student_id) {
+                throw new BadRequestException({ name: 'student_id', message: 'Student ID already exists'});
+            }
         }
 
         const name = body.firstName + ' ' + body.lastName;
