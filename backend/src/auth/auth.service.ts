@@ -5,18 +5,41 @@ import { EmailSenderService } from 'src/email-sender/email-sender.service';
 import { UserType } from 'src/lib/decorator/User.decorator';
 import { v4 as uuidv4 } from 'uuid';
 import { LoginDto, RegistrationDto } from './dto/auth.dto';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class AuthService {
     constructor(
         @Inject('POSTGRES_POOL') private readonly sql: any,
+        @Inject('CACHE_MANAGER') private readonly cacheManager: Cache,
         private readonly jwtService: JwtService,
         private readonly emailSender: EmailSenderService
     ) {}
 
     async checkUser(user: UserType) {
         // might want to get into the database later and cache if more data is needed
-        return user
+        const userId = user.id;
+
+        const userCache = await this.cacheManager.get(`${userId}`); 
+        // TODO: update he cached in the settings when changing information
+
+        if(userCache) {
+            return userCache
+        }
+
+        const getUser = await this.sql`
+            SELECT id, name, email, username, branch, role, student_id, year_level, course, profile
+            FROM users
+            WHERE id = ${userId}
+        `
+
+        if(!getUser.length) {
+            throw new NotFoundException('User not found')
+        }
+
+        await this.cacheManager.set(`${userId}`, getUser[0])
+
+        return getUser[0];
     }
 
     async validateUser(body: LoginDto) {

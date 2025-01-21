@@ -14,6 +14,7 @@ import PollVote from "./Pages/PollVote"
 import FinishedVote from "./Pages/FinishedVote"
 import ViewYourVote from "./Pages/ViewYourVote"
 import VoteHistory from "./Pages/VoteHistory"
+import Settings from "./Pages/Settings"
 
 function App() {
   const { loading , user } = useAuthContext()
@@ -40,6 +41,7 @@ function App() {
         <Route path="/finishVote" element={<FinishedVote />} />
 
         <Route path="/history" element={<VoteHistory />} />
+        <Route path="/settings" element={<Settings />} />
 
         <Route path="/pollVote/:id" element={<PollVote />} />
 
