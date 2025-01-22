@@ -13,6 +13,7 @@ import { PositionsModule } from './positions/positions.module';
 import { CandidatesModule } from './candidates/candidates.module';
 import { VoteModule } from './vote/vote.module';
 import { UserModule } from './user/user.module';
+import { FaqsModule } from './faqs/faqs.module';
 
 // CONFIG MODULE NOT BEING LOADED FIRST!!!
 @Module({
@@ -26,7 +27,7 @@ import { UserModule } from './user/user.module';
     }),
     EmailSenderModule, 
     AuthModule, 
-    DatabaseModuleModule, PollModule, PartiesModule, FileUploadModule, PositionsModule, CandidatesModule, VoteModule, UserModule
+    DatabaseModuleModule, PollModule, PartiesModule, FileUploadModule, PositionsModule, CandidatesModule, VoteModule, UserModule, FaqsModule
   ],
   controllers: [AppController],
   providers: [AppService],
