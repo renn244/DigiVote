@@ -33,6 +33,7 @@ export class CommunityQuestionsService {
                 q.question, 
                 asked_by_id, 
                 u.username AS "askedBy", 
+                q.created_at,
                 COALESCE(
                     (
                         SELECT JSON_AGG(
@@ -46,7 +47,8 @@ export class CommunityQuestionsService {
                                     SELECT COUNT(id)
                                     FROM likes
                                     WHERE answer_id = ans.id
-                                )
+                                ),
+                                'created_at', ans.created_at
                             )
                         )
                         FROM answers ans
@@ -121,7 +123,7 @@ export class CommunityQuestionsService {
         return updatedAnswer[0];
     }
 
-    async deleteCommunityAnswer(user: UserType, answerId: number) {
+    async deleteCommunityAnswer(user: UserType, answerId: string) {
         const deletedAnswer = await this.sql`
             DELETE FROM answers
             WHERE id = ${answerId} AND answered_by_id = ${user.id}

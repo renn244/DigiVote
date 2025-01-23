@@ -7,6 +7,7 @@ export type answer = {
     answeredBy?: string
     answered_by_id?: number,
     question_id: number,
+    created_at: string,
 }
 
 export type question = {
@@ -14,5 +15,6 @@ export type question = {
     question: string,
     askedBy?: string,
     asked_by_id: number?,
-    answers: answer[]
+    answers: answer[],
+    created_at: string,
 }

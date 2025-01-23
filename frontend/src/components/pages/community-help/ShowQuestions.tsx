@@ -5,8 +5,10 @@ import { useQuery } from "@tanstack/react-query"
 import toast from "react-hot-toast"
 import CreateQuestion from "./CreateQuestion"
 import QuestionCard from "./QuestionCard"
+import { useState } from "react"
 
 const ShowQuestions = () => {
+    const [showAnswerForm, setShowAnswerForm] = useState<number | null>(null);
 
     const { data: communityQuestions, isLoading } = useQuery({
         queryKey: ['questions'],
@@ -35,7 +37,8 @@ const ShowQuestions = () => {
                 <CreateQuestion />
             </div>
             {communityQuestions?.map((question) => (
-                <QuestionCard key={question.id} question={question} />
+                <QuestionCard showAnswerForm={showAnswerForm} setShowAnswerForm={setShowAnswerForm} 
+                key={question.id} question={question} />
             ))}
         </div>
     )

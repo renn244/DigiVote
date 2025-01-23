@@ -23,7 +23,8 @@ const ShowFaqs = () => {
             }
 
             return response.data as faq[]
-        }
+        },
+        refetchOnWindowFocus: false,
     })
 
     if(isLoading) {
