@@ -9,6 +9,7 @@ CREATE TABLE faqs (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- community question
 CREATE TABLE questions (
     id SERIAL PRIMARY KEY,
 
@@ -25,8 +26,11 @@ CREATE TABLE answers (
 
     answer TEXT NOT NULL,
 
+    question_id INT NOT NULL,
+    FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE,
+
     answered_by_id INT,
-    answered_by REFERENCES (answered_by_id) REFERENCES users(id) ON DELETE,
+    FOREIGN KEY (answered_by_id) REFERENCES users(id) ON DELETE,
 
     created_at TIMESTAMPTZ DEFAULT NOW()  
 );
@@ -34,8 +38,8 @@ CREATE TABLE answers (
 CREATE TABLE likes (
     id SERIAL PRIMARY KEY,
 
-    question_id INT NOT NULL,
-    FOREIGN KEY (question_id) REFERENCES answers(id) ON DELETE CASCADe,
+    answer_id INT NOT NULL,
+    FOREIGN KEY (question_id) REFERENCES answers(id) ON DELETE CASCADE,
 
     user_id INT,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,

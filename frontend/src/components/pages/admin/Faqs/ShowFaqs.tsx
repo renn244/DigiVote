@@ -44,12 +44,14 @@ const ShowFaqs = () => {
                         <AccordionItem value={`item-${index}`} key={index}>
                             <AccordionTrigger className="flex-row ">
                                 <div className="flex items-center">
-                                    <div onClick={(e) => e.stopPropagation()}>
-                                        <FaqOption  id={faq.id} initialData={{
-                                            question: faq.question,
-                                            answer: faq.answer,
-                                        }} />
-                                    </div>
+                                    {user.role === 'admin' && (
+                                        <div onClick={(e) => e.stopPropagation()}>
+                                            <FaqOption  id={faq.id} initialData={{
+                                                question: faq.question,
+                                                answer: faq.answer,
+                                            }} />
+                                        </div> 
+                                    )}
                                     {faq.question}
                                 </div>
                             </AccordionTrigger>

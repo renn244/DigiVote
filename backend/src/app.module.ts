@@ -14,6 +14,7 @@ import { CandidatesModule } from './candidates/candidates.module';
 import { VoteModule } from './vote/vote.module';
 import { UserModule } from './user/user.module';
 import { FaqsModule } from './faqs/faqs.module';
+import { CommunityQuestionsModule } from './community-questions/community-questions.module';
 
 // CONFIG MODULE NOT BEING LOADED FIRST!!!
 @Module({
@@ -27,7 +28,7 @@ import { FaqsModule } from './faqs/faqs.module';
     }),
     EmailSenderModule, 
     AuthModule, 
-    DatabaseModuleModule, PollModule, PartiesModule, FileUploadModule, PositionsModule, CandidatesModule, VoteModule, UserModule, FaqsModule
+    DatabaseModuleModule, PollModule, PartiesModule, FileUploadModule, PositionsModule, CandidatesModule, VoteModule, UserModule, FaqsModule, CommunityQuestionsModule
   ],
   controllers: [AppController],
   providers: [AppService],
