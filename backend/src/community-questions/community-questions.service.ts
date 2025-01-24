@@ -24,7 +24,8 @@ export class CommunityQuestionsService {
         return createdQuestion[0];
     }
 
-    async getCommunityQuestions(user: UserType) {
+    async getCommunityQuestions(user: UserType, query: { search: string }) {
+
         // have pagination and search
 
         const questions = await this.sql`
@@ -65,7 +66,8 @@ export class CommunityQuestionsService {
                     '[]'::json
                 ) as answers
             FROM questions q
-            LEFT JOIN users u ON q.asked_by_id = u.id;
+            LEFT JOIN users u ON q.asked_by_id = u.id
+            WHERE q.question ILIKE ${`%${query.search}%`};
         `
 
         return questions;

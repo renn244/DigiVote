@@ -39,8 +39,8 @@ const QuestionCard = ({
       <CardContent>
 
         {question.answers.map((answer) => (
-          <div className="flex w-full mb-2 p-2 bg-gray-100 rounded">
-            <div key={answer.id} className=" w-full">
+          <div key={answer.id} className="flex w-full mb-2 p-2 bg-gray-100 rounded">
+            <div className=" w-full">
               <p>{answer.answer}</p>
               <div className="flex items-center mt-2 text-sm text-gray-500">
                 <Like initialLiked={answer.liked} answerId={answer.id} />

@@ -43,7 +43,7 @@ const ShowFaqs = () => {
                 <Accordion type="single" collapsible>
                     {faqs?.map((faq: faq, index: any) => (
                         <AccordionItem value={`item-${index}`} key={index}>
-                            <AccordionTrigger className="flex-row ">
+                            <AccordionTrigger className="flex-row">
                                 <div className="flex items-center">
                                     {user.role === 'admin' && (
                                         <div onClick={(e) => e.stopPropagation()}>

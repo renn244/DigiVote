@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { User, UserType } from 'src/lib/decorator/User.decorator';
 import { JwtAuthGuard } from 'src/lib/guards/jwt-auth.guard';
 import { CommunityQuestionsService } from './community-questions.service';
@@ -18,8 +18,8 @@ export class CommunityQuestionsController {
     }
 
     @Get('getQuestions')
-    async getCommunityQuestions(@User() user: UserType) {
-        return this.communityQuestionsService.getCommunityQuestions(user);
+    async getCommunityQuestions(@User() user: UserType, @Query() query: { search: string }) {
+        return this.communityQuestionsService.getCommunityQuestions(user, query);
     }
 
     @Patch('updateQuestion/:questionId')

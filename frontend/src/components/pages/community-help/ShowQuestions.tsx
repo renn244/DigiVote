@@ -6,14 +6,17 @@ import toast from "react-hot-toast"
 import CreateQuestion from "./CreateQuestion"
 import QuestionCard from "./QuestionCard"
 import { useState } from "react"
+import { useSearchParams } from "react-router"
 
 const ShowQuestions = () => {
+    const [searchParams] = useSearchParams();
+    const search = searchParams.get('search') || '';
     const [showAnswerForm, setShowAnswerForm] = useState<number | null>(null);
 
     const { data: communityQuestions, isLoading } = useQuery({
-        queryKey: ['questions'],
+        queryKey: ['questions', search],
         queryFn: async () => {
-            const response = await axiosFetch.get('/community-questions/getQuestions')
+            const response = await axiosFetch.get(`/community-questions/getQuestions?search=${search}`)
 
             if(response.status >= 400) {
                 toast.error(response.data.message)
