@@ -8,6 +8,7 @@ export type answer = {
     answered_by_id?: number,
     question_id: number,
     created_at: string,
+    liked: boolean,
 }
 
 export type question = {

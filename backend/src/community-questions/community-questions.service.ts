@@ -1,7 +1,7 @@
 import { GoneException, Inject, Injectable } from '@nestjs/common';
 import { UserType } from 'src/lib/decorator/User.decorator';
-import { CreateQuestionDto, updateQuestionDto } from './dto/questions.dto';
 import { CreateAnswerDto, UpdateAnswerDto } from './dto/answer.dto';
+import { CreateQuestionDto, updateQuestionDto } from './dto/questions.dto';
 
 @Injectable()
 export class CommunityQuestionsService {
@@ -24,7 +24,7 @@ export class CommunityQuestionsService {
         return createdQuestion[0];
     }
 
-    async getCommunityQuestions() {
+    async getCommunityQuestions(user: UserType) {
         // have pagination and search
 
         const questions = await this.sql`
@@ -47,6 +47,13 @@ export class CommunityQuestionsService {
                                     SELECT COUNT(id)
                                     FROM likes
                                     WHERE answer_id = ans.id
+                                ),
+                                'liked', (
+                                    SELECT EXISTS (
+                                        SELECT 1
+                                        FROM likes
+                                        WHERE answer_id = ans.id AND user_id = ${user.id}
+                                    )
                                 ),
                                 'created_at', ans.created_at
                             )
@@ -135,5 +142,34 @@ export class CommunityQuestionsService {
         }
 
         return deletedAnswer[0];
+    }
+
+    // likes
+    async likeAnswer(user: UserType, answerId: string) {
+        const likedAnswer = await this.sql`
+            INSERT INTO likes (answer_id, user_id)
+            VALUES (${answerId}, ${user.id})
+            RETURNING *;
+        `
+
+        if(!likedAnswer.length) {
+            throw new GoneException('Failed to like answer');
+        }
+        
+        return likedAnswer[0];
+    }
+
+    async unlikeAnswer(user: UserType, answerId: string) {
+        const unlikedAnswer = await this.sql`
+            DELETE FROM likes
+            WHERE answer_id = ${answerId} AND user_id = ${user.id}
+            RETURNING *;
+        `
+
+        if(!unlikedAnswer.length) {
+            throw new GoneException('Failed to unlike answer');
+        }
+
+        return unlikedAnswer[0];
     }
 }

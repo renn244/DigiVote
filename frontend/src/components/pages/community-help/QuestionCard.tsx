@@ -1,13 +1,14 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { question } from "@/types/questions"
-import { MessageCircle, ThumbsUp } from "lucide-react"
+import { MessageCircle } from "lucide-react"
 import QuestionOption from "./QuestionOption"
 import { useAuthContext } from "@/context/AuthContext"
 import { Dispatch, SetStateAction } from "react"
 import AddAnswer from "./Answer/AddAnswer"
 import { format } from "date-fns"
 import AnswerOption from "./Answer/AnswerOption"
+import Like from "./Like/Like"
 
 type QuestionCardProps = {
   question: question,
@@ -36,17 +37,20 @@ const QuestionCard = ({
         )}
       </CardHeader>
       <CardContent>
+
         {question.answers.map((answer) => (
           <div className="flex w-full mb-2 p-2 bg-gray-100 rounded">
             <div key={answer.id} className=" w-full">
               <p>{answer.answer}</p>
               <div className="flex items-center mt-2 text-sm text-gray-500">
-                <ThumbsUp className="h-4 w-4 mr-1" />
-                <span className="mr-4">{answer.likes}</span>
+                <Like initialLiked={answer.liked} answerId={answer.id} />
+                <span className="mr-4 select-none">{answer.likes}</span>
                 <span>Answered by {answer.answeredBy} • {format(new Date(answer?.created_at), 'yyyy-MM-dd')}</span>
               </div>
             </div>
-            <AnswerOption initialData={{ answer: answer.answer }} answerId={answer.id} />
+            {answer.answered_by_id === user.id && (
+              <AnswerOption initialData={{ answer: answer.answer }} answerId={answer.id} />
+            )}
           </div>
         ))}
 

@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { CommunityQuestionsService } from './community-questions.service';
-import { JwtAuthGuard } from 'src/lib/guards/jwt-auth.guard';
 import { User, UserType } from 'src/lib/decorator/User.decorator';
-import { CreateQuestionDto } from './dto/questions.dto';
+import { JwtAuthGuard } from 'src/lib/guards/jwt-auth.guard';
+import { CommunityQuestionsService } from './community-questions.service';
 import { CreateAnswerDto } from './dto/answer.dto';
+import { CreateQuestionDto } from './dto/questions.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('community-questions')
@@ -18,8 +18,8 @@ export class CommunityQuestionsController {
     }
 
     @Get('getQuestions')
-    async getCommunityQuestions() {
-        return this.communityQuestionsService.getCommunityQuestions();
+    async getCommunityQuestions(@User() user: UserType) {
+        return this.communityQuestionsService.getCommunityQuestions(user);
     }
 
     @Patch('updateQuestion/:questionId')
@@ -49,5 +49,13 @@ export class CommunityQuestionsController {
     }
 
     // likes
-    
+    @Post('likeAnswer/:answerId')
+    async likeAnswer(@User() user: UserType, @Param('answerId') answerId: string) {
+        return this.communityQuestionsService.likeAnswer(user, answerId);
+    }
+
+    @Delete('unlikeAnswer/:answerId')
+    async unlikeAnswer(@User() user: UserType, @Param('answerId') answerId: string) {
+        return this.communityQuestionsService.unlikeAnswer(user, answerId);
+    }
 }
