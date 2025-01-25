@@ -1,4 +1,5 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner"
+import SomethingWentWrong from "@/components/common/SomethingWentWrong"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,7 +13,7 @@ import { Link, Navigate, useParams } from "react-router"
 const Election = () => {
     const { id } = useParams()
 
-    const { data: election, isLoading } = useQuery({
+    const { data: election, isLoading, isError } = useQuery({
         queryKey: ['election', id],
         queryFn: async () => {
             const response = await axiosFetch.get(`/poll/${id}`)
@@ -21,6 +22,7 @@ const Election = () => {
                 return undefined
             }
 
+            // TODO: HANDLE ERROR properly later
             if(response.status >= 400) {
                 throw new Error(response.data.message);
             }
@@ -33,6 +35,10 @@ const Election = () => {
 
     if(isLoading) {
         return <LoadingSpinner />
+    }
+
+    if(isError) {
+        return <SomethingWentWrong />
     }
 
     if(!election) {

@@ -41,6 +41,24 @@ export class PollService {
         return getPollsForUser
     }
 
+    async getResults(user: UserType) {
+        const branch = user.branch;
+
+        const getResultsForUser = await this.sql`
+            SELECT p.*,
+            COALESCE(
+                JSON_AGG(pa.name) FILTER (WHERE pa.id IS NOT NULL),
+                '[]'
+            ) as parties
+            FROM poll p
+            LEFT JOIN parties pa ON p.id = pa.poll_id
+            WHERE p.branch = ${branch} AND p.end_date < NOW()
+            GROUP BY p.id;
+        `
+
+        return getResultsForUser
+    }
+
     async getPoll(user: UserType, pollId: string) {
         const branch = user.branch; 
         
@@ -94,7 +112,7 @@ export class PollService {
 
         return getPollForUser[0]
     }
-
+    
     async getPollForVoting(user: UserType, pollId: string) {
         const branch = user.branch;
 
@@ -158,6 +176,39 @@ export class PollService {
         }
 
         return getPoll[0];
+    }
+
+    async getResult(user: UserType, pollId: string) {
+        const branch = user.branch;
+
+        // get turnout later
+        const getResultForUser = await this.sql`
+            SELECT p.id, p.title, p.description, p.start_date, p.end_date, p.vote_type,
+            COALESCE(
+                JSON_AGG(
+                    pa.name
+                ) FILTER (WHERE pa.id IS NOT NULL),
+                '[]'
+            ) as parties,
+            (
+                SELECT COUNT(v.id)
+                FROM votes v
+                WHERE v.poll_id = p.id
+            ) as totalVotes
+            -- get results or winner, depending if it is single or multiple choice
+            FROM poll p
+            LEFT JOIN parties pa ON p.id = pa.poll_id
+            WHERE p.branch = ${branch} AND p.id = ${pollId}
+            GROUP BY p.id;
+        `
+
+        if(!getResultForUser.length) {
+            throw new NotFoundException('Poll not found')
+        }
+
+        // check if pooll has ended using date
+        
+        return getResultForUser[0]
     }
 
     async updatePoll(user: UserType, pollId: string, body: CreatePollDto) {

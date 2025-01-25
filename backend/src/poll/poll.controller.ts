@@ -24,6 +24,16 @@ export class PollController {
         return this.pollService.getPolls(user, search)
     }
 
+    @Get('results')
+    async getResults(@User() user: UserType) {
+        return this.pollService.getResults(user);
+    }
+
+    @Get('results/:id')
+    async getPollResults(@User() user: UserType, @Param('id') pollId: string) {
+        return this.pollService.getResult(user, pollId);
+    }
+    
     @Get('getPollForVoting/:id')
     async getPollForVoting(@User() user: UserType, @Param('id') pollId: string) {
         return this.pollService.getPollForVoting(user, pollId);

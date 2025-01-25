@@ -16,6 +16,8 @@ import ViewYourVote from "./Pages/ViewYourVote"
 import VoteHistory from "./Pages/VoteHistory"
 import Settings from "./Pages/Settings"
 import Help from "./Pages/Help"
+import Results from "./Pages/Results"
+import Result from "./Pages/Result"
 
 function App() {
   const { loading , user } = useAuthContext()
@@ -38,6 +40,10 @@ function App() {
 
         <Route path="/elections" element={<Elections />} />
         <Route path="/elections/:id" element={<Election />} />
+
+        <Route path="/results" element={<Results />} />
+        <Route path="/results/:id" element={<Result />} />
+
         <Route path="/viewFinishVote/:id" element={<ViewYourVote />} />
         <Route path="/finishVote" element={<FinishedVote />} />
 
