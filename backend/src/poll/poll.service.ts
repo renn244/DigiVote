@@ -9,7 +9,6 @@ export class PollService {
     ) {}
 
     async createPoll(user: UserType, body: CreatePollDto) {
-
         const pollCreate = await this.sql`
             INSERT INTO poll (title, description, branch, start_date, end_date, vote_type)
             VALUES (${body.title}, ${body.description}, ${user.branch} ,${body.start_date}, ${body.end_date}, ${body.vote_type})
@@ -165,7 +164,7 @@ export class PollService {
             )
             SELECT 
                 p.*,
-                COALESCE(pd.positions, '[]') as positions,
+                COALESCE(pd.positions, '[]') as positions
             FROM poll p
             LEFT JOIN position_data pd ON p.id = pd.poll_id
             WHERE p.branch = ${branch} AND p.id = ${pollId};
@@ -183,10 +182,10 @@ export class PollService {
 
         // get turnout later
         const getResultForUser = await this.sql`
-            SELECT p.id, p.title, p.description, p.start_date, p.end_date, p.vote_type,
+            SELECT p.id, p.title, p.description, p.start_date, p.end_date, p.vote_type, p.branch,
             COALESCE(
                 JSON_AGG(
-                    pa.name
+                   DISTINCT pa.name
                 ) FILTER (WHERE pa.id IS NOT NULL),
                 '[]'
             ) as parties,
@@ -194,10 +193,57 @@ export class PollService {
                 SELECT COUNT(v.id)
                 FROM votes v
                 WHERE v.poll_id = p.id
-            ) as totalVotes
+            ) as totalVotes,
+            (
+                SELECT EXISTS(
+                    SELECT 1
+                    FROM votes v
+                    WHERE v.poll_id = p.id
+                    AND v.user_id = ${user.id}
+                )
+            ) as hasVoted,
+            COALESCE (
+                JSON_AGG(
+                    DISTINCT JSON_BUILD_OBJECT(
+                        'position_id', winners.position_id,
+                        'position', winners.position,
+                        'winners', winners.winner
+                    )::jsonb
+                ) FILTER (WHERE winners.position_id IS NOT NULL),
+                '[]'
+            ) as position_winners
             -- get results or winner, depending if it is single or multiple choice
             FROM poll p
             LEFT JOIN parties pa ON p.id = pa.poll_id
+            LEFT JOIN LATERAL (
+                SELECT DISTINCT ON (po.id)
+                    po.id as position_id,
+                    po.position,
+                    JSON_AGG(
+                        JSON_BUILD_OBJECT(
+                            'id', c.id,
+                            'name', c.name,
+                            'photo', c.photo,
+                            'description', c.description,
+                            'party_id', c.party_id,
+                            'party', pa.name,
+                            'votes', vote_counts.total_votes
+                        )
+                    ) AS winner
+                FROM positions po
+                LEFT JOIN candidates c ON po.id = c.position_id
+                LEFT JOIN parties pa ON c.party_id = pa.id
+                LEFT JOIN LATERAL (
+                    SELECT 
+                        COUNT(v.id) as total_votes,
+                        ROW_NUMBER() OVER (ORDER BY COUNT(v.id) DESC) AS rank
+                    FROM candidatesvoted v
+                    WHERE v.candidate_id = c.id
+                    GROUP BY v.candidate_id
+                ) vote_counts ON TRUE
+                WHERE po.poll_id = p.id AND vote_counts.rank = 1 --Only get the winner
+                GROUP BY po.id
+            ) winners ON TRUE
             WHERE p.branch = ${branch} AND p.id = ${pollId}
             GROUP BY p.id;
         `
@@ -207,8 +253,63 @@ export class PollService {
         }
 
         // check if pooll has ended using date
+        if(new Date(getResultForUser[0].end_date) > new Date()) {
+            throw new ForbiddenException('Poll has not ended')
+        }
         
         return getResultForUser[0]
+    }
+
+    async getResultStatistics(user: UserType, pollId: string) {
+        const branch = user.branch;
+
+        const getResultStatisticsForUser = await this.sql`
+            WITH candidate_data AS (
+                SELECT 
+                    c.position_id,
+                    (
+                        SELECT JSON_AGG(sub.obj)
+                        FROM (
+                            SELECT JSON_BUILD_OBJECT(
+                                'id', c2.id,
+                                'name', c2.name,
+                                'party_id', c2.party_id,
+                                'votes', (
+                                    SELECT COUNT(v.id)
+                                    FROM candidatesvoted v
+                                    WHERE v.candidate_id = c2.id
+                                )
+                            )::jsonb AS obj
+                            FROM candidates c2
+                            WHERE c2.position_id = c.position_id
+                            ORDER BY party_id
+                        ) sub
+                    ) AS candidates
+                FROM candidates c
+                GROUP BY c.position_id
+            ),
+            position_data AS (
+                SELECT 
+                    po.poll_id,
+                    JSON_AGG(
+                        DISTINCT JSON_BUILD_OBJECT(
+                            'id', po.id,
+                            'position', po.position,
+                            'candidates', COALESCE(cd.candidates, '[]')
+                        )::jsonb
+                    ) AS positions
+                FROM positions po
+                LEFT JOIN candidate_data cd ON po.id = cd.position_id
+                GROUP BY po.poll_id
+            )
+            SELECT 
+                COALESCE(pd.positions, '[]') as positions
+            FROM poll p
+            LEFT JOIN position_data pd ON p.id = pd.poll_id
+            WHERE p.branch = ${branch} AND p.id = ${pollId} AND p.end_date < NOW();
+        `
+
+        return getResultStatisticsForUser[0];
     }
 
     async updatePoll(user: UserType, pollId: string, body: CreatePollDto) {

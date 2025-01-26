@@ -36,3 +36,10 @@ export type pollVote = {
         }[]
     }[]
 } & poll
+
+export type pollResult = {
+    totalVotes: number,
+    turnout: number,
+    parties: party['name'][],
+    winners: any
+} & poll

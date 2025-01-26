@@ -49,7 +49,6 @@ const UpdateAnswer = ({
                         ...question,
                         answers: question.answers.map((currAnswer) => {
                             if(currAnswer.id === answerId) {
-                                console.log(currAnswer)
                                 return {
                                     ...currAnswer,
                                     answer: answer
