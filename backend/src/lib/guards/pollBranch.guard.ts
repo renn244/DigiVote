@@ -16,7 +16,6 @@ export const PollBranchGuard = (module: string, action: string): Type<CanActivat
 
             // add all the different ways to get the pollId later
             const pollId = request.params.pollId || request.query.pollId || request.body.poll_id;
-            console.log(request.body)
             if(!pollId) {
                 throw new BadRequestException('pollId is required');
             }

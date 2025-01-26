@@ -68,10 +68,6 @@ const SignUp = () => {
         }
     }
 
-    useEffect(() => {
-        console.log('changed')
-    }, [errors])
-
     return (
         <div className="flex justify-center items-center w-full min-h-[855px]">
             <Card className="mx-auto">
