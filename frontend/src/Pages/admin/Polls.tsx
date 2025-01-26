@@ -69,9 +69,8 @@ const Polls = () => {
                                 {format(new Date(poll.end_date), 'yyyy-MM-dd')}
                             </TableCell>
                             <TableCell>
-                                <div className="flex space-x-2 justify-end z-50">
-                                    <Link onClick={(e) => e.stopPropagation()}
-                                    to={`/admin/polls/update/${poll.id}`}>
+                                <div onClick={(e) => e.stopPropagation()} className="flex space-x-2 justify-end z-50">
+                                    <Link to={`/admin/polls/update/${poll.id}`}>
                                         <Button className="bg-yellow-500 hover:bg-yellow-600 text-white" variant="outline" size="sm">
                                             <Edit className="h-4 w-4" />
                                         </Button>

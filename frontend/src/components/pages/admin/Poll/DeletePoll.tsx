@@ -38,9 +38,9 @@ const DeletePoll = ({
     })
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog open={isOpen} onOpenChange={setIsOpen} >
             <DialogTrigger asChild>
-                <Button onClick={(e) => e.stopPropagation()} 
+                <Button 
                 className="bg-yellow-500 hover:bg-yellow-600 text-white" variant="outline" size="sm">
                     <Trash2 className="h-4 w-4" />
                 </Button>
@@ -55,10 +55,10 @@ const DeletePoll = ({
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                    <Button onClick={(e) => { e.stopPropagation(); setIsOpen(false); }} variant="outline">
+                    <Button onClick={() => setIsOpen(false)} variant="outline">
                         Cancel
                     </Button>
-                    <Button onClick={(e) => {e.stopPropagation(); mutate(); }} variant="destructive" disabled={isPending}>
+                    <Button onClick={() => mutate()} variant="destructive" disabled={isPending}>
                         { isPending ? <LoadingSpinner /> : "Delete" }
                     </Button>
                 </DialogFooter>
