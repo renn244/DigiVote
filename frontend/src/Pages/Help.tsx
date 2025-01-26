@@ -7,6 +7,11 @@ import { Search } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router"
 
+/*
+* make this public from unauthenticated users
+* but make it so that they are not able to comment or post questions
+*/
+
 const HelpHeader = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [search, setSearch] = useState(searchParams.get('search') || '');

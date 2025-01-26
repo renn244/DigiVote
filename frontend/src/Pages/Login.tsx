@@ -8,7 +8,7 @@ import axiosFetch from "@/lib/axios"
 import { useMutation } from "@tanstack/react-query"
 import { FormEvent, useState } from "react"
 import toast from "react-hot-toast"
-import { Link } from "react-router"
+import { Link, useSearchParams } from "react-router"
 
 type LoginStateType = {
     username: string,
@@ -16,6 +16,8 @@ type LoginStateType = {
 }
 
 const Login = () => {
+    const [searchParams] = useSearchParams();
+    const redirectTo = searchParams.get('next') || undefined
     const [error, setError] = useState({ type: '', error: '' })
     const [credentials, setCredentials] = useState<LoginStateType>({
         username: '',
@@ -50,7 +52,12 @@ const Login = () => {
             // save access token in the local storage
             window.localStorage.setItem('access_token', response.data.access_token)
             window.localStorage.setItem('refresh_token', response.data.refresh_token)
-            window.location.assign('/')
+
+            if(redirectTo) {
+                window.location.assign(redirectTo)
+            } else {
+                window.location.assign('/')
+            }
         },
         onError: (error: any) => {
             toast.error(error.message)

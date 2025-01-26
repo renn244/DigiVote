@@ -18,6 +18,7 @@ import Settings from "./Pages/Settings"
 import Help from "./Pages/Help"
 import Results from "./Pages/Results"
 import Result from "./Pages/Result"
+import AuthenticatedRoute from "./components/common/AuthenticatedRoute"
 
 function App() {
   const { loading , user } = useAuthContext()
@@ -38,25 +39,67 @@ function App() {
         <Route path="/notfound" element={<NotFound />}   />
         <Route path="*" element={<Navigate to={'/notfound'} />} />
 
-        <Route path="/elections" element={<Elections />} />
-        <Route path="/elections/:id" element={<Election />} />
+        <Route path="/elections" element={
+          <AuthenticatedRoute>
+            <Elections />
+          </AuthenticatedRoute>
+        } />
+        <Route path="/elections/:id" element={
+          <AuthenticatedRoute>
+            <Election />
+            </AuthenticatedRoute>
+        } />
 
-        <Route path="/results" element={<Results />} />
-        <Route path="/results/:id" element={<Result />} />
+        <Route path="/results" element={
+          <AuthenticatedRoute>
+            <Results />
+          </AuthenticatedRoute>
+        } />
+        <Route path="/results/:id" element={
+          <AuthenticatedRoute>
+            <Result />
+          </AuthenticatedRoute>
+        } />
 
-        <Route path="/viewFinishVote/:id" element={<ViewYourVote />} />
-        <Route path="/finishVote" element={<FinishedVote />} />
+        <Route path="/viewFinishVote/:id" element={
+          <AuthenticatedRoute>
+            <ViewYourVote />
+          </AuthenticatedRoute>
+        } />
+        <Route path="/finishVote" element={
+          <AuthenticatedRoute>
+            <FinishedVote />
+          </AuthenticatedRoute>
+        } />
 
-        <Route path="/history" element={<VoteHistory />} />
-        <Route path="/help" element={<Help />} />
-        <Route path="/settings" element={<Settings />} />
-
-        <Route path="/pollVote/:id" element={<PollVote />} />
+        <Route path="/history" element={
+          <AuthenticatedRoute>
+            <VoteHistory />
+          </AuthenticatedRoute>
+        } />
+        <Route path="/help" element={
+          <AuthenticatedRoute>
+            <Help />
+          </AuthenticatedRoute>
+        } />
+        <Route path="/settings" element={
+          <AuthenticatedRoute>
+            <Settings />
+          </AuthenticatedRoute>
+        } />
+   
+        <Route path="/pollVote/:id" element={
+          <AuthenticatedRoute>
+            <PollVote />
+          </AuthenticatedRoute>
+        } />
 
         <Route path="/admin/*" element={
-          <ProtectedRoute roles={['admin']}>
-            <Admin />
-          </ProtectedRoute>
+          <AuthenticatedRoute>
+            <ProtectedRoute roles={['admin']}>
+              <Admin />
+            </ProtectedRoute>
+          </AuthenticatedRoute>
         } />
       </Routes>
     </div>
