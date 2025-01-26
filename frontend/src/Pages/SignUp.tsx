@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import axiosFetch from "@/lib/axios"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from "react-hot-toast"
 import { Link } from "react-router"

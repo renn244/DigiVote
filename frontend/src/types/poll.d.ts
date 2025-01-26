@@ -43,3 +43,26 @@ export type pollResult = {
     parties: party['name'][],
     winners: any
 } & poll
+
+export const pollStatus = {
+    Upcoming = "Upcoming",
+    Ongoing = "Ongoing",
+    Completed = "Completed"
+} as const;
+export type pollStatus = typeof pollStatus[keyof typeof pollStatus];
+
+export type vote_stat = {
+    vote_date: string,
+    vote_per_day: number
+}
+
+export type pollStats = {
+    id: poll['id'],
+    title: poll['title'],
+    start_date: poll['start_date'],
+    end_date: poll['end_date'],
+    total_votes: number,
+    participating_parties: number,
+    status: pollStatus,
+    votes_stats: vote_stat[]
+}

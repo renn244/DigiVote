@@ -3,17 +3,46 @@ import Positions from "@/components/pages/admin/Position/Positions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import axiosFetch from "@/lib/axios";
+import { pollStats } from "@/types/poll";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Clock, Flag, User, Vote } from "lucide-react";
+import toast from "react-hot-toast";
 import { Link, useParams } from "react-router"
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+
+const chartConfig = {
+    votes: {
+        label: 'Votes',
+        color: 'hsl(var(--chart-1))'
+    }
+} satisfies ChartConfig
 
 const PollInfo = () => {
     const { id } = useParams();
 
+    const { data: election } = useQuery({
+        queryKey: ['election', id],
+        queryFn: async () => {
+            const response = await axiosFetch.get(`/poll/pollStats/${id}`);
+
+            if(response.status >= 400) {
+                toast.error(response.data.message);
+                return
+            }
+
+            return response.data as pollStats
+        },
+        refetchOnWindowFocus: false
+    })
+
+    if(!election) return null;
 
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold text-gray-800">COMSOC ELECTIONS</h1>
+                <h1 className="text-3xl font-bold text-gray-800">{election?.title}</h1>
                 
                 <Button variant={'outline'} asChild>
                     <Link to={'/admin/polls'}>
@@ -23,13 +52,15 @@ const PollInfo = () => {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <DashboardCard icon={User} title="Total Votes" value={100} />
+                <DashboardCard icon={User} title="Total Votes" value={election?.total_votes} />
                 <DashboardCard icon={Vote} title="Status" value={
-                    <Badge>Upcoming</Badge> 
+                    <Badge>
+                        {election?.status}
+                    </Badge> 
                 } />
-                <DashboardCard icon={Flag} title="Participating Parties" value={3} />
+                <DashboardCard icon={Flag} title="Participating Parties" value={election?.participating_parties} />
                 <DashboardCard icon={Clock} title="Start-End Date" value={
-                    "2025-1-15" + " to " + "2025-1-25"
+                    new Date(election?.start_date).toLocaleDateString() + " to " + new Date(election?.end_date).toLocaleDateString()
                 } className="text-lg" />
             </div>
 
@@ -39,20 +70,35 @@ const PollInfo = () => {
                         <CardTitle>Parties Votes or voters on days they voted</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {/* <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={election.voterTurnout}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="age" />
-                                <YAxis />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="turnout" fill="#3b82f6" />
-                            </BarChart>
-                        </ResponsiveContainer> */}
+                        <ChartContainer config={chartConfig}>
+                            <AreaChart 
+                            accessibilityLayer
+                            data={election.votes_stats}
+                            margin={{
+                            }}>
+                                <CartesianGrid vertical={false} />
+                                <XAxis 
+                                dataKey='vote_date'
+                                tickLine={false}
+                                axisLine={false}
+                                />
+                                <ChartTooltip
+                                cursor={false}
+                                content={<ChartTooltipContent indicator="line" />}
+                                />
+                                <Area 
+                                dataKey={'votes_per_day'}
+                                type="bumpX"
+                                fillOpacity={0.4}
+                                />
+                            </AreaChart>   
+                        </ChartContainer>
                     </CardContent>
                 </Card>
                 <Positions />
             </div>
+
+            {/* also display the candidates votings */}
         </div>
     )
 }

@@ -58,6 +58,56 @@ export class PollService {
         return getResultsForUser
     }
 
+    async getPollStatistics(user: UserType, pollId: string) {
+        const branch = user.branch;
+
+        const getPollStatisticsForUser = await this.sql`
+            SELECT 
+                p.id, p.title, p.start_date, p.end_date,
+                (
+                    SELECT COUNT(DISTINCT v2.id)
+                    FROM votes v2
+                    WHERE v2.poll_id = p.id
+                )::INT AS total_votes,
+                (
+                    SELECT COUNT(DISTINCT pa.id)
+                    FROM parties pa
+                    WHERE pa.poll_id = p.id
+                )::INT AS participating_parties,
+                CASE 
+                    WHEN CURRENT_TIMESTAMP < p.start_date THEN 'Upcoming'
+                    WHEN CURRENT_TIMESTAMP BETWEEN p.start_date AND p.end_date THEN 'Ongoing'
+                    WHEN CURRENT_TIMESTAMP > p.end_date THEN 'Completed'
+                END AS status,
+                (
+                    SELECT JSON_AGG(
+                        JSON_BUILD_OBJECT(
+                            'vote_date', TO_CHAR(vote_date, 'MM-DD'),
+                            'votes_per_day', votes_count
+                        )
+                        ORDER BY vote_date
+                    )
+                    FROM (
+                        SELECT
+                            ds.vote_date,
+                            COUNT(DISTINCT v.id) as votes_count
+                        FROM(
+                            SELECT generate_series(
+                                p.start_date::DATE, p.end_date::DATE, '1 day'::INTERVAL
+                            )::DATE AS vote_date
+                        ) ds
+                        LEFT JOIN votes v ON ds.vote_date = DATE(v.created_at)
+                        AND v.poll_id = p.id
+                        GROUP BY ds.vote_date
+                    ) AS daily_votes
+                ) AS votes_stats
+            FROM poll p
+            WHERE p.id = ${pollId} AND p.branch = ${branch};
+        `
+    
+        return getPollStatisticsForUser[0];
+    }
+
     async getPoll(user: UserType, pollId: string) {
         const branch = user.branch; 
         
