@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import * as sgMail from '@sendgrid/mail'
+import * as sgMail from '@sendgrid/mail';
 
 @Injectable()
 export class EmailSenderService {
@@ -7,12 +7,12 @@ export class EmailSenderService {
         sgMail.setApiKey(process.env.SENDGRID_API_KEY) 
     }
 
-    async sendEmail(to: string, subject: string, title: string, content: string) {
+    async sendEmail(to: string, subject: string, title: string, content: string, options?: Partial<sgMail.MailDataRequired>) {
         const msg = {
             to: to,
             from: 'renatodsantosjr9@gmail.com',
             subject: subject,
-            html: content
+            html: content,
         }
 
         try {
@@ -29,7 +29,7 @@ export class EmailSenderService {
         <div style="font-family: Helvetica,Arial,sans-serif;width:600px;overflow:auto;line-height:2">
             <div style="margin:50px auto;width:70%;padding:20px 0">
                 <div style="border-bottom:1px solid #eee">
-                    <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">STI-voting</a>
+                    <a href="${process.env.CLIENT_BASE_URL}" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">STI-voting</a>
                 </div>
                 <p style="font-size:1.1em">Hi,</p>
                 <p>Thank you for choosing STI-voting. Use the following OTP to verify your account and complete the sign-up process.</p>
@@ -51,5 +51,40 @@ export class EmailSenderService {
        } catch (error) {
         console.log('error sending otp: ', error)
        }
+    }
+
+    async sendResetPasswordLink(to: string, token: number) {
+        try {
+            const baseUrl = process.env.CLIENT_BASE_URL
+            const magicLink = `${baseUrl}/resetPassword?token=${token}&email=${to}`
+
+            const content = `
+            <div style="font-family: Helvetica,Arial,sans-serif;width:600px;overflow:auto;line-height:2">
+                <div style="margin:50px auto;width:70%;padding:20px 0">
+                    <div style="border-bottom:1px solid #eee">
+                        <a href="${baseUrl}" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">STI-voting</a>
+                    </div>
+                    <p style="font-size:1.1em">Hi,</p>
+                    <p>You are resetting your password. if this is you please click the link to reset your password</p>
+                    <a href="${magicLink}" 
+                    style="background: #00466a;margin: 0 auto;width: max-content;padding: 10px 20px;color: #fff;border-radius: 4px;">
+                        resetPassword
+                    </a>
+                    <p style="font-size:0.9em;">Regards,<br />STI-voting Team</p>
+                    <hr style="border:none;border-top:1px solid #eee" />
+                    <div style="float:center;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
+                        <p>STI-voting Inc</p>
+                        <p>Poblacion Sta Maria, Bulacan</p>
+                        <p>Philippines</p>
+                    </div>
+                </div>
+            </div>
+            `
+            
+            await this.sendEmail(to, 'Reset Password', 'Reset Password', content)
+        } catch (error) {
+            console.log('error sending reset password link: ', error)
+            throw new InternalServerErrorException('Error sending reset password link')
+        }
     }
 }

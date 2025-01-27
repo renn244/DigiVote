@@ -27,4 +27,5 @@ export type partyOverview = {
     votes_count: number,
     candidates_count: number,
     branch: poll['branch'],
+    vote_percentage: string, // it is returned as string
 } & party

@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { EmailSenderService } from 'src/email-sender/email-sender.service';
 import { UserType } from 'src/lib/decorator/User.decorator';
 import { v4 as uuidv4 } from 'uuid';
-import { LoginDto, RegistrationDto } from './dto/auth.dto';
+import { ForgotPasswordDto, LoginDto, RegistrationDto, ResetPasswordDto } from './dto/auth.dto';
 import { Cache } from 'cache-manager';
 
 @Injectable()
@@ -290,5 +290,73 @@ export class AuthService {
         }
 
         return this.login(user[0])
+    }
+
+    async forgotPassword(body: ForgotPasswordDto) {
+        const checkEmail = await this.sql`
+            SELECT email FROM users
+            WHERE email = ${body.email}
+        `;
+
+        if(!checkEmail.length) {
+            throw new BadRequestException('user does not exist with this email')
+        }
+
+        const code = Math.floor(100000 + Math.random() * 900000); // generate 6 digit code
+
+        const createResetCode = await this.sql`
+            INSERT INTO passwordcode (email, code)
+            VALUES (${body.email}, ${code})
+            RETURNING code;
+        `
+
+        if(!createResetCode.length) {
+            throw new InternalServerErrorException('failed to create reset code')
+        }
+        
+        // send email
+        await this.emailSender.sendResetPasswordLink(body.email, code)
+
+        return {
+            message: "Please check your email for the reset link."
+        }
+    }
+
+    async resetPassword(body: ResetPasswordDto) {
+        const getCode = await this.sql`
+            SELECT * FROM passwordcode
+            WHERE email = ${body.email}
+        `
+
+        if(!getCode.length) {
+            throw new BadRequestException('No reset code found')
+        }
+        console.log(getCode[0].code, body.token)
+        if(getCode[0].code !== body.token) {
+            throw new BadRequestException('Invalid reset code')
+        }
+
+        const hashedPassword = await bcrypt.hash(body.newPassword, 10);
+
+        const updatePassword = await this.sql`
+            UPDATE users
+            SET password = ${hashedPassword}
+            WHERE email = ${body.email}
+            RETURNING email;
+        `
+
+        if(!updatePassword.length) {
+            throw new InternalServerErrorException('failed to update password')
+        }
+
+        // delete the reset code
+        const deleteCode = await this.sql`
+            DELETE FROM passwordcode
+            WHERE email = ${body.email}
+        `
+    
+        return {
+            'message': 'Password has been updated'
+        }
     }
 }

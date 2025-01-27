@@ -1,4 +1,5 @@
-import { IsString } from 'class-validator'
+import { IsString, Matches } from 'class-validator'
+import { Match } from 'src/lib/decorator/Match.decorator';
 export class RegistrationDto {
     @IsString()
     username: string;
@@ -34,4 +35,34 @@ export class LoginDto {
 
     @IsString()
     password: string;
+}
+
+export class ForgotPasswordDto {
+    @IsString({
+        message: 'Email is required'
+    })
+    @Matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z]+\.sti\.edu\.ph$/, {
+        message: 'Invalid email'
+    })
+    email: string;
+}
+
+export class ResetPasswordDto {
+    @IsString()
+    token: string;
+
+    @IsString()
+    newPassword: string;
+
+    @IsString()
+    @Match('newPassword', {
+        message: 'Passwords do not match'
+    })
+    confirmPassword: string;
+
+    @IsString()
+    @Matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z]+\.sti\.edu\.ph$/, {
+        message: 'Invalid email'
+    })
+    email: string;
 }

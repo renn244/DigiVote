@@ -30,6 +30,7 @@ const Login = () => {
             e.preventDefault();
             if(!credentials.username || !credentials.password) {
                 toast.error('please fill in the fields!')
+                return
             }
 
             const response = await axiosFetch.post('/auth/login', credentials)

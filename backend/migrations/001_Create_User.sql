@@ -48,3 +48,8 @@ CREATE TABLE userplaceholder (
         ON DELETE CASCADE
 );
 
+CREATE TABLE passwordCode (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    code VARCHAR(255) NOT NULL
+);
