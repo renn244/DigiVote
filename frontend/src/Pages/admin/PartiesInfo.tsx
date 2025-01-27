@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Users, Vote } from "lucide-react";
 import toast from "react-hot-toast";
 import { Link, Navigate, useNavigate, useParams } from "react-router"
-import { Bar, BarChart,  ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
 const chartConfig = {
     votes: {
@@ -86,7 +86,7 @@ const PartiesInfo = () => {
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 <DashboardCard icon={Vote} title="Total Votes" value={party.votes_count} />
-                <DashboardCard icon={BarChart} title="Vote Percentage" value={"37.3%"} />
+                <DashboardCard icon={BarChart} title="Vote Percentage" value={party.vote_percentage + "%"} />
                 <DashboardCard icon={Users} title="Candidates" value={party.candidates_count} />
                 <DashboardCard icon={Vote} title="Associated Poll" value={
                     <Badge variant="outline" className="h-8">

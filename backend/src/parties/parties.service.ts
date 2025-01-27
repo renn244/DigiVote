@@ -85,14 +85,26 @@ export class PartiesService {
                     FROM candidates c
                     WHERE c.party_id = p.id
                 )::INT as candidates_count,
+                COALESCE(v.votes_count, 0)::INT as votes_count,
                 (
-                    SELECT COUNT(cv.id)
+                    SELECT ROUND(
+                        (COALESCE(v.votes_count, 0)::decimal / NULLIF(COUNT(cv.id), 0)::decimal * 100), 
+                        2
+                    )
                     FROM candidatesvoted cv
-                    JOIN candidates c ON cv.candidate_id = c.id
-                    WHERE c.party_id = p.id
-                )::INT as votes_count
+                    JOIN votes v2 ON cv.vote_id = v2.id
+                    WHERE v2.poll_id = p.poll_id
+                ) as vote_percentage
             FROM parties p
             LEFT JOIN poll po ON p.poll_id = po.id
+            LEFT JOIN (
+                SELECT 
+                    c.party_id,
+                    COUNT(cv.id) as votes_count
+                FROM candidatesvoted cv
+                JOIN candidates c ON cv.candidate_id = c.id
+                GROUP BY c.party_id
+            ) v ON v.party_id = p.id
             WHERE p.id = ${partyId}
         `
 
