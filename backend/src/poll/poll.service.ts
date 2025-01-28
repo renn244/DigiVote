@@ -9,6 +9,7 @@ export class PollService {
     ) {}
 
     async createPoll(user: UserType, body: CreatePollDto) {
+        // make this transaction
         const pollCreate = await this.sql`
             INSERT INTO poll (title, description, branch, start_date, end_date, vote_type)
             VALUES (${body.title}, ${body.description}, ${user.branch} ,${body.start_date}, ${body.end_date}, ${body.vote_type})
@@ -18,6 +19,11 @@ export class PollService {
         if(!pollCreate.length) {
             throw new GoneException('failed to create Poll')
         }
+
+        const createPollEligibleStudents = await this.sql`
+            INSERT INTO poll_eligibility (poll_id, allowed_education_levels, allowed_courses)
+            VALUES (${pollCreate[0].id}, ${body.allowed_education_levels}, ${body.allowed_courses})
+        `
 
         return pollCreate[0]
     }
@@ -106,6 +112,27 @@ export class PollService {
         `
     
         return getPollStatisticsForUser[0];
+    }
+    
+    // for updating
+    async getInitialData(user: UserType, pollId: string) {
+        const branch = user.branch;
+
+        const initialData = await this.sql`
+            SELECT
+            p.*, 
+            pe.allowed_courses,
+            pe.allowed_education_levels::text[] as allowed_education_levels
+            FROM poll p
+            LEFT JOIN poll_eligibility pe ON p.id = pe.poll_id
+            WHERE p.id = ${pollId} AND p.branch = ${branch}
+        `
+
+        if(!initialData.length) {
+            throw new NotFoundException('failed to find initial poll')
+        }
+
+        return initialData[0];
     }
 
     async getPoll(user: UserType, pollId: string) {
@@ -363,7 +390,7 @@ export class PollService {
     }
 
     async updatePoll(user: UserType, pollId: string, body: CreatePollDto) {
-
+        // should be a transaction because well never know if what fail
         const updatePoll = await this.sql`
             UPDATE poll 
             SET 
@@ -376,11 +403,23 @@ export class PollService {
             RETURNING *;
         `
 
-        if(!updatePoll.length) {
+        const updatePollElegibility = await this.sql`
+            UPDATE poll_eligibility
+            SET 
+                allowed_courses = ${body.allowed_courses},
+                allowed_education_levels = ${body.allowed_education_levels}
+            WHERE poll_id = ${pollId}
+            RETURNING allowed_courses, allowed_education_levels::text[];
+        `
+
+        if(!updatePoll.length || !updatePollElegibility) {
             throw new GoneException('failed to update Poll')
         }
 
-        return updatePoll[0]
+        return {
+            ...updatePoll[0],
+            ...updatePollElegibility[0]
+        }
     }
 
     // should i delete or archive the poll?

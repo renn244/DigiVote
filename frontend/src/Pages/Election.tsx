@@ -125,7 +125,7 @@ const Election = () => {
                                     </div>
                                     <div className="flex flex-col items-center justify-center p-4 bg-red-50 rounded-lg">
                                         <CalendarIcon className="h-8 w-8 text-red-600 mb-2" />
-                                        <span className="text-2xl font-bold text-red-600">{election.daysremaining}</span>
+                                        <span className="text-2xl font-bold text-red-600">{election.daysremaining < 0 ? "Already Ended" : election.daysremaining}</span>
                                         <span className="text-sm text-red-600">Days Remaining</span>
                                     </div>
                                 </div>

@@ -17,6 +17,16 @@ CREATE TABLE POLL (
     vote_type vote_type NOT NULL DEFAULT 'multiple'
 );
 
+CREATE TABLE POLL_ELIGIBILITY (
+    id SERIAL PRIMARY KEY,
+
+    poll_id INT NOT NULL,
+    FOREIGN KEY (poll_id) REFERENCES POLL(id) ON DELETE CASCADE,
+
+    allowed_education_levels education_level[] NOT NULL, -- senior highschool or tertiary
+    allowed_courses VARCHAR(255)[], -- course or strand
+)
+
 -- every poll will have a party and a candidate
 -- in order to have candidate they must be in a party
 CREATE TABLE  PARTIES (

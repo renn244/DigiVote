@@ -15,7 +15,7 @@ const UpdatePoll = () => {
     const { data, isLoading } = useQuery({
         queryKey: ['update', 'polls', id],
         queryFn: async () => {
-            const response = await axiosFetch.get(`/poll/${id}`);
+            const response = await axiosFetch.get(`/poll/getInitialData/${id}`);
 
             if(response.status === 404) {
                 navigate('/notfound')
@@ -63,7 +63,7 @@ const UpdatePoll = () => {
                 <h1 className="text-3xl font-bold text-gray-800">Update Poll</h1>
             </div>
             <div className="flex justify-center">
-                <PollForm className="w-full max-w-[550px]"
+                <PollForm className="w-full max-w-[855px]"
                 initialData={data} onsubmit={onSubmit} />
             </div>
         </div>
