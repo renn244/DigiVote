@@ -41,11 +41,15 @@ const Settings = () => {
        return
     }
 
-    const changeUserInfo: SubmitHandler<UserInfoState> = async (data) => {
+    const changeUserInfo = async (data: UserInfoState, setError: UseFormSetError<UserInfoState>) => {
         const response = await axiosFetch.patch('/user/updateUserInfo', data)
 
         if(response.status >= 400) {
-            throw new Error(response.data.message)
+            setError(response.data.name, {
+                type: 'manual',
+                message: response.data.message
+            })
+            return
         }
 
         // invalidate the query

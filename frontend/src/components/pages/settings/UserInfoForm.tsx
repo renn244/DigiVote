@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
-import { SubmitHandler, useForm } from "react-hook-form"
+import { useForm, UseFormSetError } from "react-hook-form"
 import toast from "react-hot-toast"
 
 export type UserInfoState = {
@@ -14,7 +14,7 @@ export type UserInfoState = {
 }
 
 type UserInfoFormProps = {
-    onsubmit: SubmitHandler<UserInfoState>,
+    onsubmit: (data: UserInfoState, setError: UseFormSetError<UserInfoState>) => Promise<void>
     initialData: UserInfoState
 }
 
@@ -23,14 +23,14 @@ const UserInfoForm = ({
     initialData
 }: UserInfoFormProps) => {
     const [isLoading, setIsLoading] = useState(false);
-    const { register, handleSubmit, formState: { errors } } = useForm<UserInfoState>({
+    const { register, setError, handleSubmit, formState: { errors } } = useForm<UserInfoState>({
         defaultValues: initialData
     });
 
     const onSubmit = async (data: UserInfoState) => {
         setIsLoading(true);
         try {
-            await onsubmit(data);
+            await onsubmit(data, setError);
         } catch (error: any) {
             toast.error(error.message);
         } finally {
