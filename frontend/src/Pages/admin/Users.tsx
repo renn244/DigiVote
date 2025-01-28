@@ -1,3 +1,4 @@
+import UserOptions from "@/components/pages/admin/User/UserOptions"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -88,6 +89,13 @@ const Users = () => {
                                     <TableCell>{user.student_id}</TableCell>
                                     <TableCell>{user.year_level}</TableCell>
                                     <TableCell>{user.course}</TableCell>
+                                    <TableCell>
+                                        <UserOptions searchParams={{
+                                            search: search,
+                                            page: page
+                                        }} 
+                                        userId={user.id} name={user.name} />
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

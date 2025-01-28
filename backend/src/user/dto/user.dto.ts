@@ -1,4 +1,5 @@
 import { IsString } from "class-validator";
+import { Match } from "src/lib/decorator/Match.decorator";
 
 export class ChangePasswordDto {
     @IsString()
@@ -35,3 +36,28 @@ export class updateUserInfoDto {
     @IsString()
     branch: string;
 }
+
+export class ChangePasswordAdminDto {
+    @IsString()
+    password: string;
+
+    @IsString()
+    @Match('password', {
+        message: 'Password does not match'
+    })
+    confirmPassword: string;
+}
+
+export class updateUserInfoAdmin extends updateUserInfoDto {
+    @IsString()
+    student_id: string;
+
+    @IsString()
+    education_level: string;
+
+    @IsString()
+    year_level: number;
+
+    @IsString()
+    course: string;
+} 

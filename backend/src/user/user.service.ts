@@ -1,6 +1,6 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, GoneException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { UserType } from 'src/lib/decorator/User.decorator';
-import { ChangePasswordDto, updateStudentInfoDto, updateUserInfoDto } from './dto/user.dto';
+import { ChangePasswordAdminDto, ChangePasswordDto, updateStudentInfoDto, updateUserInfoAdmin, updateUserInfoDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 
@@ -12,7 +12,7 @@ export class UserService {
     ) {}
 
     async getUsers(user: UserType, query: { page: string, search: string }) {
-        const limit = 12;
+        const limit = 9;
         const offset = ((parseInt(query.page) || 1) - 1) * limit;
 
         const users = await this.sql`
@@ -39,13 +39,17 @@ export class UserService {
     }
 
     // for settings page
-    async getInitialUserInfo(user: UserType) {
+    async getInitialUserInfo(userId: string) {
         const getUser = await this.sql`
             SELECT name, email, username, branch,
-                education_level, year_level, course, profile
+                education_level, year_level, student_id, course, profile
             FROM users
-            WHERE id = ${user.id}
+            WHERE id = ${userId}
         `
+
+        if(!getUser.length) {
+            throw new NotFoundException()
+        }
 
         return getUser[0]
     }
@@ -81,7 +85,29 @@ export class UserService {
         return updatedAvatar[0];
     }
 
-    async changePassword(user: UserType, body: ChangePasswordDto) {
+    async changePassword(userId: string, newPassword: string) {
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+
+        const updatedPassword = await this.sql`
+            UPDATE users
+            SET password = ${hashedPassword}
+            WHERE id = ${userId}
+            RETURNING password;
+        `
+
+        if(!updatedPassword.length) {
+            throw new GoneException({
+                name: 'password',
+                message: 'Failed to update password'
+            })
+        }
+        
+        return {
+            message: 'Password changed successfully'
+        }
+    }
+
+    async changeUserPassword(user: UserType, body: ChangePasswordDto) {
         const { currentPassword, newPassword, confirmPassword } = body
 
         if (newPassword !== confirmPassword) {
@@ -91,6 +117,7 @@ export class UserService {
             })
         }
 
+        // check if password is correct
         const getUser = await this.sql`
             SELECT password
             FROM users
@@ -106,14 +133,8 @@ export class UserService {
             })
         }
 
-        const hashedPassword = await bcrypt.hash(newPassword, 10)
-
-        await this.sql`
-            UPDATE users
-            SET password = ${hashedPassword}
-            WHERE id = ${user.id}
-        `
-
+        await this.changePassword(user.id, newPassword)
+        
         return {
             message: 'Password changed successfully'
         }
@@ -135,18 +156,90 @@ export class UserService {
     }
 
     async updateUserInfo(user: UserType, body: updateUserInfoDto) {
-        const { name, email, username, branch } = body
+        try {
+            const { name, email, username, branch } = body
 
-        const updatedUserInfo = await this.sql`
-            UPDATE users
-            SET name = COALESCE(${name}, name),
-                email = COALESCE(${email}, email),
-                username = COALESCE(${username}, username),
-                branch = COALESCE(${branch}, branch)
-            WHERE id = ${user.id}
-            RETURNING name, email, username, branch;
-        `
+            const updatedUserInfo = await this.sql`
+                UPDATE users
+                SET name = COALESCE(${name}, name),
+                    email = COALESCE(${email}, email),
+                    username = COALESCE(${username}, username),
+                    branch = COALESCE(${branch}, branch)
+                WHERE id = ${user.id}
+                RETURNING name, email, username, branch;
+            `
+            
+            return updatedUserInfo[0]
+        } catch (error) {
+            if(error.code === '23505') {
+                if(error.constraint === 'users_email_key') {
+                    throw new BadRequestException({
+                        name: 'email',
+                        message: 'Email is already taken'
+                    })
+                } else if(error.constraint === 'users_username_key') {
+                    throw new BadRequestException({
+                        name: 'username',
+                        message: 'Username is already taken'
+                    })
+                }
+            }
+
+            throw error
+        }
+    }
+
+    // for admin change
+    async changePasswordAdmin(userId: string, body: ChangePasswordAdminDto) {
+
+        await this.changePassword(userId, body.password)
         
-        return updatedUserInfo[0]
+        return {
+            message: 'Password changed successfully'
+        }
+    }
+
+
+    async changeUserInfoAdmin(userId: string, body: updateUserInfoAdmin) {
+        try {
+            const { name, email, username, branch, education_level, year_level, course, student_id } = body
+
+            const updatedUserInfo = await this.sql`
+                UPDATE users
+                SET name = COALESCE(${name}, name),
+                    email = COALESCE(${email}, email),
+                    username = COALESCE(${username}, username),
+                    branch = COALESCE(${branch}, branch),
+                    education_level = COALESCE(${education_level}, education_level),
+                    year_level = COALESCE(${year_level}, year_level),
+                    course = COALESCE(${course}, course),
+                    student_id = COALESCE(${student_id}, student_id)
+                WHERE id = ${userId}
+                RETURNING name, email, username, branch, education_level, year_level, course, student_id;
+            `
+            
+            return updatedUserInfo[0]
+        } catch (error) {
+            if(error.code === '23505') {
+                if(error.constraint === 'users_email_key') {
+                    throw new BadRequestException({
+                        name: 'email',
+                        message: 'Email is already taken'
+                    })
+                } else if(error.constraint === 'users_username_key') {
+                    throw new BadRequestException({
+                        name: 'username',
+                        message: 'Username is already taken'
+                    })
+                } else if(error.constraint === 'users_student_id_key') {
+                    throw new BadRequestException({
+                        name: 'student_id',
+                        message: 'Student ID is already taken'
+                    })
+                }
+            }
+
+            throw error
+        }
     }
 }

@@ -1,6 +1,11 @@
 import { Injectable, CanActivate, ExecutionContext, BadRequestException, Inject, NotFoundException, ForbiddenException, Type } from "@nestjs/common";
 
 
+/*
+*   this guard if the admin is allowed to access the controller 
+*   if the admin is in the same branch as the poll he's trying to access
+*/
+
 export const PollBranchGuard = (module: string, action: string): Type<CanActivate> => {
     @Injectable()
     class PollBranchGuard implements CanActivate {

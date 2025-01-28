@@ -7,6 +7,7 @@ import PasswordInput from "@/components/common/PasswordInput";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import axiosFetch from "@/lib/axios";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 type ResetPasswordForm = {
     newPassword: string
@@ -93,8 +94,8 @@ const ResetPassword = () => {
                                     {errors.confirmPassword && <span className="text-red-500 font-medium text-sm">{errors.confirmPassword.message}</span>}
                                 </div>
                             </div>
-                            <Button className="" type="submit" >
-                                Reset Password
+                            <Button disabled={isLoading} type="submit" >
+                                {isLoading ? <LoadingSpinner /> : "Reset Password"}
                             </Button>
                         </form>
                     </CardContent>

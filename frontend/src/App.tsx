@@ -19,7 +19,7 @@ import Help from "./Pages/Help"
 import Results from "./Pages/Results"
 import Result from "./Pages/Result"
 import AuthenticatedRoute from "./components/common/AuthenticatedRoute"
-import ForgotPassword from "./Pages/forgot-password"
+import ForgotPassword from "./Pages/Forgot-password"
 import ResetPassword from "./Pages/ResetPassword"
 
 function App() {
