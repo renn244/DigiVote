@@ -111,7 +111,7 @@ const Election = () => {
                                     <div className="flex flex-col items-center justify-center p-4 bg-green-50 rounded-lg">
                                         <VoteIcon className="h-8 w-8 text-green-600 mb-2" />
                                         <span className="text-2xl font-bold text-green-600">
-                                            {election.votescast.toLocaleString()}
+                                            {election.votescast?.toLocaleString()}
                                         </span>
                                         <span className="text-sm text-green-600">Votes Cast</span>
                                     </div>

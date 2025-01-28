@@ -12,7 +12,6 @@ export class PartiesService {
     ) {}
 
     async createParties(user: UserType, body: CreatePartiesDto, banner: Express.Multer.File) {
-        // check if the one making the parties is actually admin and in branch
         try {    
             const getPoll = await this.sql`
                 SELECT branch, title FROM poll

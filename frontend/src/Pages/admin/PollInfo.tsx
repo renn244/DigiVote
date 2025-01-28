@@ -65,7 +65,7 @@ const PollInfo = () => {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-                <Card>
+                <Card className="max-h-[513.13px]">
                     <CardHeader>
                         <CardTitle>Parties Votes or voters on days they voted</CardTitle>
                     </CardHeader>
@@ -95,7 +95,38 @@ const PollInfo = () => {
                         </ChartContainer>
                     </CardContent>
                 </Card>
-                <Positions />
+                <div className="space-y-3">
+                    <Card className="max-h-[300px]">
+                        <CardHeader>
+                            <CardTitle>
+                                Eligible to Vote
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <div className="space-y-1">
+                                <h1 className="text-lg font-semibold">Education Level</h1>
+                                <div className="flex flex-wrap gap-1">
+                                    {election?.allowed_education_levels.map((education_level, idx) => (
+                                        <Badge key={idx}>
+                                            {education_level}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="space-y-1">
+                                <h1 className="text-lg font-semibold">Course/Strand</h1>
+                                <div className="flex flex-wrap">
+                                    {election?.allowed_courses.map((course, idx) => (
+                                        <Badge key={idx}>
+                                            {course}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Positions />
+                </div>
             </div>
 
             {/* also display the candidates votings */}

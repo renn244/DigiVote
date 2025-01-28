@@ -106,8 +106,11 @@ export class PollService {
                         AND v.poll_id = p.id
                         GROUP BY ds.vote_date
                     ) AS daily_votes
-                ) AS votes_stats
+                ) AS votes_stats,
+                pe.allowed_courses,
+                pe.allowed_education_levels::text[] as allowed_education_levels
             FROM poll p
+            LEFT JOIN poll_eligibility pe ON p.id = pe.poll_id
             WHERE p.id = ${pollId} AND p.branch = ${branch};
         `
     

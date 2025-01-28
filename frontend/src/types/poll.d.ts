@@ -64,5 +64,7 @@ export type pollStats = {
     total_votes: number,
     participating_parties: number,
     status: pollStatus,
-    votes_stats: vote_stat[]
+    votes_stats: vote_stat[],
+    allowed_courses: string[],
+    allowed_education_levels: string[],
 }

@@ -252,8 +252,10 @@ const PollForm = ({
                             <FormItem>
                                 <FormLabel>Allowed Courses</FormLabel>
                                 <FormControl>
-                                    <TagInput options={["BSIT", "BSCS", "BSIS"]} // fetch the courses from the backend
-                                    tags={field.value || []}
+                                    <TagInput options={["ALL SHS", "ALL TERTIARY" ,"BSIT", "BSCS", "BSIS", "IT", "ACT", "BSBA", "BSA", "BSAIS", "BSMA", "BSRTCS", "ART", "BSHM", "BSCM", "HRA", "HRS",
+                                    "BSTM", "STEM", "HUMSS", "ABM", "GAS", "ICT"
+                                    ]} // is this not practical?
+                                    tags={field.value || []} className="max-w-[330px]"
                                     setTags={(tags) => field.onChange(tags)} />
                                 </FormControl>
                                 <FormDescription>

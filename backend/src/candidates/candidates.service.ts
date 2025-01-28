@@ -83,7 +83,6 @@ export class CandidatesService {
 
     async updateCandidate(user: UserType, body: UpdateCandidateDto, candidateId: string, photo: Express.Multer.File | undefined) {
         try {
-            // check if he is admin within the branch
             let photoUrl = undefined;
             if(photo) {
                 const getCandidate = await this.getCandidate(candidateId);

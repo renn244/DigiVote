@@ -41,7 +41,7 @@ const Positions = () => {
                 <CreatePosition />
             </CardHeader>
             <CardContent className="px-0">
-                <ScrollArea className="h-96 p-6 pt-0">
+                <ScrollArea className="h-86 p-6 pt-0">
                     <div className="space-y-3">
                         {data?.map((position: any) => (
                             <div key={position.id} className="flex items-center">
