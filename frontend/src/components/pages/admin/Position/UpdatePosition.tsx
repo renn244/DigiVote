@@ -56,7 +56,7 @@ const UpdatePosition = ({
                         Update Position
                     </DialogTitle>
                 </DialogHeader>
-                <PositionForm onsubmit={onSubmit}
+                <PositionForm onsubmit={onSubmit} isUpdate
                 initialData={initialData} poll_id={parseInt(poll_id)} />
             </DialogContent>
         </Dialog>

@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import axiosFetch from "@/lib/axios"
 import { partyBasicInfo } from "@/types/party"
 import { useQuery } from "@tanstack/react-query"
-import { AlertTriangle, ArrowLeft, CalendarIcon, Percent, Users, VoteIcon } from "lucide-react"
+import { AlertTriangle, CalendarIcon, Percent, Users, VoteIcon } from "lucide-react"
 import { Link, Navigate, useParams } from "react-router"
 
 const Election = () => {
@@ -101,8 +101,7 @@ const Election = () => {
                                     <div className="flex flex-col items-center justify-center p-4 bg-blue-50 rounded-lg">
                                         <Users className="h-8 w-8 text-blue-600 mb-2" />
                                         <span className="text-2xl font-bold text-blue-600">
-                                            {/* {election.registeredVoters.toLocaleString()} */}
-                                            NOT YET IMPLEMENTED
+                                            {election.registered_voters?.toLocaleString()}
                                         </span>
                                         <span className="text-sm text-blue-600">Registered Voters</span>
                                     </div>
@@ -116,8 +115,7 @@ const Election = () => {
                                     <div className="flex flex-col items-center justify-center p-4 bg-yellow-50 rounded-lg">
                                         <Percent className="h-8 w-8 text-yellow-600 mb-2" />
                                         <span className="text-2xl font-bold text-yellow-600">
-                                            {/* {election.voterTurnout}% */}
-                                            NOT YET IMPLEMENTED
+                                            {election.voter_turnout > 100 ? 100 : election.voter_turnout}%
                                         </span>
                                         <span className="text-sm text-yellow-600">Voter Turnout</span>
                                     </div>
@@ -162,7 +160,7 @@ const Election = () => {
                     </div>
                     <div className="space-y-6">
                         {
-                            status === "active"  ? 
+                            status === "active" && election.allowed === true  ? 
                                 election.hasvoted ? (
                                     <div className="space-y-1">
                                         <h2 className="text-lg font-medium">You already voted!</h2>
@@ -212,7 +210,7 @@ const Election = () => {
                                 <div className="space-y-3">
                                     <div className="space-y-1">
                                         <h1 className="text-lg font-semibold">Education Level</h1>
-                                        <div className="flex flex-wrap">
+                                        <div className="flex flex-wrap gap-1">
                                             {election?.allowed_education_levels?.map((education_level: string, idx: number) => (
                                                 <Badge key={idx}>
                                                     {education_level}
@@ -222,7 +220,7 @@ const Election = () => {
                                     </div>
                                     <div className="space-y-1">
                                         <h1 className="text-lg font-semibold">Course/Strand</h1>
-                                        <div className="flex flex-wrap">
+                                        <div className="flex flex-wrap gap-1">
                                             {election?.allowed_courses?.map((course: string, idx: number) => (
                                                 <Badge key={idx}>
                                                     {course}
@@ -242,21 +240,21 @@ const Election = () => {
                             <CardContent className="px-0">
                                 {election.positions && election.positions.length > 0 ? (
                                     <ScrollArea className="h-96 p-6 pb-3 pt-0">
-                                    <div className="space-y-3">
-                                        {election.positions?.map((position: any) => (
-                                            <div key={position.id}>
-                                                <div className="space-y-1 flex-1">
-                                                    <p className="text-lg font-bold">{position.position}</p>
+                                        <div className="space-y-3">
+                                            {election.positions?.map((position: any) => (
+                                                <div key={position.id}>
+                                                    <div className="space-y-1 flex-1">
+                                                        <p className="text-lg font-bold">{position.position}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {position.description}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        {position.description}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </ScrollArea>
+                                            ))}
+                                        </div>
+                                    </ScrollArea>
                                 ) : (
                                     <div className="mx-3">
                                         <div className="flex items-center justify-center bg-yellow-100 rounded-lg px-6 py-3">

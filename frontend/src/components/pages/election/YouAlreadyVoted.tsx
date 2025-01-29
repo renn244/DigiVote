@@ -18,7 +18,7 @@ const YouAlreadyVoted = ({
                 </div>
                 <h1 className='text-3xl font-bold text-blue-900 mb-4'>Access Forbidden</h1>
                 <p className='text-blue-800 mb-6'>
-                    Sorry, you have already voted in this election.
+                    Sorry, you have already voted in this election or forbidden to vote.
                 </p>
                 <div className='space-y-4'>
                     <Button asChild className='w-full'>

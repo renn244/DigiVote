@@ -49,7 +49,7 @@ const CreateCandidates = ({
         <Dialog open={DialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger>
                 <Button className="bg-yellow-500 hover:bg-yellow-600 text-white">
-                    <PlusCircle className="mr-2 h-4 w-4" /> Add Position
+                    <PlusCircle className="mr-2 h-4 w-4" /> Add Candidates
                 </Button>
             </DialogTrigger>
             <DialogContent>

@@ -28,6 +28,41 @@ export class PollService {
         return pollCreate[0]
     }
 
+    // check if the user is eligible to vote
+    async isEligibleForPoll(userId: number | string, pollId: number | string) {
+        const getLatestUserInfo = await this.sql`
+            SELECT education_level, course, branch
+            FROM users
+            WHERE id = ${userId}
+        `
+
+        const userEducation = getLatestUserInfo[0].education_level;
+        const course = getLatestUserInfo[0].course;
+        const branch = getLatestUserInfo[0].branch;
+
+        const isElegibleResult = await this.sql`
+            SELECT 
+                (
+                    CASE
+                        WHEN ${userEducation} = ANY(pe.allowed_education_levels) AND 'ALL TERTIARY' = ANY(pe.allowed_courses) AND p.branch = ${branch}
+                        THEN True
+                        WHEN ${userEducation} = ANY(pe.allowed_education_levels) AND 'ALL SHS' = ANY(pe.allowed_courses) AND p.branch = ${branch}
+                        THEN True
+
+                        -- check if qualified
+                        WHEN ${userEducation} = ANY(pe.allowed_education_levels) AND ${course} = ANY(pe.allowed_courses) AND p.branch = ${branch}
+                        THEN True
+                        ELSE False
+                    END 
+                )::boolean as allowed
+            FROM poll_eligibility pe
+            LEFT JOIN poll p ON p.id = pe.poll_id
+            WHERE poll_id = ${pollId}
+        `
+
+        return isElegibleResult[0]
+    }
+
     async getPolls(user: UserType, search: string) {
         const branch = user.branch;
 
@@ -177,6 +212,13 @@ export class PollService {
                     AND v2.poll_id = p.id 
                 )
             ) as hasVoted,
+            ( -- getting the same poll Id because people who are not eligible will not be able to vote any way
+                SELECT ROUND((NULLIF(COUNT(v.id), 0)::decimal / COALESCE(registered_voters.registered_count, 0)::decimal * 100), 2)
+                FROM poll_eligibility pe
+                LEFT JOIN votes v ON pe.poll_id = v.poll_id 
+                WHERE pe.poll_id = p.id
+            ) as voter_turnout,
+            registered_voters.registered_count as registered_voters,
             pe.allowed_courses,
             pe.allowed_education_levels::text[] as allowed_education_levels,
             p.end_date::DATE - NOW()::DATE as daysRemaining -- get day remaining
@@ -184,15 +226,33 @@ export class PollService {
             LEFT JOIN parties pa ON p.id = pa.poll_id
             LEFT JOIN positions po ON p.id = po.poll_id
             LEFT JOIN poll_eligibility pe ON p.id = pe.poll_id
-            WHERE p.branch = ${branch} AND p.id = ${pollId} 
-            GROUP BY p.id, pe.allowed_courses, pe.allowed_education_levels;
+            JOIN ( -- ISSUE: when user change information like branch, or course the voter turnout will be affected and also registered vote. must create registered_voter with dates so that it's contants and not based on realtime
+                SELECT 
+                    pe.poll_id,
+                    COUNT(u.id)::INT AS registered_count
+                FROM poll_eligibility pe
+                JOIN poll p2 ON p2.id = pe.poll_id
+                JOIN users u ON (
+                    ('ALL SHS' = ANY(pe.allowed_courses) AND u.education_level = ANY(pe.allowed_education_levels) AND p2.branch = u.branch) OR
+                    ('ALL TERTIARY' = ANY(pe.allowed_courses) AND u.education_level = ANY(pe.allowed_education_levels) AND p2.branch = u.branch ) OR 
+                    (u.course = ANY(pe.allowed_courses) AND u.education_level = ANY(pe.allowed_education_levels) AND p2.branch = u.branch)
+                )
+                GROUP BY pe.poll_id
+            ) as registered_voters ON registered_voters.poll_id = p.id
+            WHERE p.branch = ${branch} AND p.id = ${pollId}
+            GROUP BY p.id, pe.allowed_courses, pe.allowed_education_levels, registered_voters.registered_count;
         `
 
         if(!getPollForUser.length) {
             throw new NotFoundException('Poll not found')
         }
 
-        return getPollForUser[0]
+        const isEligible = await this.isEligibleForPoll(user.id, pollId)
+
+        return { 
+            ...getPollForUser[0],
+            ...isEligible
+        }
     }
     
     async getPollForVoting(user: UserType, pollId: string) {
@@ -206,6 +266,15 @@ export class PollService {
 
         if(getVotes.length) {
             throw new ForbiddenException('You have already voted')
+        }
+
+        const isEligible = await this.isEligibleForPoll(user.id, pollId)
+
+        if(!isEligible.allowed) {
+            throw new ForbiddenException({
+                name: 'eligible',
+                message: 'you are not eligible to vote'
+            })
         }
 
         const getPoll = await this.sql`

@@ -1,10 +1,12 @@
 import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { UserType } from 'src/lib/decorator/User.decorator';
+import { PollService } from 'src/poll/poll.service';
 
 @Injectable()
 export class VoteService {
     constructor(
-        @Inject('POSTGRES_POOL') private readonly sql: any
+        @Inject('POSTGRES_POOL') private readonly sql: any,
+        private readonly pollService: PollService
     ) {}
 
     async createVote(user: UserType, pollId: string, votes: { candidate_id: number }[]) {
@@ -19,6 +21,12 @@ export class VoteService {
 
         if(new Date(getPollResult[0].end_date) < new Date() ) {
             throw new ForbiddenException('poll is closed')
+        }
+
+        const isEligible = await this.pollService.isEligibleForPoll(user.id, pollId)
+
+        if(!isEligible.allowed) {
+            throw new ForbiddenException('you are not eligible to vote')
         }
 
         const getVoteResult = await this.sql`
@@ -186,21 +194,4 @@ export class VoteService {
         return getPollResult[0];
     }
 
-    async getVote(user: UserType, pollId: string) {
-        const getVoteResult = await this.sql`
-            SELECT * FROM votes
-            WHERE poll_id = ${pollId} AND user_id = ${user.id}
-        `
-
-        if(!getVoteResult.length) {
-            throw new NotFoundException('vote does not exist')
-        }
-
-        // if the vote does not belong to the user or the user is not an admin
-        if(getVoteResult[0].user_id === user.id && user.role !== 'admin') {
-            throw new ForbiddenException('the vote does not belong to you')
-        }
-
-        return getVoteResult;
-    }
 }

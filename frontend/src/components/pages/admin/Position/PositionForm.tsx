@@ -28,6 +28,7 @@ type PositionFormProps = {
     initialData?: position,
     onsubmit: (data: z.infer<typeof formSchema>) => Promise<void>,
     className?: string,
+    isUpdate?: boolean,
     poll_id: number
 } & ComponentProps<'form'>
 
@@ -35,6 +36,7 @@ const PositionForm = ({
     initialData,
     onsubmit,
     className,
+    isUpdate=false,
     poll_id,
     ...props
 }: PositionFormProps) => {
@@ -99,7 +101,7 @@ const PositionForm = ({
                 <div>
                     <Button disabled={isLoading} type="submit" 
                     className="bg-yellow-500 hover:bg-yellow-600 text-white mt-4 w-full">
-                        {isLoading ? <LoadingSpinner /> : "Create Position"}
+                        {isLoading ? <LoadingSpinner /> : isUpdate ? "Update Position" : "Create Position"}
                     </Button>
                 </div>
             </form>

@@ -172,7 +172,7 @@ const CandidateForm = ({
                 <div>
                     <Button disabled={isLoading} type="submit"
                     className="bg-yellow-500 hover:bg-yellow-600 text-white w-full mt-4">
-                        {isLoading ? <LoadingSpinner /> : "Create Candidate"}
+                        {isLoading ? <LoadingSpinner /> : isUpdate ? "Update Candidate" : "Create Candidate"}
                     </Button>
                 </div>
             </form>

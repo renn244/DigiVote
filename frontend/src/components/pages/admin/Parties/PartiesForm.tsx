@@ -173,7 +173,7 @@ const PartiesForm = ({
                 <div>
                     <Button disabled={isLoading} type="submit" 
                     className="bg-yellow-500 hover:bg-yellow-600 text-white w-full mt-4">
-                        {isLoading ? <LoadingSpinner /> : "Create Poll"}
+                        {isLoading ? <LoadingSpinner /> : isUpdate ? "Update Party" : "Create Party"}
                     </Button>
                 </div>
             </form>

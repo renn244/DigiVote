@@ -1,13 +1,12 @@
+import GoBackButton from "@/components/common/GoBackButton";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ElectionVotingInfo from "@/components/pages/election/ElectionVotingInfo";
 import PositionCard from "@/components/pages/election/PositionCard";
-import { Button } from "@/components/ui/button";
 import axiosFetch from "@/lib/axios";
 import { poll } from "@/types/poll";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
-import { Link, Navigate, useParams } from "react-router"
+import { Navigate, useParams } from "react-router"
 
 type pollVote = {
     positions: {
@@ -56,12 +55,9 @@ const ViewYourVote = () => {
                 <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
                     <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0'>
                         <div className='flex items-center space-x-4'>
-                            <Button variant="outline" asChild className="bg-white hover:bg-yellow-100">
-                                <Link to="/elections" className='flex items-center'>
-                                    <ArrowLeft className='mr-2 h-4 w-4' />
-                                    <span className='font-semibold'>Back to Election</span>
-                                </Link>
-                            </Button>
+                            <GoBackButton to={`/elections/${pollId}`}>
+                                Back to Election
+                            </GoBackButton>
                         </div>
                     </div>
                 </div>

@@ -39,16 +39,6 @@ const UpdatePoll = () => {
         }
 
         toast.success('Poll updated successfully!');
-        
-        // // updating the poll
-        // queryClient.setQueryData(['polls'], (old: poll[]) => {
-        //     return old.map(poll => {
-        //         if(poll.id === response.data.id) {
-        //             return response.data
-        //         }
-        //         return poll
-        //     })
-        // })
 
         // updating the get poll query
         queryClient.setQueryData(['update', 'polls', id], () => response.data)
@@ -63,7 +53,7 @@ const UpdatePoll = () => {
                 <h1 className="text-3xl font-bold text-gray-800">Update Poll</h1>
             </div>
             <div className="flex justify-center">
-                <PollForm className="w-full max-w-[855px]"
+                <PollForm className="w-full max-w-[855px]" isUpdate
                 initialData={data} onsubmit={onSubmit} />
             </div>
         </div>

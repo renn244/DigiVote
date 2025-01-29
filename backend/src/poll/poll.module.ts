@@ -4,6 +4,7 @@ import { PollController } from './poll.controller';
 
 @Module({
   providers: [PollService],
-  controllers: [PollController]
+  controllers: [PollController],
+  exports: [PollService]
 })
 export class PollModule {}

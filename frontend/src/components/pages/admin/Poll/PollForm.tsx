@@ -41,6 +41,7 @@ export const formSchema = z.object({
   
 type PollFormProps = {
     initialData?: any,
+    isUpdate?: boolean,
     onsubmit: (data: z.infer<typeof formSchema>) => Promise<void>, // make the onsubmit small because it's affecting form
     className?: string
 } & ComponentProps<'form'>
@@ -49,6 +50,7 @@ const PollForm = ({
     initialData,
     onsubmit,
     className,
+    isUpdate=false,
     ...props
 }: PollFormProps) => {
     const [isLoading, setIsLoading] = useState(false)
@@ -268,7 +270,7 @@ const PollForm = ({
                 </div>
                 <div>
                     <Button disabled={isLoading} type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-white w-full mt-4">
-                        {isLoading ? <LoadingSpinner /> : "Create Poll"}
+                        {isLoading ? <LoadingSpinner /> : isUpdate ? "Update Poll" : "Create Poll"}
                     </Button>
                 </div>
             </form>
