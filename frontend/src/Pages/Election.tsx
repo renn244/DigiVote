@@ -1,3 +1,4 @@
+import GoBackButton from "@/components/common/GoBackButton"
 import LoadingSpinner from "@/components/common/LoadingSpinner"
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
 import { Badge } from "@/components/ui/badge"
@@ -60,16 +61,13 @@ const Election = () => {
 
     return (
         <div className="min-h-[855px] bg-white">
-            <div className="text-yellow-900 pt-8">
+            <div className=" pt-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
                         <div className="flex items-center space-x-4">
-                            <Button variant="outline" asChild className="bg-white hover:bg-yellow-100">
-                                <Link to="/elections" className="flex items-center">
-                                    <ArrowLeft className="mr-2 h-4 w-4" />
-                                    <span className="font-semibold">Back to Elections</span>
-                                </Link>
-                            </Button>
+                            <GoBackButton to={`/elections`}>
+                                Back to Elections
+                            </GoBackButton>
                         </div>
                     </div>
                 </div>
@@ -207,21 +205,31 @@ const Election = () => {
                         <Card>
                             <CardHeader>
                                 <CardTitle>
-                                    Voter Information
+                                    Eligible to vote:
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div>
-                                    <h3 className="font-semibold">Eligibility:</h3>
-                                    <p>FROM STI</p>
-                                </div>
-                                <div>
-                                    <h3 className="font-bold">Voting Methods:</h3>
-                                    <ul className="font-semibold list-inside">
-                                        {election?.votingMethods?.map((method: string, idx: number) => (
-                                            <li key={idx}>{method}</li>
-                                        ))}
-                                    </ul>
+                                <div className="space-y-3">
+                                    <div className="space-y-1">
+                                        <h1 className="text-lg font-semibold">Education Level</h1>
+                                        <div className="flex flex-wrap">
+                                            {election?.allowed_education_levels?.map((education_level: string, idx: number) => (
+                                                <Badge key={idx}>
+                                                    {education_level}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <h1 className="text-lg font-semibold">Course/Strand</h1>
+                                        <div className="flex flex-wrap">
+                                            {election?.allowed_courses?.map((course: string, idx: number) => (
+                                                <Badge key={idx}>
+                                                    {course}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>

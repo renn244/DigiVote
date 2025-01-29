@@ -177,12 +177,15 @@ export class PollService {
                     AND v2.poll_id = p.id 
                 )
             ) as hasVoted,
+            pe.allowed_courses,
+            pe.allowed_education_levels::text[] as allowed_education_levels,
             p.end_date::DATE - NOW()::DATE as daysRemaining -- get day remaining
             FROM poll p
             LEFT JOIN parties pa ON p.id = pa.poll_id
             LEFT JOIN positions po ON p.id = po.poll_id
+            LEFT JOIN poll_eligibility pe ON p.id = pe.poll_id
             WHERE p.branch = ${branch} AND p.id = ${pollId} 
-            GROUP BY p.id;
+            GROUP BY p.id, pe.allowed_courses, pe.allowed_education_levels;
         `
 
         if(!getPollForUser.length) {

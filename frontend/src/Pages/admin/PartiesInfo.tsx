@@ -1,4 +1,5 @@
 import DashboardCard from "@/components/common/DashboardCard";
+import GoBackButton from "@/components/common/GoBackButton";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Candidates from "@/components/pages/admin/Candidates/Candidates";
 import { Badge } from "@/components/ui/badge";
@@ -77,11 +78,9 @@ const PartiesInfo = () => {
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-gray-800">1neSTI Dashboard</h1>
 
-                <Button variant="outline" asChild>
-                    <Link to="/admin/parties">
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Parties
-                    </Link>
-                </Button>
+                <GoBackButton to="/admin/parties">
+                    Back to Parties
+                </GoBackButton>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

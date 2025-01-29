@@ -1,4 +1,5 @@
 import DashboardCard from "@/components/common/DashboardCard";
+import GoBackButton from "@/components/common/GoBackButton";
 import Positions from "@/components/pages/admin/Position/Positions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,11 +45,9 @@ const PollInfo = () => {
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-gray-800">{election?.title}</h1>
                 
-                <Button variant={'outline'} asChild>
-                    <Link to={'/admin/polls'}>
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Elections
-                    </Link>
-                </Button>
+                <GoBackButton to="/admin/polls">
+                    Back to Elections
+                </GoBackButton>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
