@@ -5,13 +5,15 @@ import StudentInfoForm, { StudentInfoState } from "@/components/pages/settings/S
 import UserInfoForm, { UserInfoState } from "@/components/pages/settings/UserInfoForm"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import axiosFetch from "@/lib/axios"
+import useRefreshToken from "@/lib/useRefreshToken"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { SubmitHandler, UseFormSetError } from "react-hook-form"
 import toast from "react-hot-toast"
 
 const Settings = () => {
     const queryClient = useQueryClient();
-    // get initialData here
+    const { refreshToken } = useRefreshToken()
+
     const { data, isLoading } = useQuery({
         queryKey: ['getInitialUserInfo'],
         queryFn: async () => {
@@ -37,8 +39,10 @@ const Settings = () => {
             throw new Error(response.data.message)
         }
 
-       toast.success('Password changed successfully')
-       return
+        await refreshToken()
+        queryClient.invalidateQueries({ queryKey: ['getInitialUserInfo']})
+        toast.success('Password changed successfully')
+        return
     }
 
     const changeUserInfo = async (data: UserInfoState, setError: UseFormSetError<UserInfoState>) => {
@@ -52,8 +56,8 @@ const Settings = () => {
             return
         }
 
-        // invalidate the query
-        queryClient.invalidateQueries({ queryKey: ['user'] })
+        await refreshToken()
+        queryClient.invalidateQueries({ queryKey: ['getInitialUserInfo']})
         toast.success('User information updated successfully')
         return
     }
@@ -65,6 +69,8 @@ const Settings = () => {
             throw new Error(response.data.message)
         }
 
+        await refreshToken()
+        queryClient.invalidateQueries({ queryKey: ['getInitialUserInfo']})
         toast.success('Student information updated successfully')
         return 
     }

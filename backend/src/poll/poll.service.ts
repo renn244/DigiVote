@@ -212,12 +212,12 @@ export class PollService {
                     AND v2.poll_id = p.id 
                 )
             ) as hasVoted,
-            ( -- getting the same poll Id because people who are not eligible will not be able to vote any way
-                SELECT ROUND((NULLIF(COUNT(v.id), 0)::decimal / COALESCE(registered_voters.registered_count, 0)::decimal * 100), 2)
-                FROM poll_eligibility pe
-                LEFT JOIN votes v ON pe.poll_id = v.poll_id 
-                WHERE pe.poll_id = p.id
-            ) as voter_turnout,
+            ( -- getting the amount of people who voted for the last hour
+                SELECT COUNT(v3.id)
+                FROM votes as v3
+                WHERE v3.poll_id = ${pollId} 
+                AND v3.created_at BETWEEN (CURRENT_TIMESTAMP - interval '1 hour') AND CURRENT_TIMESTAMP
+            )::INT as voteforthe_last_hour,
             registered_voters.registered_count as registered_voters,
             pe.allowed_courses,
             pe.allowed_education_levels::text[] as allowed_education_levels,

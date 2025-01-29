@@ -1,15 +1,17 @@
 import axiosFetch from "@/lib/axios";
-import { useQuery } from "@tanstack/react-query";
+import { QueryObserverResult, RefetchOptions, useQuery } from "@tanstack/react-query";
 import { createContext, PropsWithChildren, useContext } from "react";
 
 type AuthContextState = {
     user: any | undefined,
-    loading: boolean
+    loading: boolean,
+    refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<any, Error>> | undefined
 }
 
 const initialState  = {
     user: undefined,
-    loading: true
+    loading: true,
+    refetch: () => undefined
 }
 
 const AuthContext = createContext<AuthContextState>(initialState);
@@ -23,7 +25,7 @@ const AuthProvider = ({
     children
 }: PropsWithChildren) => {
     
-    const { data:user, isLoading } = useQuery({
+    const { data:user, isLoading, refetch } = useQuery({
         queryKey: ['user'],
         queryFn: async () => {
             if(!localStorage.getItem('access_token') && !localStorage.getItem('refresh_token')) return
@@ -42,7 +44,8 @@ const AuthProvider = ({
 
     const value = {
         user: user,
-        loading: isLoading
+        loading: isLoading,
+        refetch: refetch
     }
 
     return (

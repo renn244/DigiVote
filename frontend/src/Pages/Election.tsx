@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import axiosFetch from "@/lib/axios"
 import { partyBasicInfo } from "@/types/party"
 import { useQuery } from "@tanstack/react-query"
-import { AlertTriangle, CalendarIcon, Percent, Users, VoteIcon } from "lucide-react"
+import { AlertTriangle, CalendarIcon, Clock, Users, VoteIcon } from "lucide-react"
 import { Link, Navigate, useParams } from "react-router"
 
 const Election = () => {
@@ -113,11 +113,11 @@ const Election = () => {
                                         <span className="text-sm text-green-600">Votes Cast</span>
                                     </div>
                                     <div className="flex flex-col items-center justify-center p-4 bg-yellow-50 rounded-lg">
-                                        <Percent className="h-8 w-8 text-yellow-600 mb-2" />
+                                        <Clock className="h-8 w-8 text-yellow-600 mb-2" />
                                         <span className="text-2xl font-bold text-yellow-600">
-                                            {election.voter_turnout > 100 ? 100 : election.voter_turnout}%
+                                            {election.voteforthe_last_hour}
                                         </span>
-                                        <span className="text-sm text-yellow-600">Voter Turnout</span>
+                                        <span className="text-sm text-yellow-600">Vote Withing the last hour</span>
                                     </div>
                                     <div className="flex flex-col items-center justify-center p-4 bg-red-50 rounded-lg">
                                         <CalendarIcon className="h-8 w-8 text-red-600 mb-2" />
