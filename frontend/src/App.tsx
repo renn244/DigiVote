@@ -21,6 +21,8 @@ import Result from "./Pages/Result"
 import AuthenticatedRoute from "./components/common/AuthenticatedRoute"
 import ForgotPassword from "./Pages/Forgot-password"
 import ResetPassword from "./Pages/ResetPassword"
+import About from "./Pages/About"
+import Homepage from "./Pages/Homepage"
 
 function App() {
   const { loading , user } = useAuthContext()
@@ -33,7 +35,8 @@ function App() {
     <div>
       <Navbar />
       <Routes>
-        <Route path="/" element={user ? undefined : <Navigate to={'/login'} />} />
+        <Route path="/" element={<Homepage />} />
+        <Route path="/about" element={<About />} />
         <Route path="/login" element={user ? <Navigate to={'/'} /> : <Login />}   />
         <Route path="/register" element={user ? <Navigate to={'/'} /> : <SignUp />} />
         <Route path="/forgot-password" element={user ? <Navigate to={'/'} /> : <ForgotPassword /> } />

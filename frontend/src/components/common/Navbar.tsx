@@ -19,13 +19,13 @@ const Navbar = () => {
                             <span className="text-blue-900 text-2xl font-bold">STI voting</span>
                         </Link>
                     </div>
-                    <div className="hidden md:block">
+                    {user && <div className="hidden md:block">
                         <div className="ml-10 flex items-center space-x-4">
                             <NavLink href="/elections" icon={<Vote className="h-5 w-5 mr-1" />}>Elections</NavLink>
                             <NavLink href="/results" icon={<BarChart3 className="h-5 w-5 mr-1" />}>Results</NavLink>
                             <NavLink href="/about" icon={<Info className="h-5 w-5 mr-1" />}>About</NavLink>
                         </div>
-                    </div>
+                    </div>}
                     <div className="hidden md:block">
                         <div className="ml-4 flex items-center md:ml-6">
                             <NavLink href="/help" icon={<HelpCircle className="h-5 w-5 mr-1" />} >Help</NavLink>
@@ -33,12 +33,15 @@ const Navbar = () => {
                                 <NavLink href="/admin" icon={<UserRoundCog className="h-5 w-5 mr-1" />}>Admin</NavLink>
                             )}
                             {!user ? (
-                                <Link to={'/login'}>
-                                    <Button variant={'outline'} className="ml-2">
-                                        <LogIn className="h-5 w-5 mr-1" />
-                                        Login
-                                    </Button>
-                                </Link> 
+                                <>
+                                    <NavLink href="/about" icon={<Info className="h-5 w-5 mr-1" />}>About</NavLink>
+                                    <Link to={'/login'}>
+                                        <Button variant={'outline'} className="ml-2">
+                                            <LogIn className="h-5 w-5 mr-1" />
+                                            Login
+                                        </Button>
+                                    </Link>
+                                </> 
                             ) : (
                                 <ProfileSheet />
                             )}
@@ -118,7 +121,7 @@ const MobileNavLink = ({
     <Link
     {...props}
     to={href}
-    className="text-blue-900 hover:bg-yellow-500 hover:text-white block px-3 py-2 rounded-md text-base font-medium flex items-center transition duration-150 ease-in-out"
+    className="text-blue-900 hover:bg-yellow-500 hover:text-white px-3 py-2 rounded-md text-base font-medium flex items-center transition duration-150 ease-in-out"
     >
       {icon}
       {children}
