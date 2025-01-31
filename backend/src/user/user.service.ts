@@ -1,15 +1,33 @@
 import { BadRequestException, GoneException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { UserType } from 'src/lib/decorator/User.decorator';
-import { ChangePasswordAdminDto, ChangePasswordDto, updateStudentInfoDto, updateUserInfoAdmin, updateUserInfoDto } from './dto/user.dto';
+import { ChangePasswordAdminDto, ChangePasswordDto, getInTouchDto, updateStudentInfoDto, updateUserInfoAdmin, updateUserInfoDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
+import { EmailSenderService } from 'src/email-sender/email-sender.service';
 
 @Injectable()
 export class UserService {
     constructor(
         @Inject('POSTGRES_POOL') private readonly sql: any,
-        private readonly fileUploadService: FileUploadService
+        private readonly fileUploadService: FileUploadService,
+        private readonly emailSenderService: EmailSenderService
     ) {}
+
+    // this is about the contact me
+    async getInTouch(body: getInTouchDto) {
+        if(!body.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z]+\.[a-zA-Z]{2,}$/)) {
+            throw new BadRequestException({
+                name: 'email',
+                message: 'email is invalid!'
+            })
+        }
+
+        await this.emailSenderService.sendTextEmail(body.name, body.email, body.message)
+
+        return {
+            message: 'Successfully sent message!'
+        }
+    }
 
     async getUsers(user: UserType, query: { page: string, search: string }) {
         const limit = 9;

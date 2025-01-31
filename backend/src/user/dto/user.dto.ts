@@ -61,3 +61,14 @@ export class updateUserInfoAdmin extends updateUserInfoDto {
     @IsString()
     course: string;
 } 
+
+export class getInTouchDto {
+    @IsString()
+    name: string;
+
+    @IsString()
+    email: string;
+
+    @IsString()
+    message: string;
+}

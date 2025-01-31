@@ -1,10 +1,31 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { GoneException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as sgMail from '@sendgrid/mail';
 
 @Injectable()
 export class EmailSenderService {
     constructor() {
         sgMail.setApiKey(process.env.SENDGRID_API_KEY) 
+    }
+
+    async sendTextEmail(name: string, email: string, message: string) {
+        const msg = {
+            to: 'renatodsantosjr9@gmail.com',
+            from: 'renatodsantosjr9@gmail.com',
+            subject: 'Get In Touch (STI Voting System)',
+            text: `
+                Name: ${name},
+                Email: ${email}
+
+                message: ${message}
+            `,
+        } satisfies sgMail.MailDataRequired
+
+        try {
+            const response = await sgMail.send(msg)
+            return response
+        } catch (error) {
+            throw new GoneException('failed to send message try again later!')   
+        }
     }
 
     async sendEmail(to: string, subject: string, title: string, content: string, options?: Partial<sgMail.MailDataRequired>) {

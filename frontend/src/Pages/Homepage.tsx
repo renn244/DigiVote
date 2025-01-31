@@ -24,7 +24,7 @@ const Homepage = () => {
                         DigiVote brings secure, accessible, and transparent digital voting to your educational institution. Make every student's voice count.
                     </p>
                     <Button asChild size="lg" className="bg-yellow-400 text-blue-900">
-                        <Link to={'/register'}>Start Voting Now</Link>
+                        <Link to={'/elections'}>Start Voting Now</Link>
                     </Button>
                 </div>
                 <div data-aos="fade-left" data-aos-duration="500" data-aos-delay="200" className="lg:w-1/2">
@@ -79,13 +79,13 @@ const Homepage = () => {
             <footer className="container mx-auto px-4 py-8 text-center">
                 <p>&copy; 2023 DigiVote for STI. All rights reserved.</p>
                 <div className="mt-4">
-                <Link to="/about" className="text-yellow-400 hover:underline mr-4">
+                <Link to="/about" className="text-yellow-400 hover:underline underline-offset-4 mr-4">
                     About
                 </Link>
-                <Link to="/contact" className="text-yellow-400 hover:underline mr-4">
+                <Link to="/contact" className="text-yellow-400 hover:underline underline-offset-4 mr-4">
                     Contact
                 </Link>
-                <Link to="/privacy" className="text-yellow-400 hover:underline">
+                <Link to="/privacy" className="text-yellow-400 hover:underline underline-offset-4">
                     Privacy Policy
                 </Link>
                 </div>

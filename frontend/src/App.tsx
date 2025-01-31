@@ -23,6 +23,8 @@ import ForgotPassword from "./Pages/Forgot-password"
 import ResetPassword from "./Pages/ResetPassword"
 import About from "./Pages/About"
 import Homepage from "./Pages/Homepage"
+import Contact from "./Pages/Contact"
+import Privacy from "./Pages/Privacy"
 
 function App() {
   const { loading , user } = useAuthContext()
@@ -37,6 +39,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/login" element={user ? <Navigate to={'/'} /> : <Login />}   />
         <Route path="/register" element={user ? <Navigate to={'/'} /> : <SignUp />} />
         <Route path="/forgot-password" element={user ? <Navigate to={'/'} /> : <ForgotPassword /> } />
