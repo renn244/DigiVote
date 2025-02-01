@@ -3,13 +3,12 @@ import LoadingSpinner from "@/components/common/LoadingSpinner"
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
 import ResultStatistic from "@/components/pages/result/ResultStatistic"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import axiosFetch from "@/lib/axios"
 import { useQuery } from "@tanstack/react-query"
-import { ArrowLeft, BarChart, CalendarIcon, Users, VoteIcon } from "lucide-react"
+import { BarChart, CalendarIcon, Users, VoteIcon } from "lucide-react"
 import toast from "react-hot-toast"
-import { Link, Navigate, useParams } from "react-router"
+import { Navigate, useParams } from "react-router"
 
 const Result = () => {
     const { id } = useParams<{ id: string }>()
@@ -89,10 +88,10 @@ const Result = () => {
                                     <CalendarIcon className="mr-2 h-5 w-5 text-yellow-600" />
                                     <span>{new Date(result.start_date).toLocaleDateString()} - {new Date(result.end_date).toLocaleDateString()}</span>
                                 </div>
-                                <div className="flex items-center text-sm">
+                                {/* <div className="flex items-center text-sm">
                                     <BarChart className="mr-2 h-5 w-5 text-yellow-600" />
                                     <span>Turnout: To be Implemented</span>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                         <p className="font-semibold mb-2">
@@ -118,15 +117,17 @@ const Result = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="p-6">
-                        {/* {winners.map((winner, idx) => (
-                            <div key={idx} className="mb-4">
-                                <p className="text-xl font-bold text-blue-900">{winner.name}</p>
-                                <p className="text-lg text-gray-600">{winner.party}</p>
+                        {result.topcandidates.map((candidate: any, idx: number) => (
+                            <div key={idx} className="mb-2 flex justify-between items-center">
+                                <div className="flex items-center">
+                                    <p className="text-lg font-bold text-blue-900">{candidate.name}</p>
+                                    <p className=" text-gray-600 ml-2">({candidate.party})</p>
+                                </div>
                                 <p className="text-md text-gray-500">
-                                    {winner.votes.toLocaleString()} votes ({((winner.votes / result.total_votes) * 100).toFixed(2)}%)
+                                    {candidate.votes.toLocaleString()} votes ({((candidate.votes / result.totalvotes) * 100).toFixed(2)}%)
                                 </p>
                             </div>
-                        ))} */}
+                        ))}
                     </CardContent>
                 </Card>
             </div>
@@ -139,23 +140,40 @@ const Result = () => {
                 </CardHeader>
                 <CardContent className="p-6">
                     <ul className="space-y-4">
-                        {result.position_winners.map((winner: any, idx: number) => (
-                            <li key={idx} className=" border-b border-gray-200 last:border-b-0">
-                                <h1 className="text-lg font-bold text-yellow-500">{winner.position}</h1>
-                                <div className="flex justify-between items-center pb-2">
-                                    <div className="flex items-center">
-                                        <p className="font-semibold text-lg">{winner.winners[0].name}</p>
-                                        <p className="text-sm text-gray-500 ml-2">({winner.winners[0].party})</p>
+                        {result.position_winners.map((winner: any, idx: number) => {
+                            const firstWinner = winner.winners[0].votes
+                            const winners = winner.winners.filter((currwinner: any) => firstWinner == currwinner.votes)
+
+                            const isDraw = winners.length >= 2;
+
+                            return (
+                                <li key={idx} className=" border-b border-gray-200 last:border-b-0">
+                                    <div className="flex justify-between items-center">
+                                        <h1 className="text-lg font-bold text-yellow-500">{winner.position}</h1>
+                                        <Badge>
+                                            {isDraw ? "Draw" : "Winner"}
+                                        </Badge>
                                     </div>
-                                    <div>
-                                        <span className="font-semibold">{winner.winners[0].votes.toLocaleString()} votes</span>
-                                        <span className="text-sm text-gray-500 ml-2">
-                                            ({((winner.winners[0].votes / result.totalvotes) * 100).toFixed(2)}%)
-                                        </span>
+                                    <div className="flex justify-between items-center pb-2">
+                                        <div className="flex items-center max-w-[600px]">
+                                            {winners.map((winner: any, idx: number) => (
+                                                <div key={idx} className="flex items-center">
+                                                    <p className="font-semibold text-lg">{winner.name}</p>
+                                                    <p className="text-sm text-gray-500 ml-2">({winner.party})</p>
+                                                    {isDraw && idx !== winners.length - 1 && <span className="mx-2 font-semibold">&</span>}
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold">{winner.winners[0].votes.toLocaleString()} votes</span>
+                                            <span className="text-sm text-gray-500 ml-2">
+                                                ({((winner.winners[0].votes / result.totalvotes) * 100).toFixed(2)}%)
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                        ))}
+                                </li>
+                            )
+                        })}
                     </ul>
                 </CardContent>
             </Card>

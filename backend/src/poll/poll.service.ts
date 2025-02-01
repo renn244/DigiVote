@@ -354,13 +354,35 @@ export class PollService {
                     AND v.user_id = ${user.id}
                 )
             ) as hasVoted,
+            (
+                SELECT JSON_AGG(
+                    JSON_BUILD_OBJECT(
+                        'id', c.id,
+                        'name', c.name,
+                        'party', c.party,
+                        'votes', COALESCE(c.total_votes, 0) -- Handle NULL cases
+                    )
+                )
+                FROM (
+                    SELECT c.id, c.name, p.name as party, COALESCE(vote_counts.total_votes, 0) AS total_votes
+                    FROM candidates c
+                    LEFT JOIN parties p ON c.party_id = p.id
+                    LEFT JOIN (
+                        SELECT candidate_id, COUNT(id) as total_votes
+                        FROM candidatesvoted
+                        GROUP BY candidate_id
+                    ) vote_counts ON c.id = vote_counts.candidate_id
+                    ORDER BY total_votes DESC -- Sort candidates by votes (highest first)
+                    LIMIT 3 -- Select the top 3 candidates
+                ) c
+            ) AS topcandidates,
             COALESCE (
                 JSON_AGG(
                     DISTINCT JSON_BUILD_OBJECT(
                         'position_id', winners.position_id,
                         'position', winners.position,
                         'winners', winners.winner
-                    )::jsonb
+                    )::jsonb 
                 ) FILTER (WHERE winners.position_id IS NOT NULL),
                 '[]'
             ) as position_winners
@@ -381,6 +403,7 @@ export class PollService {
                             'party', pa.name,
                             'votes', vote_counts.total_votes
                         )
+                        ORDER BY vote_counts.total_votes DESC -- ensure that the person with the most vote goes on the top
                     ) AS winner
                 FROM positions po
                 LEFT JOIN candidates c ON po.id = c.position_id
@@ -393,7 +416,7 @@ export class PollService {
                     WHERE v.candidate_id = c.id
                     GROUP BY v.candidate_id
                 ) vote_counts ON TRUE
-                WHERE po.poll_id = p.id AND vote_counts.rank = 1 --Only get the winner
+                WHERE po.poll_id = p.id 
                 GROUP BY po.id
             ) winners ON TRUE
             WHERE p.branch = ${branch} AND p.id = ${pollId}

@@ -79,7 +79,7 @@ const Homepage = () => {
             <footer className="container mx-auto px-4 py-8 text-center">
                 <p>&copy; 2023 DigiVote for STI. All rights reserved.</p>
                 <div className="mt-4">
-                <Link to="/about" className="text-yellow-400 hover:underline underline-offset-4 mr-4">
+                <Link reloadDocument to="/about" className="text-yellow-400 hover:underline underline-offset-4 mr-4">
                     About
                 </Link>
                 <Link to="/contact" className="text-yellow-400 hover:underline underline-offset-4 mr-4">
