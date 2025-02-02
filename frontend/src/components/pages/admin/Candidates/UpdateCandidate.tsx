@@ -45,7 +45,10 @@ const UpdateCandidate = ({
         (old: candidateWithPosition[]) => {
             return old.map((candidate: any) => {
                 if(candidate.id === response.data.id) {
-                    return response.data
+                    return {
+                        ...response.data,
+                        votes: candidate.votes
+                    }
                 }
                 return candidate
             })

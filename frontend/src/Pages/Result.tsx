@@ -5,8 +5,9 @@ import ResultStatistic from "@/components/pages/result/ResultStatistic"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import axiosFetch from "@/lib/axios"
+import { pollResultStats } from "@/types/poll"
 import { useQuery } from "@tanstack/react-query"
-import { BarChart, CalendarIcon, Users, VoteIcon } from "lucide-react"
+import { CalendarIcon, Users, VoteIcon } from "lucide-react"
 import toast from "react-hot-toast"
 import { Navigate, useParams } from "react-router"
 
@@ -27,7 +28,7 @@ const Result = () => {
                 return
             }
 
-            return response.data 
+            return response.data as pollResultStats
         },
         refetchOnWindowFocus: false,
         retry: false
@@ -44,6 +45,11 @@ const Result = () => {
     if(!result) {
         return <Navigate to={'/notfound'} />
     }
+
+    // handling draws in parties
+    const firstParty = result.partieswinner?.[0]
+    const winningParties = result.partieswinner.filter((party: any) => firstParty.votes === party.votes);
+    const isDrawParties = winningParties.length >= 2;
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -113,21 +119,44 @@ const Result = () => {
                 <Card className="overflow-hidden border border-gray-200">
                     <CardHeader className="bg-yellow-400 text-yellow-900 p-6">
                         <CardTitle className="text-2xl">
-                            {result.vote_type === "single" ? "Winner" : "Top Candidates"}
+                            {result.vote_type === "single" ? (
+                                <div className="flex justify-between">
+                                    Winning Parties 
+                                    <Badge variant="secondary" className="hover:bg-secondary cursor-pointer">
+                                        {isDrawParties ? "Draw" : "Winner"}
+                                    </Badge>
+                                </div>
+                            ) : "Top Candidates"}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="p-6">
-                        {result.topcandidates.map((candidate: any, idx: number) => (
-                            <div key={idx} className="mb-2 flex justify-between items-center">
-                                <div className="flex items-center">
-                                    <p className="text-lg font-bold text-blue-900">{candidate.name}</p>
-                                    <p className=" text-gray-600 ml-2">({candidate.party})</p>
+                        {result.vote_type === "multiple" ? (
+                            result.topcandidates.map((candidate: any, idx: number) => (
+                                <div key={idx} className="mb-2 flex justify-between items-center">
+                                    <div className="flex items-center">
+                                        <p className="text-lg font-bold text-blue-900">{candidate.name}</p>
+                                        <p className=" text-gray-600 ml-2">({candidate.party})</p>
+                                    </div>
+                                    <p className="text-md text-gray-500">
+                                        {candidate.votes.toLocaleString()} votes ({((candidate.votes / result.totalvotes) * 100).toFixed(2)}%)
+                                    </p>
                                 </div>
-                                <p className="text-md text-gray-500">
-                                    {candidate.votes.toLocaleString()} votes ({((candidate.votes / result.totalvotes) * 100).toFixed(2)}%)
-                                </p>
+                            ))
+                        ) : (
+                            <div className="grid justify-center md:grid-cols-2 gap-6">
+                                {winningParties.map((party: any) => (
+                                    <div key={party.id} className="border rounded-lg">
+                                        <div className="mb-1">
+                                            <img src={party.banner} className="rounded-t-lg w-full h-[150px]" />  
+                                        </div>
+                                        <div className="px-2 pb-2">
+                                            <h2 className="font-bold text-lg">{party.name}</h2>
+                                            
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        )}
                     </CardContent>
                 </Card>
             </div>

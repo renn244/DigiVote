@@ -27,7 +27,7 @@ const PositionCard = ({
                             <div className='relative flex-shrink-0 flex justify-center w-full mb-2'>
                                 <img src={candidate.photo} className='rounded-lg h-[300px] w-[300px]' />
                             </div>
-                            <div className='flex-grow px-4'>
+                            <div className='flex-grow px-4 w-full'>
                                 <h2 className='text-2xl font-bold my-2'>{candidate.name}</h2>
                                 <p className="text-sm mt-1">{candidate.description}</p>
                             </div>

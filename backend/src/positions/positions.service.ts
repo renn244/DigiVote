@@ -27,6 +27,7 @@ export class PositionsService {
         const getPositionResult = await this.sql`
             SELECT * FROM positions
             WHERE poll_id = ${pollId}
+            ORDER BY id
         `
 
         return getPositionResult;

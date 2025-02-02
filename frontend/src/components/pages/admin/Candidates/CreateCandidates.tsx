@@ -41,7 +41,7 @@ const CreateCandidates = ({
         setDialogOpen(false)
 
         queryClient.setQueryData(['candidates', partyId], (old: candidateWithPosition[]) => {
-            return [...old, response.data]
+            return [...old, {...response.data, votes: 0}]
         })
     }
 

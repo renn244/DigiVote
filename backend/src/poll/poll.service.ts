@@ -316,6 +316,22 @@ export class PollService {
             )
             SELECT 
                 p.*,
+                COALESCE(
+                    (
+                        SELECT JSON_AGG(
+                            JSON_BUILD_OBJECT(
+                                'id', pa.id,
+                                'name', pa.name,
+                                'description', pa.description,
+                                'banner', pa.banner,
+                                'poll_id', pa.poll_id
+                            )
+                        )
+                        FROM parties pa
+                        WHERE pa.poll_id = p.id
+                    ), 
+                    '[]'
+                ) as parties,
                 COALESCE(pd.positions, '[]') as positions
             FROM poll p
             LEFT JOIN position_data pd ON p.id = pd.poll_id
@@ -345,7 +361,7 @@ export class PollService {
                 SELECT COUNT(v.id)
                 FROM votes v
                 WHERE v.poll_id = p.id
-            ) as totalVotes,
+            )::INT as totalvotes,
             (
                 SELECT EXISTS(
                     SELECT 1
@@ -354,28 +370,60 @@ export class PollService {
                     AND v.user_id = ${user.id}
                 )
             ) as hasVoted,
-            (
-                SELECT JSON_AGG(
-                    JSON_BUILD_OBJECT(
-                        'id', c.id,
-                        'name', c.name,
-                        'party', c.party,
-                        'votes', COALESCE(c.total_votes, 0) -- Handle NULL cases
+            ( -- for multiple choice
+                CASE 
+                    WHEN p.vote_type = 'multiple' THEN (
+                        SELECT JSON_AGG(
+                            JSON_BUILD_OBJECT(
+                                'id', c.id,
+                                'name', c.name,
+                                'party', c.party,
+                                'votes', COALESCE(c.total_votes, 0) -- Handle NULL cases
+                            )
+                        )
+                        FROM (
+                            SELECT c.id, c.name, pa.name as party, COALESCE(vote_counts.total_votes, 0) AS total_votes
+                            FROM candidates c
+                            LEFT JOIN parties pa ON c.party_id = pa.id
+                            LEFT JOIN (
+                                SELECT candidate_id, COUNT(id) as total_votes
+                                FROM candidatesvoted
+                                GROUP BY candidate_id
+                            ) vote_counts ON c.id = vote_counts.candidate_id    
+                            WHERE pa.poll_id = p.id
+                            ORDER BY total_votes DESC -- Sort candidates by votes (highest first)
+                            LIMIT 3 -- Select the top 3 candidates
+                        ) c
                     )
-                )
-                FROM (
-                    SELECT c.id, c.name, p.name as party, COALESCE(vote_counts.total_votes, 0) AS total_votes
-                    FROM candidates c
-                    LEFT JOIN parties p ON c.party_id = p.id
-                    LEFT JOIN (
-                        SELECT candidate_id, COUNT(id) as total_votes
-                        FROM candidatesvoted
-                        GROUP BY candidate_id
-                    ) vote_counts ON c.id = vote_counts.candidate_id
-                    ORDER BY total_votes DESC -- Sort candidates by votes (highest first)
-                    LIMIT 3 -- Select the top 3 candidates
-                ) c
+                    ELSE '[]'::json
+                END
             ) AS topcandidates,
+            ( -- for single choice
+                CASE 
+                    WHEN p.vote_type = 'single' THEN (
+                        SELECT JSON_AGG(
+                            JSON_BUILD_OBJECT(
+                                'id', pa.id,
+                                'name', pa.name,
+                                'banner', pa.banner,
+                                'votes', top_candidate.votes -- the candidates votes is all the same so just pick 1 and base it as the parties since it's a single choice
+                            )
+                            ORDER BY top_candidate.votes DESC
+                        )
+                        FROM parties pa
+                        JOIN (
+                            SELECT DISTINCT ON (c2.party_id) 
+                                c2.party_id, COUNT(v2.id) AS votes
+                            FROM candidates c2
+                            LEFT JOIN candidatesvoted v2 ON v2.candidate_id = c2.id
+                            GROUP BY c2.party_id, c2.id
+                            ORDER BY c2.party_id, votes DESC  -- Ensure highest-voted candidate is chosen
+                        ) top_candidate ON pa.id = top_candidate.party_id
+                        WHERE pa.poll_id = p.id
+                    )
+                    ELSE '[]'::json
+                END
+            ) AS partieswinner,
             COALESCE (
                 JSON_AGG(
                     DISTINCT JSON_BUILD_OBJECT(

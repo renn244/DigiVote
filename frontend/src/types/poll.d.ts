@@ -1,4 +1,6 @@
+import { candidate } from "./candidate";
 import { party } from "./party";
+import { position } from "./position";
 
 export const vote_type = {
     single = "single",
@@ -23,6 +25,12 @@ export type pollView = {
 export type pollsView = pollView[]
 
 export type pollVote = {
+    parties: {
+        id: party['id'],
+        banner: party['banner'],
+        name: party['name'],
+        description: party['description']
+    }[]
     positions: {
         id: number,
         position: string,
@@ -68,3 +76,34 @@ export type pollStats = {
     allowed_courses: string[],
     allowed_education_levels: string[],
 }
+
+export type pollResultStats = {
+    parties: party['name'][],
+    totalvotes: number,
+    hasvoted: boolean,
+    topcandidates: {
+        id: candidate['id'],
+        name: candidate['name'],
+        party: party['name'],
+        votes: number
+    }[],
+    partieswinner: {
+        id: party['id'],
+        name: party['name'],
+        banner: party['banner'],
+        votes: number
+    }[],
+    position_winners: {
+        position_id: position['id'],
+        position: position['name'],
+        winners: {
+            id: candidate['id'],
+            name: candidate['name'],
+            description: candidate['description'],
+            photo: candidate['photo'],
+            party_id: party['id'],
+            party: party['name'],
+            votes: number
+        }[]
+    }[]
+} & poll

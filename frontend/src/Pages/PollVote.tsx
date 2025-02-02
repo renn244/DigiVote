@@ -1,9 +1,11 @@
 import GoBackButton from '@/components/common/GoBackButton';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import PartyCard from '@/components/pages/admin/Parties/PartyCard';
 import ElectionVotingInfo from '@/components/pages/election/ElectionVotingInfo';
 import PositionCard from '@/components/pages/election/PositionCard';
 import YouAlreadyVoted from '@/components/pages/election/YouAlreadyVoted';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import axiosFetch from '@/lib/axios'
 import { pollVote } from '@/types/poll';
@@ -73,7 +75,19 @@ const PollVote = () => {
         }
     })
 
-    const handleVote = (positionId: number, candidateId: number) => {
+    if(isLoading) {
+        return <LoadingSpinner />
+    }
+
+    if(votedAlready) {
+        return <YouAlreadyVoted pollId={pollId} />
+    }
+
+    if(!election) {
+        return <Navigate to='/notfound' />
+    }
+
+    const handleVoteMultiple = (positionId: number, candidateId: number) => {
         setVotes((prevVotes) => {
             return prevVotes?.map((vote) => {
                 if(vote.positionId === positionId) {
@@ -88,22 +102,45 @@ const PollVote = () => {
         })
     }
 
+    const handleVoteSingle = (partyId: number) => {
+        setVotes((prevVotes) => {
+            return prevVotes?.map((vote, idx) => {
+                if(vote.positionId === election?.positions[idx]?.id) {
+                    const candidate = election?.positions[idx]?.candidates.filter((candidate) => 
+                        candidate.party_id === partyId  
+                    )
+
+                    return {
+                        ...vote,
+                        candidateId: candidate?.[0]?.id || 0
+                    }
+                }
+
+                return vote
+            })
+        })
+    }
+
     const isVoted = (positionId: number, candidateId: number) => {
         if(!votes) return false // if there is no votes then return false for all
 
         return votes?.some((vote) => vote.positionId === positionId && vote.candidateId === candidateId)
     }
 
-    if(isLoading) {
-        return <LoadingSpinner />
-    }
+    const isVotedSingle = (partyId: number) => {
+        const findCandidateById = (candidateId: number) => {
+            for (const position of election?.positions) {
+                const candidate = position.candidates.find(c => c.id === candidateId);
+                if (candidate) return candidate;
+            }
+            return null;
+        };
 
-    if(votedAlready) {
-        return <YouAlreadyVoted pollId={pollId} />
-    }
+        // we only need to get one of the candidates since the vote is by parties
+        const firstCandidateId = votes?.[0]?.candidateId
+        const candidate = firstCandidateId ? findCandidateById(firstCandidateId) : null;
 
-    if(!election) {
-        return <Navigate to='/notfound' />
+        return candidate?.party_id === partyId
     }
 
     return (
@@ -124,9 +161,29 @@ const PollVote = () => {
                 <ElectionVotingInfo title={election.title} description={election.description} start_date={election.start_date} 
                 end_date={election.end_date} branch={election.branch} vote_type={election.vote_type} />
 
-                {election.positions.map((position) => (
-                    <PositionCard position={position} handleClick={handleVote} isVoted={isVoted} />
-                ))}
+                {election.vote_type === 'multiple' ? (
+                    election.positions.map((position) => (
+                        <PositionCard key={position.id} position={position} handleClick={handleVoteMultiple} isVoted={isVoted} />
+                    ))
+                ) : (
+                    <Card className='mb-8'>
+                        <CardHeader>
+                            <CardTitle>
+                                Parties
+                            </CardTitle>
+                            <CardDescription>
+                                This is the list of parties you will be voting for.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                                {election.parties.map((party: any) => (
+                                    <PartyCard isVoted={isVotedSingle} handleVoteSingle={handleVoteSingle} parties={party} />
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
                 <Separator className="my-8" />
 
