@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Edit2 } from "lucide-react"
 import { Dispatch, SetStateAction, useState } from "react"
 import toast from "react-hot-toast"
+import { useSearchParams } from "react-router"
 
 type UpdateAnswerProps = {
     answerId: number,
@@ -24,6 +25,7 @@ const UpdateAnswer = ({
     initialData
 }: UpdateAnswerProps) => {
     const queryClient = useQueryClient();
+    const [searchParams] = useSearchParams()
     const [open, setOpen] = useState<boolean>(false)
     const [answer, setAnswer] = useState<string>(initialData.answer || "")
 
@@ -43,7 +45,9 @@ const UpdateAnswer = ({
         onSuccess: async () => {
             setOpen(false)
             setPopOver(false)
-            await queryClient.setQueryData(['questions'], (old: question[]) => {
+
+            const search = searchParams.get('search')
+            await queryClient.setQueryData(['questions', search], (old: question[]) => {
                 return old.map((question) => {
                     return {
                         ...question,

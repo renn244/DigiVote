@@ -56,7 +56,7 @@ const Result = () => {
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center">
                     <h1 className="text-3xl font-bold text-blue-900">{result.title}</h1>
-                    <Badge className="text-xl">
+                    <Badge className="text-xl ml-3">
                         {result.hasvoted ? "Voted" : "Not Voted"}
                     </Badge>
                 </div>

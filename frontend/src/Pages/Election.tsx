@@ -212,7 +212,7 @@ const Election = () => {
                                         <h1 className="text-lg font-semibold">Education Level</h1>
                                         <div className="flex flex-wrap gap-1">
                                             {election?.allowed_education_levels?.map((education_level: string, idx: number) => (
-                                                <Badge key={idx}>
+                                                <Badge key={idx} className="capitalize">
                                                     {education_level}
                                                 </Badge>
                                             ))}

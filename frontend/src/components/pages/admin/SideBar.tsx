@@ -1,8 +1,8 @@
-import { LayoutDashboard, LogOut, Settings, Users, ChartNoAxesColumn, Flag } from "lucide-react"
-import { Link } from "react-router"
+import { LayoutDashboard, Users, ChartNoAxesColumn, Flag } from "lucide-react"
+import { Link, NavLink } from "react-router"
 
 const sidebarItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
+    { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
     { icon: Users, label: 'Users', href: '/admin/users' },
     { icon: ChartNoAxesColumn, label: 'Polls', href: '/admin/polls' },
     { icon: Flag, label: 'Parties', href: '/admin/parties' },
@@ -18,13 +18,13 @@ const SideBar = () => {
                 <ul className="space-y-2">
                 {sidebarItems.map((item) => (
                     <li key={item.label}>
-                    <Link 
-                        to={item.href}
-                        className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-800 transition-colors"
+                    <NavLink
+                    to={item.href}
+                    className={({ isActive }) => `flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-800 transition-colors ${isActive ? "bg-blue-800" : ""}`}
                     >
                         <item.icon className="h-5 w-5" />
                         <span>{item.label}</span>
-                    </Link>
+                    </NavLink>
                     </li>
                 ))}
                 </ul>

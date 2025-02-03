@@ -8,6 +8,7 @@ import { question } from "@/types/questions"
 import { useQueryClient } from "@tanstack/react-query"
 import { Dispatch, SetStateAction, useState } from "react"
 import toast from "react-hot-toast"
+import { useSearchParams } from "react-router"
 
 type AddAnswerProps = {
     setShowAnswerForm: Dispatch<SetStateAction<number | null>>,
@@ -18,6 +19,7 @@ const AddAnswer = ({
     setShowAnswerForm,
     questionId,
 }: AddAnswerProps) => {
+    const [searchParams] = useSearchParams()
     const { user } = useAuthContext();
     const queryClient = useQueryClient()
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -38,7 +40,8 @@ const AddAnswer = ({
             setShowAnswerForm(null)
             setAnswer("")
             
-            await queryClient.setQueryData(['questions'], (old: question[]) => {
+            const search = searchParams.get('search')
+            await queryClient.setQueryData(['questions', search], (old: question[]) => {
                 return old.map((question) => {
                     if(question.id === questionId) {
                         const newAnswer = {

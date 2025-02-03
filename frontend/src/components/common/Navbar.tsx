@@ -1,8 +1,7 @@
 import { useAuthContext } from "@/context/AuthContext"
-import { cn } from "@/lib/utils"
 import { BarChart3, HelpCircle, Info, LogIn, Menu, UserCircle, Vote, X, UserRoundCog } from "lucide-react"
 import { ComponentProps, PropsWithChildren, useState } from "react"
-import { Link } from "react-router"
+import { Link, NavLink as ReactNavLink } from "react-router"
 import { Button } from "../ui/button"
 import ProfileSheet from "./ProfileSheet"
 
@@ -72,9 +71,8 @@ const Navbar = () => {
                         <MobileNavLink href="/results" icon={<BarChart3 className="h-5 w-5 mr-2" />}>Results</MobileNavLink>
                         <MobileNavLink href="/about" icon={<Info className="h-5 w-5 mr-2" />}>About</MobileNavLink>
                         <MobileNavLink href="/help" icon={<HelpCircle className="h-5 w-5 mr-2" />}>Help</MobileNavLink>
-                        <MobileNavLink href="/login" icon={<LogIn className="h-5 w-5 mr-2" />}>Login</MobileNavLink>
                         <MobileNavLink href="/profile" icon={<UserCircle className="h-5 w-5 mr-2" />}>Profile</MobileNavLink>
-                        {/* put log out and settings */}
+                        <MobileNavLink href="/login" icon={<LogIn className="h-5 w-5 mr-2" />}>Login</MobileNavLink>
                     </div>
                 </div>
             )}
@@ -95,13 +93,16 @@ const NavLink = ({
     children,
     ...props
 }: NavLinkProps) =>  (
-    <Link
+    <ReactNavLink
     {...props}
     to={href} 
-    className={cn("text-blue-900 hover:bg-yellow-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-150 ease-in-out", className)}>
+    className={({ isActive }) => `
+        text-blue-900 hover:bg-yellow-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-150 ease-in-out
+        ${isActive ? "text-white bg-yellow-500" : ""}
+    ` + className}>
         {icon}
         {children}
-    </Link>
+    </ReactNavLink>
 )
 
 

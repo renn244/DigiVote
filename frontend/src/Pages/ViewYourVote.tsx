@@ -51,7 +51,7 @@ const ViewYourVote = () => {
 
     return (
         <div className='min-h-[855px] bg-white'>
-            <div className='text-yellow-900 pt-8'>
+            <div className='pt-8'>
                 <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
                     <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0'>
                         <div className='flex items-center space-x-4'>
