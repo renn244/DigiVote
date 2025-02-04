@@ -3,15 +3,14 @@ import GoBackButton from "@/components/common/GoBackButton";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Candidates from "@/components/pages/admin/Candidates/Candidates";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import axiosFetch from "@/lib/axios";
 import { partyOverview } from "@/types/party";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Users, Vote } from "lucide-react";
+import { Users, Vote } from "lucide-react";
 import toast from "react-hot-toast";
-import { Link, Navigate, useNavigate, useParams } from "react-router"
+import { Navigate, useNavigate, useParams } from "react-router"
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
 const chartConfig = {

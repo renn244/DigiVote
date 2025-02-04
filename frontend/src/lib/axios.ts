@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const isProduction = import.meta.env.VITE_SOFTWARE_ENV === 'production'
+
 const axiosFetch = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: isProduction ? '/api' : import.meta.env.VITE_BACKEND_URL,
     validateStatus: (status) => {
         if(status === 401) {
             return false

@@ -4,9 +4,9 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import axiosFetch from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query"
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis } from "recharts";
 
 type ResultStatisticProps = {
     pollId: string

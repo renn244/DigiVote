@@ -2,14 +2,6 @@ import { neon } from '@neondatabase/serverless';
 import { Global, Module, Provider } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-const DatabaseURL = process.env.DATABASE_URL || 'postgresql://postgres:Renato000@localhost:5432/STI-voting?schema=public'
-const sql = neon(DatabaseURL)
-
-const dbProvider = {
-    provide: 'POSTGRES_POOL',
-    useValue: sql
-} as Provider
-
 @Global()
 @Module({
     providers: [{
@@ -20,6 +12,6 @@ const dbProvider = {
             return neon(db_Url);
         }
     }],
-    exports: [dbProvider]
+    exports: ['POSTGRES_POOL']
 })
 export class DatabaseModuleModule {}

@@ -59,7 +59,7 @@ const ChangeAvatar = ({
                         <input hidden onChange={(e) => handleFileChange(e, setFile, setPreview)} id="avatarInput" type="file" />
                     </label>
                 </div>
-                <Button onClick={e => handleSubmit()} className="mt-4 w-full">
+                <Button onClick={() => handleSubmit()} className="mt-4 w-full">
                     Save
                 </Button>
             </CardContent>

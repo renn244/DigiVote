@@ -2,15 +2,14 @@ import DashboardCard from "@/components/common/DashboardCard";
 import GoBackButton from "@/components/common/GoBackButton";
 import Positions from "@/components/pages/admin/Position/Positions";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import axiosFetch from "@/lib/axios";
 import { pollStats } from "@/types/poll";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Clock, Flag, User, Vote } from "lucide-react";
+import { Clock, Flag, User, Vote } from "lucide-react";
 import toast from "react-hot-toast";
-import { Link, useParams } from "react-router"
+import { useParams } from "react-router"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 const chartConfig = {

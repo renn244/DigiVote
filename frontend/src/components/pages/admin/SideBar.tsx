@@ -1,5 +1,5 @@
 import { LayoutDashboard, Users, ChartNoAxesColumn, Flag } from "lucide-react"
-import { Link, NavLink } from "react-router"
+import { NavLink } from "react-router"
 
 const sidebarItems = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
