@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { ThumbsUp } from "lucide-react"
 import { useState } from "react"
 import toast from "react-hot-toast"
+import { useSearchParams } from "react-router"
 
 type LikeProps = {
     answerId: number,
@@ -14,11 +15,12 @@ const Like = ({
     answerId, 
     initialLiked
 }: LikeProps) => {
+    const [searchParams] = useSearchParams()
     const queryClient = useQueryClient();
     const [liked, setLiked] = useState<boolean>(initialLiked || false)
 
     const updateLike = async (action: 'increment' | 'decrement') => {
-        queryClient.setQueryData(['questions'], (data: question[]) => {
+        queryClient.setQueryData(['questions', searchParams.get('search')], (data: question[]) => {
             return data.map((question) => {
                 return {
                     ...question,

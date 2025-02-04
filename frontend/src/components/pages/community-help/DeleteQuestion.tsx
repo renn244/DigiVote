@@ -8,6 +8,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Trash2 } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import toast from "react-hot-toast";
+import { useSearchParams } from "react-router";
 
 type DeleteQuestionProps = {
     questionId: number,
@@ -18,6 +19,7 @@ const DeleteQuestion = ({
     questionId,
     setPopOver
 }: DeleteQuestionProps) => {
+    const [searchParams] = useSearchParams();
     const queryClient = useQueryClient();
     const [open, setOpen] = useState<boolean>(false);
 
@@ -35,7 +37,9 @@ const DeleteQuestion = ({
         onSuccess: async () => {
             setOpen(false)
             setPopOver(false)
-            await queryClient.setQueryData(['questions'], (old: question[]) => {
+
+            const search = searchParams.get('search')
+            await queryClient.setQueryData(['questions', search], (old: question[]) => {
                 return old.filter(question => 
                     question.id !== questionId
                 )

@@ -15,6 +15,7 @@ import { ComponentProps, useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import * as z from 'zod'
+import PollTypeToolTip from "./PollType.tooltip"
 
 export const formSchema = z.object({
     title: z.string().min(2, {
@@ -202,7 +203,10 @@ const PollForm = ({
                         name="vote_type"
                         render={({ field }) => (
                             <FormItem className="space-y-3">
-                                <FormLabel>Poll Type</FormLabel>
+                                <div className="flex items-center gap-2">
+                                    <FormLabel>Poll Type</FormLabel>
+                                    <PollTypeToolTip />
+                                </div>
                                 <FormControl>
                                     <RadioGroup
                                     value={form.getValues("vote_type")}

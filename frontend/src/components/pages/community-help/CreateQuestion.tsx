@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button"
 import { useQueryClient } from "@tanstack/react-query"
 import { question } from "@/types/questions"
 import { useAuthContext } from "@/context/AuthContext"
+import { useSearchParams } from "react-router"
 
 const CreateQuestion = () => {
+    const [searchParams] = useSearchParams();
     const { user } = useAuthContext();
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false)
@@ -23,12 +25,15 @@ const CreateQuestion = () => {
 
         toast.success('Question created successfully!')
         setOpen(false)
-        queryClient.setQueryData(['questions'], (old: question[]) => {
+
+        const search = searchParams.get('search')
+        queryClient.setQueryData(['questions', search], (old: question[]) => {
             const newData = {
                 id: response.data.id,
                 question: data.question,
                 askedBy: user.username,
                 asked_by_id: user.id,
+                created_at: response.data.created_at,
                 answers: []
             }
             return [newData, ...old]

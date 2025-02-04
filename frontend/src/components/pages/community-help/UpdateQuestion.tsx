@@ -8,6 +8,7 @@ import * as z from 'zod'
 import QuestionsForm, { formSchema } from "./QuestionsForm";
 import { Edit2 } from "lucide-react";
 import { question } from "@/types/questions";
+import { useSearchParams } from "react-router";
 
 type UpdateQuestionProps = {
     questionId: number,
@@ -22,6 +23,7 @@ const UpdateQuestion = ({
     initialData,
     setPopOver
 }: UpdateQuestionProps) => {
+    const [searchParams] = useSearchParams();
     const queryClient = useQueryClient();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -36,7 +38,8 @@ const UpdateQuestion = ({
         setIsOpen(false);
         setPopOver(false);
         
-        await queryClient.setQueryData(['questions'], (old: question[]) => {
+        const search = searchParams.get('search')
+        await queryClient.setQueryData(['questions', search], (old: question[]) => {
             return old.map((question: question) => {
                 if(question.id === questionId) {
                     return {

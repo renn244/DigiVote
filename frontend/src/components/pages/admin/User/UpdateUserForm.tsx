@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 import axiosFetch from '@/lib/axios'
+import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -29,6 +30,7 @@ const UpdateUserForm = ({
     userId,
     initialData 
 }: UpdateUserFormProps) => {
+    const queryClient = useQueryClient();
     const [loading, setLoading] = useState(false)
     const { register, watch, setError, setValue, handleSubmit, formState: { errors } } = useForm<userInfoForm>({
         defaultValues: {
@@ -60,6 +62,7 @@ const UpdateUserForm = ({
                 throw new Error(response.data.message);
             }
 
+            await queryClient.setQueryData(['getUser', userId], () => response.data)
             toast.success("User updated successfully")
         } catch (error: any) {
             toast.error(error.message)

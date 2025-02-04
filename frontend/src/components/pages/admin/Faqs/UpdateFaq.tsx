@@ -39,7 +39,8 @@ const UpdateFaq = ({
         await queryClient.setQueryData(['faqs'], (old: any) => {
             return old.map((faq: any) => {
                 if(faq.id === id) {
-                    return data;
+                    
+                    return response.data;
                 }
 
                 return faq;
