@@ -24,6 +24,16 @@ export class PollController {
         return this.pollService.getPolls(user, search)
     }
 
+    @Get('adminDashboard')
+    async getAdminDashboard(@User() user: UserType) {
+        return this.pollService.getAdminDashboard(user)
+    }
+
+    @Get('adminDashboard/statistics')
+    async getAdminDashboardStats(@User() user: UserType) {
+        return this.pollService.getAdminDashboardStats(user)
+    }
+
     @Get('results')
     async getResults(@User() user: UserType) {
         return this.pollService.getResults(user);

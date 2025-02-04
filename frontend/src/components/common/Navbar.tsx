@@ -29,7 +29,7 @@ const Navbar = () => {
                         <div className="ml-4 flex items-center md:ml-6">
                             <NavLink href="/help" icon={<HelpCircle className="h-5 w-5 mr-1" />} >Help</NavLink>
                             {user?.role === 'admin' && (
-                                <NavLink href="/admin" icon={<UserRoundCog className="h-5 w-5 mr-1" />}>Admin</NavLink>
+                                <NavLink href="/admin/dashboard" icon={<UserRoundCog className="h-5 w-5 mr-1" />}>Admin</NavLink>
                             )}
                             {!user ? (
                                 <>

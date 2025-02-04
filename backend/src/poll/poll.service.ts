@@ -75,10 +75,173 @@ export class PollService {
             FROM poll p
             LEFT JOIN parties pa ON p.id = pa.poll_id
             WHERE branch = ${branch}
+            AND (p.end_date + INTERVAL '5 days')> CURRENT_TIMESTAMP -- it will stay for 7 days before disappearing
             GROUP BY p.id;
         `
 
         return getPollsForUser
+    }
+
+    async getAdminDashboard(user: UserType) {
+        const branch = user.branch;
+
+        const getResultAdminDashboard = await this.sql`
+            SELECT 
+                COUNT(DISTINCT p.id)::INT as active_polls,
+                COALESCE(SUM(DISTINCT total_parties), 0)::INT as total_parties,
+                COALESCE(SUM(DISTINCT total_positions), 0)::INT as total_positions,
+                COALESCE(SUM(DISTINCT total_candidates), 0)::INT as total_candidates,
+                COALESCE(
+                    JSON_AGG(
+                        DISTINCT JSON_BUILD_OBJECT(
+                            'id', p.id,
+                            'name', p.title,
+                            'branch', p.branch,
+                            'end_date', p.end_date,
+                            'vote_type', p.vote_type,
+                            'votes', votes_counts.poll_votes::INT
+                        )::jsonb
+                    ) FILTER (WHERE p.id IS NOT NULL),
+                    '[]'
+                ) as active_polls_information,
+                COALESCE(
+                    JSON_AGG(
+                        DISTINCT JSON_BUILD_OBJECT(
+                            'id', p.id,
+                            'name', p.title,
+                            'branch', p.branch,
+                            'eligible_education', pe.allowed_education_levels,
+                            'eligible_course_strand', pe.allowed_courses
+                        )::jsonb
+                    ) FILTER (WHERE p.id IS NOT NULL),
+                    '[]'
+                ) as poll_eligibility_overview,
+                COALESCE(
+                    JSON_AGG(
+                        DISTINCT JSON_BUILD_OBJECT(
+                            'id', p.id,
+                            'name', p.title,
+                            'positions', total_positions,
+                            'parties', total_parties,
+                            'candidates', total_candidates
+                        )::jsonb
+                    ) FILTER (WHERE p.id IS NOT NULL),
+                    '[]'
+                ) as poll_stats_per_poll,
+                COALESCE(
+                    JSON_AGG(
+                        JSON_BUILD_OBJECT(
+                            'id', most_voted.id,
+                            'name', most_voted.name,
+                            'party', most_voted.party_name,
+                            'position', most_voted.position_name,
+                            'totalVotes', most_voted.total_votes
+                        )
+                        ORDER BY most_voted.total_votes DESC
+                    ),
+                    '[]'
+                ) as most_voted_candidates
+            FROM poll p
+            LEFT JOIN poll_eligibility pe ON pe.poll_id = p.id
+            LEFT JOIN (
+                SELECT 
+                    c2.id, c2.name, pa.poll_id, pa.name AS party_name, po.position AS position_name,
+                    COUNT(v.id) AS total_votes
+                FROM candidates c2
+                LEFT JOIN parties pa ON c2.party_id = pa.id
+                LEFT JOIN positions po ON c2.position_id = po.id
+                LEFT JOIN candidatesvoted v ON v.candidate_id = c2.id
+                GROUP BY c2.id, pa.name, po.position, pa.poll_id
+                ORDER BY total_votes DESC
+                LIMIT 5
+            ) most_voted ON most_voted.poll_id = p.id
+            LEFT JOIN (
+                SELECT p2.id as p2_id, COUNT(v.id) as poll_votes
+                FROM poll p2
+                LEFT JOIN votes v ON v.poll_id = p2.id
+                GROUP BY p2.id
+            ) votes_counts ON votes_counts.p2_id = p.id
+            LEFT JOIN LATERAL (
+                SELECT COUNT(pa.id) as total_parties
+                FROM parties pa 
+                WHERE pa.poll_id = p.id
+            ) party_counts ON TRUE
+            LEFT JOIN LATERAL (
+                SELECT COUNT(po.id) as total_positions
+                FROM positions po
+                WHERE po.poll_id = p.id
+            ) position_counts ON TRUE
+            LEFT JOIN LATERAL (
+                SELECT COUNT(c.id) as total_candidates
+                FROM parties pa2
+                LEFT JOIN candidates c ON c.party_id = pa2.id
+                WHERE pa2.poll_id = p.id
+            ) candidate_counts ON TRUE
+            WHERE p.branch = ${branch}
+            AND p.start_date <= CURRENT_TIMESTAMP AND p.end_date > CURRENT_TIMESTAMP
+        `
+
+
+        return getResultAdminDashboard[0];
+    }
+    
+    async getAdminDashboardStats(user: UserType) {
+        const branch = user.branch;
+        
+        const adminDashboardStats = await this.sql`
+            SELECT JSON_AGG(
+                JSON_BUILD_OBJECT(
+                    'vote_date', TO_CHAR(vote_date, 'MM-DD'),
+                    'votes_per_day', votes_count
+                )
+                ORDER BY vote_date
+            ) as voting_trends
+            FROM (
+                SELECT
+                    ds.vote_date,
+                    COUNT(DISTINCT v.id) as votes_count
+                FROM(
+                    SELECT generate_series(
+                    NOW()::DATE - INTERVAL '7 days', NOW()::DATE, '1 day'::INTERVAL
+                    )::DATE AS vote_date
+                ) ds
+                LEFT JOIN poll p ON p.branch = ${branch}
+                AND p.start_date <= CURRENT_TIMESTAMP AND p.end_date > CURRENT_TIMESTAMP
+                LEFT JOIN votes v ON ds.vote_date = DATE(v.created_at)
+                AND v.poll_id = p.id
+                GROUP BY ds.vote_date
+            ) AS daily_votes
+        `
+
+        const ParticipatingByEducationLevel = await this.sql`
+            SELECT DISTINCT ON (u.education_level)
+                u.education_level as name,
+                COUNT(v.user_id)::INT as value
+            FROM votes v 
+            LEFT JOIN poll p ON p.id = v.poll_id
+            LEFT JOIN users u ON v.user_id = u.id
+            WHERE p.branch = ${branch}
+            AND p.start_date <= CURRENT_TIMESTAMP AND p.end_date > CURRENT_TIMESTAMP
+            GROUP BY u.education_level
+        `
+
+        const ParticipatingByCourse_and_Strand = await this.sql`
+            SELECT DISTINCT ON (u.course)
+                u.course as name,
+                COUNT(v.user_id)::INT as value
+            FROM poll p
+            LEFT JOIN votes v  ON p.id = v.poll_id
+            LEFT JOIN users u ON v.user_id = u.id
+            WHERE p.branch = ${branch}
+            AND p.start_date <= CURRENT_TIMESTAMP AND p.end_date > CURRENT_TIMESTAMP
+            GROUP BY u.course
+        `
+
+        return {
+            ...adminDashboardStats[0],
+            participationByCourse: ParticipatingByCourse_and_Strand,
+            participationByEducationLevel: ParticipatingByEducationLevel
+        }
     }
 
     async getResults(user: UserType) {
@@ -92,7 +255,8 @@ export class PollService {
             ) as parties
             FROM poll p
             LEFT JOIN parties pa ON p.id = pa.poll_id
-            WHERE p.branch = ${branch} AND p.end_date < NOW()
+            WHERE p.branch = ${branch} AND p.end_date < CURRENT_TIMESTAMP
+            AND (p.end_date + INTERVAL '1 month') > CURRENT_TIMESTAMP -- it will stay for 1 month
             GROUP BY p.id;
         `
 
@@ -114,7 +278,7 @@ export class PollService {
                     SELECT COUNT(DISTINCT pa.id)
                     FROM parties pa
                     WHERE pa.poll_id = p.id
-                )::INT AS participating_parties,
+                )::INT AS partwicipating_parties,
                 CASE 
                     WHEN CURRENT_TIMESTAMP < p.start_date THEN 'Upcoming'
                     WHEN CURRENT_TIMESTAMP BETWEEN p.start_date AND p.end_date THEN 'Ongoing'

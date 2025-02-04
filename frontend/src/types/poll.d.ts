@@ -107,3 +107,54 @@ export type pollResultStats = {
         }[]
     }[]
 } & poll
+
+export type adminDashboardStatsGraph = {
+    voting_trends: {
+       vote_date: string,
+       votes_per_day: number 
+    }[],
+    participationByCourse: {
+        name: string,
+        value: number,
+    }[],
+    participationByEducationLevel: {
+        name: string,
+        value: number,
+    }[]
+}
+
+export type adminDashboardInfo = {
+    active_polls: number,
+    total_parties: number,
+    total_positions: number,
+    total_candidates: number,
+    active_polls_information: {
+        id: poll['id'],
+        name: poll['title'],
+        branch: poll['branch'],
+        end_date: poll['end_date'],
+        vote_type: poll['vote_type'],
+        votes: number
+    }[],
+    poll_eligibility_overview: {
+        id: poll['id'],
+        name: poll['title'],
+        branch: poll['branch'],
+        eligible_education: string[],
+        eligible_course_strand: string[]
+    }[],
+    poll_stats_per_poll: {
+        id: poll['id'],
+        name: poll['name'],
+        parties: number,
+        positions: number,
+        candidates: number
+    }[],
+    most_voted_candidates: {
+        id: candidate['id'],
+        name: candidate['name'],
+        party: party['name'],
+        position: position['position'],
+        totalVotes: number
+    }[]
+}

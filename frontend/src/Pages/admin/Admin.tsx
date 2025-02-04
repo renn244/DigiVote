@@ -8,6 +8,7 @@ import UpdateParties from "@/components/pages/admin/Parties/UpdateParties"
 import PartiesInfo from "./PartiesInfo"
 import Users from "./Users"
 import UpdateUserInfo from "./UpdateStudent/UpdateUserInfo"
+import Dashboard from "./Dashboard"
 
 const Admin = () => {
     return (
@@ -15,6 +16,8 @@ const Admin = () => {
             <SideBar />
             <main className="flex-1 p-8">
                 <Routes>
+                    <Route path="/dashboard" element={<Dashboard />} />
+
                     <Route path="/polls" element={<Polls />} />
                     <Route path="/polls/:id" element={<PollInfo />} />
                     <Route path="/polls/update/:id" element={<UpdatePoll />} />
