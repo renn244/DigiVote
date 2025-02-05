@@ -22,6 +22,7 @@ export class UserController {
         return this.userService.getInTouch(body)
     }
 
+    @UseGuards(AdminGuard('getUsers', 'Get'))
     @Get()
     async getUsers(@User() user: UserType, @Query() query: { page: string, search: string }) {
         return this.userService.getUsers(user, query);
