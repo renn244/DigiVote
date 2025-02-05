@@ -690,10 +690,20 @@ export class PollService {
                 GROUP BY po.poll_id
             )
             SELECT 
-                COALESCE(pd.positions, '[]') as positions
+                COALESCE(pd.positions, '[]') as positions,
+                (
+                    SELECT JSON_AGG(
+                        JSON_BUILD_OBJECT(
+                            'id', pa.id,
+                            'name', pa.name
+                        )::jsonb
+                    )
+                    FROM parties pa 
+                    WHERE pa.poll_id = p.id
+                ) as parties
             FROM poll p
             LEFT JOIN position_data pd ON p.id = pd.poll_id
-            WHERE p.branch = ${branch} AND p.id = ${pollId} AND p.end_date < NOW();
+            WHERE p.branch = ${branch} AND p.id = ${pollId} AND p.end_date < NOW()
         `
 
         return getResultStatisticsForUser[0];

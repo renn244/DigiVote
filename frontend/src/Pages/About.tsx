@@ -118,7 +118,7 @@ const About = () => {
                                 available and can be published according to the predetermined settings.
                             </Step>
                         </div>
-                        <img src="https://res.cloudinary.com/dxocuabaq/image/upload/v1738232990/sti-voting/website/i2owx0xrmmgue4xi1poo.jpg"
+                        <img src="https://res.cloudinary.com/dxocuabaq/image/upload/v1738739531/sti-voting/website/unbsankefa91m7skrgaw.jpg"
                         alt="DigiVote process" className="object-fill relative rounded-lg overflow-hidden shadow-xl" />
                     </div>
                 </div>

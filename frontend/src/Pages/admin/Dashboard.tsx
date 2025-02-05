@@ -26,7 +26,7 @@ const Dashboard = () => {
     })
 
     return (
-        <div className="p-8 min-h-screen">
+        <div className="space-y-6">
             <h1 className="text-3xl font-bold text-blue-900 mb-8">STI Admin Dashboard</h1>
             
              {/* Basic Information about the poll */}
@@ -80,9 +80,9 @@ const Dashboard = () => {
                                 <XAxis dataKey="name" className="text-xs" />
                                 <YAxis />
                                 <Tooltip />
-                                <Bar dataKey="positions" fill="#3b82f6" name="Positions" />
-                                <Bar dataKey="parties" fill="#10b981" name="Parties" />
-                                <Bar dataKey="candidates" fill="#f59e0b" name="Candidates" />
+                                <Bar dataKey="positions" fill="#3b82f6" />
+                                <Bar dataKey="parties" fill="#10b981"  />
+                                <Bar dataKey="candidates" fill="#f59e0b" />
                             </BarChart>
                         </ResponsiveContainer>
                     </CardContent>
