@@ -96,7 +96,6 @@ const AdminDashboardStats = () => {
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-
                 </CardHeader>
                 <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -129,32 +128,33 @@ const AdminDashboardStats = () => {
                             <TabsTrigger value="course">Course/Strand</TabsTrigger>
                         </TabsList>
                         <TabsContent value="education">
-                            <ChartContainer config={participationEducationLevelConfig}>
-                                <ResponsiveContainer width="100%" height={250}>
-                                    <PieChart>
-                                        <Pie
-                                        data={data?.participationByEducationLevel}
-                                        cx="50%"
-                                        cy="50%"
-                                        outerRadius={100}
-                                        labelLine={false}
-                                        blendStroke={data?.participationByEducationLevel.length === 1 ? true : false}
-                                        fill="#8884D8"
-                                        dataKey="value"
-                                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                                        >
-                                            {data?.participationByEducationLevel.map((_, idx) => (
-                                                <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
-                                            ))}
-                                        </Pie>
-                                        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </ChartContainer>
+                            <ResponsiveContainer width="100%" height={250}>
+                                <ChartContainer config={participationEducationLevelConfig}>
+                                        <PieChart>
+                                            <Pie
+                                            data={data?.participationByEducationLevel}
+                                            cx="50%"
+                                            cy="50%"
+                                            outerRadius={100}
+                                            labelLine={false}
+                                            blendStroke={data?.participationByEducationLevel.length === 1 ? true : false}
+                                            fill="#8884D8"
+                                            dataKey="value"
+                                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                            >
+                                                {data?.participationByEducationLevel.map((_, idx) => (
+                                                    <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                                        </PieChart>
+                                </ChartContainer>
+                            </ResponsiveContainer>
                         </TabsContent>
                         <TabsContent value="course">
-                            <ChartContainer config={participationCourse_StrandConfig}>
-                                <ResponsiveContainer width="100%" height={250}>
+                            <ResponsiveContainer width="100%" height={250}>
+                                <ChartContainer config={participationCourse_StrandConfig}>
+
                                     <PieChart>
                                         <Pie
                                         data={data?.participationByCourse}
@@ -173,8 +173,8 @@ const AdminDashboardStats = () => {
                                         </Pie>
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                                     </PieChart>
-                                </ResponsiveContainer>
-                            </ChartContainer>
+                                </ChartContainer>
+                            </ResponsiveContainer>
                         </TabsContent>
                     </Tabs>
                 </CardContent>

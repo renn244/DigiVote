@@ -13,11 +13,11 @@ CREATE TABLE users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
 
-    -- student information
-    education_level education_level NOT NULL,
-    student_id VARCHAR(255) NOT NULL UNIQUE,
-    year_level VARCHAR(10) NOT NULL,
-    course     VARCHAR(10) NOT NULL, -- course or department or strand
+    -- student information // it's not required for admins
+    education_level education_level,
+    student_id VARCHAR(255) UNIQUE,
+    year_level VARCHAR(10),
+    course     VARCHAR(10), -- course or department or strand
 
     branch VARCHAR(255) NOT NULL,
 );
@@ -37,10 +37,10 @@ CREATE TABLE userplaceholder (
     branch VARCHAR(255) NOT NULL,
     
     -- student information
-    education_level VARCHAR(255) NOT NULL,
-    student_id VARCHAR(255) NOT NULL UNIQUE,
-    year_level VARCHAR(10) NOT NULL,
-    course     VARCHAR(10) NOT NULL, -- course or department or strand
+    education_level VARCHAR(255),
+    student_id VARCHAR(255) UNIQUE,
+    year_level VARCHAR(10),
+    course     VARCHAR(10), -- course or department or strand
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
