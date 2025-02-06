@@ -31,7 +31,7 @@ const ElectionCard = ({
                 <CardTitle className="text-2xl mb-2">{election.title}</CardTitle>
                 <Badge
                 variant={status === "active" ? "default" : "secondary"}
-                className={`status === 'Active' ? 'bg-green-500' : 'bg-yellow-200 text-yellow-800' text-sm px-3 py-1`}>
+                className={`text-yellow-800' text-sm px-3 py-1`}>
                     {status}
                 </Badge>
             </CardHeader>

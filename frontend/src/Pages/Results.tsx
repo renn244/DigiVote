@@ -1,4 +1,3 @@
-import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import axiosFetch from "@/lib/axios";
@@ -28,9 +27,16 @@ const Results = () => {
     })
 
     if(isLoading) {
-        return <LoadingSpinner />
+        return (
+            <div className="min-h-[855px] bg-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <h1 className="text-4xl font-bold text-blue-900 mb-8">
+                        Election Results
+                    </h1>
+                </div>
+            </div>
+        )
     }
-
 
     return (
         <div className="min-h-[855px] bg-white">
@@ -59,7 +65,7 @@ const Results = () => {
                                                 <span>{election.branch} Branch</span>
                                             </div>
                                             <div className="flex items-center text-sm">
-                                                <VoteIcon className="mr h-5 w-5 text-yellow-600" />
+                                                <VoteIcon className="mr-2 h-5 w-5 text-yellow-600" />
                                                 <span>{election.vote_type === "single" ? "Single Choice" : "Multiple Choice"}</span>
                                             </div>
                                         </div>

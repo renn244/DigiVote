@@ -278,7 +278,7 @@ export class PollService {
                     SELECT COUNT(DISTINCT pa.id)
                     FROM parties pa
                     WHERE pa.poll_id = p.id
-                )::INT AS partwicipating_parties,
+                )::INT AS participating_parties,
                 CASE 
                     WHEN CURRENT_TIMESTAMP < p.start_date THEN 'Upcoming'
                     WHEN CURRENT_TIMESTAMP BETWEEN p.start_date AND p.end_date THEN 'Ongoing'

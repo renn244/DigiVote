@@ -1,4 +1,3 @@
-import LoadingSpinner from "@/components/common/LoadingSpinner"
 import ElectionCard from "@/components/pages/ElectionCard"
 import { Card, CardContent } from "@/components/ui/card"
 import axiosFetch from "@/lib/axios"
@@ -27,7 +26,15 @@ const Elections = () => {
   })
 
   if(isLoading) {
-    return <LoadingSpinner />
+    return (
+      <div className="min-h-[855px] bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <h1 className="text-4xl font-bold text-blue-900 mb-8">
+            Upcoming Elections
+          </h1>
+        </div>
+      </div>
+    )
   }
 
   return (
