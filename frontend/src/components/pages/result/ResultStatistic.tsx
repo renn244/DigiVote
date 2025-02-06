@@ -1,4 +1,4 @@
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import ResultStatsSkeleton from "@/components/skeletonLoading/ResultStats.skeleton";
 import { Card } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -40,14 +40,14 @@ const ResultStatistic = ({
     })
 
     if(isLoading) {
-        return <LoadingSpinner />
+        return <ResultStatsSkeleton />
     }
 
     const positions = statistics?.positions.map((result: any) => result.position) || []
-    const data = statistics?.positions.filter((result: any) => result.position === type)?.[0]?.candidates
-    
+    const initialData = statistics?.positions.flatMap((result: any) => result.candidates.map((c: any) => c))
+
     return (
-        <div className="">
+        <div>
             <div className="flex justify-between items-center mb-2">
                 <h2 className="text-xl font-bold">Position Votes Statistics</h2>
                 <Select value={type} onValueChange={setType}>
@@ -66,7 +66,7 @@ const ResultStatistic = ({
             </div>
             <Card className="p-6">
                 <ChartContainer className="max-h-[320px] w-full" config={config}>
-                    <BarChart data={data} layout="horizontal" margin={{ top: 5 }}>
+                    <BarChart data={initialData} layout="horizontal" margin={{ top: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" type="category" />
                         <YAxis type="number" />

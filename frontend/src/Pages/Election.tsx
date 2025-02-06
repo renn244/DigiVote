@@ -1,6 +1,6 @@
 import GoBackButton from "@/components/common/GoBackButton"
-import LoadingSpinner from "@/components/common/LoadingSpinner"
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
+import ElectionSkeleton from "@/components/skeletonLoading/Election.skeleton"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -23,7 +23,6 @@ const Election = () => {
                 return undefined
             }
 
-            // TODO: HANDLE ERROR properly later
             if(response.status >= 400) {
                 throw new Error(response.data.message);
             }
@@ -35,7 +34,7 @@ const Election = () => {
     })
 
     if(isLoading) {
-        return <LoadingSpinner />
+        return <ElectionSkeleton />
     }
 
     if(isError) {
@@ -61,7 +60,7 @@ const Election = () => {
 
     return (
         <div className="min-h-[855px] bg-white">
-            <div className=" pt-8">
+            <div className="pt-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
                         <div className="flex items-center space-x-4">
@@ -163,7 +162,6 @@ const Election = () => {
                             status === "active" && election.allowed === true  ? 
                                 election.hasvoted ? (
                                     <div className="space-y-1">
-                                        <h2 className="text-lg font-medium">You already voted!</h2>
                                         <Button asChild className="w-full">
                                             <Link to={`/viewFinishVote/${id}`}>
                                                 View Your Vote

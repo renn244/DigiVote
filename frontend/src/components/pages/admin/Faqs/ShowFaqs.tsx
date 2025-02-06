@@ -8,10 +8,13 @@ import { useQuery } from "@tanstack/react-query"
 import axiosFetch from "@/lib/axios"
 import toast from "react-hot-toast"
 import LoadingSpinner from "@/components/common/LoadingSpinner"
+import { useSearchParams } from "react-router"
 
 const ShowFaqs = () => {
+    const [searchParams] = useSearchParams();
+    const search = searchParams.get('search')
     const { user } = useAuthContext()
-    
+
     const { data:faqs, isLoading }  = useQuery({
         queryKey: ['faqs'],
         queryFn: async () => {
@@ -31,6 +34,10 @@ const ShowFaqs = () => {
         return <LoadingSpinner />
     }
 
+    if(search) {
+        return
+    }
+        
     return (
         <Card>
             <CardHeader className="flex-row justify-between">

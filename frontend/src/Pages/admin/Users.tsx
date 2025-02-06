@@ -27,7 +27,7 @@ const UsersHeader = () => {
             <div className="w-full max-w-lg relative">
                 <SearchIcon className="w-4 h-4 absolute left-2.5 top-3 text-gray-500 dark:text-gray-400" />
                 <Input value={search} onChange={(e) => setSearch(e.target.value)}
-                type="text" placeholder="Search student id" className="pl-8 " />
+                type="text" placeholder="Search student id" className="pl-8 focus-visible:ring-0" />
             </div>
         </div>
     )

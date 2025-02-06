@@ -1,9 +1,8 @@
 import ShowFaqs from "@/components/pages/admin/Faqs/ShowFaqs"
 import ShowQuestions from "@/components/pages/community-help/ShowQuestions"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import useDebounce from "@/lib/useDebounce"
-import { Search } from "lucide-react"
+import { SearchIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router"
 
@@ -25,20 +24,15 @@ const HelpHeader = () => {
     }, [debounceValue])
 
     return (
-        <div className="flex mb-4">
+        <div className="flex items-center relative mb-4">
+            <SearchIcon className="absolute ml-2 h-5 w-5 text-gray-500" />
             <Input value={search} onChange={(e) => setSearch(e.target.value)}
-            type="text" placeholder="Search for help..." className="mr-2" />
-            <Button>
-                <Search className="h-4 w-4 mr-2" />
-                Search
-            </Button>
+            type="text" placeholder="Search for help..." className="mr-2 pl-8 focus-visible:ring-0" />
         </div>
     )
 }
 
 const Help = () => {
-    // impleemnt a search later using search params so that it can be detected by both faqs and community questions
-
     return (
         <div className="min-h-[855px] container mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <h1 className="text-3xl font-bold mb-6 text-blue-900">Help Center</h1>

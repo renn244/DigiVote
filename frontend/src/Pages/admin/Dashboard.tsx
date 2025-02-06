@@ -2,13 +2,29 @@ import DashboardCard from "@/components/common/DashboardCard"
 import AdminDashboardStats from "@/components/pages/admin/AdminDashboardStats"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import axiosFetch from "@/lib/axios"
 import { adminDashboardInfo } from "@/types/poll"
 import { useQuery } from "@tanstack/react-query"
 import { Award, BookOpen, Flag, GraduationCap, UserCheck, VoteIcon } from "lucide-react"
 import toast from "react-hot-toast"
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
   
+const config = {
+    positions: {
+        label: 'Positions',
+        color: '#3b82f6'
+    },
+    parties: {
+        label: 'Parties',
+        color: '#10b981',
+    },
+    candidates: {
+        label: 'Candidates',
+        color: '#f59e0b'
+    }
+} satisfies ChartConfig
+
 const Dashboard = () => {
 
     const { data: adminStats } = useQuery({
@@ -74,17 +90,19 @@ const Dashboard = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={adminStats?.poll_stats_per_poll}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" className="text-xs" />
-                                <YAxis />
-                                <Tooltip />
-                                <Bar dataKey="positions" fill="#3b82f6" />
-                                <Bar dataKey="parties" fill="#10b981"  />
-                                <Bar dataKey="candidates" fill="#f59e0b" />
-                            </BarChart>
-                        </ResponsiveContainer>
+                        <ChartContainer config={config}>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={adminStats?.poll_stats_per_poll}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="name" className="text-xs" />
+                                    <YAxis />
+                                    <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                                    <Bar dataKey="positions" fill="#3b82f6" radius={[5, 5, 0, 0]} />
+                                    <Bar dataKey="parties" fill="#10b981" radius={[5, 5, 0, 0]} />
+                                    <Bar dataKey="candidates" fill="#f59e0b" radius={[5, 5, 0, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </ChartContainer>
                     </CardContent>
                 </Card>
             </div>

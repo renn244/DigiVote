@@ -1,7 +1,7 @@
 import GoBackButton from "@/components/common/GoBackButton"
-import LoadingSpinner from "@/components/common/LoadingSpinner"
 import SomethingWentWrong from "@/components/common/SomethingWentWrong"
 import ResultStatistic from "@/components/pages/result/ResultStatistic"
+import ResultSkeleton from "@/components/skeletonLoading/Result.skeleton"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import axiosFetch from "@/lib/axios"
@@ -35,7 +35,7 @@ const Result = () => {
     })
     
     if(isLoading) {
-        return <LoadingSpinner />
+        return <ResultSkeleton />
     }
 
     if(isError) {
@@ -94,10 +94,6 @@ const Result = () => {
                                     <CalendarIcon className="mr-2 h-5 w-5 text-yellow-600" />
                                     <span>{new Date(result.start_date).toLocaleDateString()} - {new Date(result.end_date).toLocaleDateString()}</span>
                                 </div>
-                                {/* <div className="flex items-center text-sm">
-                                    <BarChart className="mr-2 h-5 w-5 text-yellow-600" />
-                                    <span>Turnout: To be Implemented</span>
-                                </div> */}
                             </div>
                         </div>
                         <p className="font-semibold mb-2">
