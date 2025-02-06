@@ -115,7 +115,7 @@ const PartiesInfo = () => {
                                     />
                                     <ChartTooltip
                                     cursor={false}
-                                    content={<ChartTooltipContent hideLabel />}
+                                    content={<ChartTooltipContent />}
                                     />
                                     <Bar dataKey="votes" fill="#3b82f6" barSize={40} radius={3} />
                                 </BarChart>

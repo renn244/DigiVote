@@ -187,7 +187,7 @@ export class PollService {
     
     async getAdminDashboardStats(user: UserType) {
         const branch = user.branch;
-        
+
         const adminDashboardStats = await this.sql`
             SELECT JSON_AGG(
                 JSON_BUILD_OBJECT(
@@ -202,7 +202,7 @@ export class PollService {
                     COUNT(DISTINCT v.id) as votes_count
                 FROM(
                     SELECT generate_series(
-                    NOW()::DATE - INTERVAL '7 days', NOW()::DATE, '1 day'::INTERVAL
+                    NOW()::DATE - INTERVAL '1 month', NOW()::DATE, '1 day'::INTERVAL
                     )::DATE AS vote_date
                 ) ds
                 LEFT JOIN poll p ON p.branch = ${branch}
