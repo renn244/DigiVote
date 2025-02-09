@@ -138,7 +138,7 @@ export class PollService {
                             'totalVotes', most_voted.total_votes
                         )
                         ORDER BY most_voted.total_votes DESC
-                    ),
+                    ) FILTER (WHERE most_voted.id IS NOT NULL),
                     '[]'
                 ) as most_voted_candidates
             FROM poll p
@@ -202,11 +202,10 @@ export class PollService {
                     COUNT(DISTINCT v.id) as votes_count
                 FROM(
                     SELECT generate_series(
-                    NOW()::DATE - INTERVAL '1 month', NOW()::DATE, '1 day'::INTERVAL
+                        NOW()::DATE - INTERVAL '1 month', NOW()::DATE, '1 day'::INTERVAL
                     )::DATE AS vote_date
                 ) ds
                 LEFT JOIN poll p ON p.branch = ${branch}
-                AND p.start_date <= CURRENT_TIMESTAMP AND p.end_date > CURRENT_TIMESTAMP
                 LEFT JOIN votes v ON ds.vote_date = DATE(v.created_at)
                 AND v.poll_id = p.id
                 GROUP BY ds.vote_date

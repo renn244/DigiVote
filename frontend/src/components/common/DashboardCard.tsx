@@ -7,7 +7,8 @@ type DashboardCardProps = {
     title: string,
     className?: string,
     value: React.ReactNode,
-    loadingState?: React.ReactNode
+    loadingState?: React.ReactNode, // used for displaying the loading icon or svg or animation
+    isLoading?: boolean
 }
 
 const DashboardCard = ({ 
@@ -15,7 +16,8 @@ const DashboardCard = ({
     title,
     value,
     className,
-    loadingState
+    loadingState,
+    isLoading=false,
 }: DashboardCardProps) => (
     <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -25,7 +27,7 @@ const DashboardCard = ({
             <Icon className="h-4 w-4 text-blue-900" />
         </CardHeader>
         <CardContent>
-            {value ? (
+            {!isLoading ? (
                 <div className={cn("text-2xl font-bold text-blue-900", className)}>{value}</div>
             ) : loadingState ? (
                     loadingState
