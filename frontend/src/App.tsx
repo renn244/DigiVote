@@ -25,6 +25,7 @@ import About from "./Pages/About"
 import Homepage from "./Pages/Homepage"
 import Contact from "./Pages/Contact"
 import Privacy from "./Pages/Privacy"
+import LiveResult from "./Pages/LiveResult"
 
 function App() {
   const { loading , user } = useAuthContext()
@@ -58,8 +59,14 @@ function App() {
         <Route path="/elections/:id" element={
           <AuthenticatedRoute>
             <Election />
-            </AuthenticatedRoute>
+          </AuthenticatedRoute>
         } />
+
+        <Route path="/live-results/:pollId" element={
+          <AuthenticatedRoute>
+            <LiveResult />
+          </AuthenticatedRoute>
+        } />        
 
         <Route path="/results" element={
           <AuthenticatedRoute>

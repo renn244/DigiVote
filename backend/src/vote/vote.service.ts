@@ -1,13 +1,22 @@
 import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { UserType } from 'src/lib/decorator/User.decorator';
+import { LiveResultGateway } from 'src/live-result/liveResult.gateway';
 import { PollService } from 'src/poll/poll.service';
 
 @Injectable()
 export class VoteService {
     constructor(
         @Inject('POSTGRES_POOL') private readonly sql: any,
-        private readonly pollService: PollService
+        private readonly pollService: PollService,
+        private readonly LiveResultGateway: LiveResultGateway
     ) {}
+
+    async updateElectionLiveResult(voteData: { candidate_id: number }[], pollId: string) {
+        this.LiveResultGateway.io.to(pollId).emit("update-live-election-result", {
+            pollId: pollId,
+            voteData
+        })
+    }
 
     async createVote(user: UserType, pollId: string, votes: { candidate_id: number }[]) {
         const getPollResult = await this.sql`
@@ -74,7 +83,72 @@ export class VoteService {
             throw error
         }
 
+        // used for updating the sockets for live election results
+        this.updateElectionLiveResult(votes, pollId)
+
         return createVote[0];
+    }
+
+    async getVoteElectionResult(user: UserType, pollId: string) {
+        const branch = user.branch
+
+        const getUpdatedVoteCount = await this.sql`
+            WITH candidate_data AS (
+                SELECT 
+                    c.position_id,
+                    (
+                        SELECT JSON_AGG(sub.obj)
+                        FROM (
+                            SELECT JSON_BUILD_OBJECT(
+                                'id', c2.id,
+                                'photo', c2.photo,
+                                'name', c2.name,
+                                'party_id', c2.party_id,
+                                'party', pa.name,
+                                'votes', ( 
+                                    SELECT COUNT(cv.id) 
+                                    FROM candidatesvoted cv
+                                    WHERE cv.candidate_id = c2.id 
+                                )
+                            ) as obj
+                            FROM candidates c2
+                            LEFT JOIN parties pa ON pa.id = c2.party_id
+                            WHERE c2.position_id = c.position_id
+                            ORDER BY party_id
+                        ) sub
+                    ) AS candidates
+                FROM candidates c
+                GROUP BY c.position_id
+            ),
+            position_data AS (
+                SELECT 
+                    po.poll_id,
+                    JSON_AGG(
+                        DISTINCT JSON_BUILD_OBJECT(
+                            'id', po.id,
+                            'description', po.description,
+                            'position', po.position,
+                            'candidates', COALESCE(cd.candidates, '[]')
+                        )::jsonb
+                    ) AS positions
+                FROM positions po 
+                LEFT JOIN candidate_data cd ON po.id = cd.position_id
+                GROUP BY po.poll_id 
+            )
+            SELECT
+                p.*,
+                (
+                    SELECT COUNT(DISTINCT v.id)
+                    FROM votes v
+                    WHERE v.poll_id = p.id
+                )::INT AS totalvotes,
+                COALESCE(pd.positions, '[]'::json) as positions
+            FROM poll p
+            LEFT JOIN position_data pd ON p.id = pd.poll_id
+            WHERE p.branch = ${branch} AND p.id = ${pollId}
+        `
+
+        return getUpdatedVoteCount[0];
     }
 
     async getVoteHistory(user: UserType, query: { page: string, search: string }) {

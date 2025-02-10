@@ -7,6 +7,7 @@ export default defineConfig(({ mode }: { mode: string }) => {
   const env = loadEnv(mode, process.cwd())
 
   const backendUrl = env.VITE_BACKEND_URL
+  const socketUrl = env.VITE_SOCKET_URL
   const isProduction = env.VITE_SOFTWARE_ENV === 'production'
 
   if(!backendUrl) throw new Error('please provide backend url in the env')
@@ -19,6 +20,11 @@ export default defineConfig(({ mode }: { mode: string }) => {
         '/api': {
           target: backendUrl,
           changeOrigin: true
+        },
+        '/socket.io': {
+          changeOrigin: true,
+          target: socketUrl,
+          ws: true
         }
       }
     } satisfies ServerOptions

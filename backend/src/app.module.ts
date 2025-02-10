@@ -17,6 +17,8 @@ import { UserModule } from './user/user.module';
 import { VoteModule } from './vote/vote.module';
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path';
+import { LiveResultGateway } from './live-result/liveResult.gateway';
+import { LiveResultModule } from './live-result/live-result.module';
 
 const imports = [
   ConfigModule.forRoot({
@@ -27,7 +29,8 @@ const imports = [
     ttl: 60 * 1000 //60 seconds
   }),
   EmailSenderModule, 
-  AuthModule, 
+  AuthModule,
+  LiveResultModule,
   DatabaseModuleModule, PollModule, PartiesModule, FileUploadModule, PositionsModule, CandidatesModule, VoteModule, UserModule, FaqsModule, CommunityQuestionsModule
 ]
 

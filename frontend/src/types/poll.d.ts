@@ -158,3 +158,27 @@ export type adminDashboardInfo = {
         totalVotes: number
     }[]
 }
+
+export type liveResult = {
+    totalvotes: number,
+    positions: {
+        id: position['id'],
+        description: position['description'],
+        position: position['position'],
+        candidates: {
+            id: candidate['id'],
+            photo: candidate['photo'],
+            name: candidate['name'],
+            party_id: candidate['party_id'],
+            party: party['name'],
+            votes: number
+        }[]
+    }[]
+} & poll
+
+export type updateLiveResultData = {
+    pollId: string,
+    voteData: { 
+        candidate_id: candidate['id']
+    }[]
+}

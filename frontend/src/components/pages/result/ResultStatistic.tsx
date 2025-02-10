@@ -1,10 +1,8 @@
 import ResultStatsSkeleton from "@/components/skeletonLoading/ResultStats.skeleton";
 import { Card } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import axiosFetch from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query"
-import { useState } from "react";
 import toast from "react-hot-toast";
 import { Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis } from "recharts";
 
@@ -22,8 +20,6 @@ const config = {
 const ResultStatistic = ({
     pollId
 }: ResultStatisticProps) => {
-    const [type, setType] = useState("President") // like president, vice president, etc
-
     const { data: statistics, isLoading } = useQuery({
         queryKey: ['statistics', pollId],
         queryFn: async () => {
@@ -43,26 +39,12 @@ const ResultStatistic = ({
         return <ResultStatsSkeleton />
     }
 
-    const positions = statistics?.positions.map((result: any) => result.position) || []
     const initialData = statistics?.positions.flatMap((result: any) => result.candidates.map((c: any) => c))
 
     return (
         <div>
             <div className="flex justify-between items-center mb-2">
                 <h2 className="text-xl font-bold">Position Votes Statistics</h2>
-                <Select value={type} onValueChange={setType}>
-                    <SelectTrigger className="max-w-48">
-                        <SelectValue placeholder="Select a position" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectLabel>Positions</SelectLabel>
-                            {positions.map((position: string, idx: number) => (
-                                <SelectItem key={idx} value={position} >{position}</SelectItem>
-                            ))}
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
             </div>
             <Card className="p-6">
                 <ChartContainer className="max-h-[320px] w-full" config={config}>
