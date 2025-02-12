@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from 'src/lib/guards/local-auth.guard';
-import { ForgotPasswordDto, RegistrationDto, ResetPasswordDto } from './dto/auth.dto';
+import { ForgotPasswordDto, RegistrationAdminDto, RegistrationUserDto, ResetPasswordDto } from './dto/auth.dto';
 import { JwtAuthGuard } from 'src/lib/guards/jwt-auth.guard';
 import { User, UserType } from 'src/lib/decorator/User.decorator';
 
@@ -18,8 +18,13 @@ export class AuthController {
     }
 
     @Post('register')
-    async register(@Body() body: RegistrationDto) {
+    async register(@Body() body: RegistrationUserDto) {
         return this.authService.RegistrationUser(body)
+    }
+
+    @Post('registerAdmin')
+    async registerAdmin(@Body() body: RegistrationAdminDto) {
+        return this.authService.RegistrationAdmin(body)
     }
 
     @Post('verifyEmail')

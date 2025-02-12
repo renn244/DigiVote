@@ -159,6 +159,10 @@ export class UserService {
     }
 
     async updateStudentInfo(user: UserType, body: updateStudentInfoDto) {
+        if(user.role === 'admin') {
+            throw new BadRequestException('admin does not have student information')
+        }
+
         const { education_level, year_level, course } = body
 
         const updatedStudentInfo = await this.sql`

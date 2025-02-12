@@ -1,6 +1,7 @@
 import { IsString, Matches } from 'class-validator'
 import { Match } from 'src/lib/decorator/Match.decorator';
-export class RegistrationDto {
+
+export class RegistrationAdminDto {
     @IsString()
     username: string;
 
@@ -15,6 +16,9 @@ export class RegistrationDto {
     
     @IsString()
     password: string;
+}
+
+export class RegistrationUserDto extends RegistrationAdminDto {
 
     @IsString()
     education_level: string;

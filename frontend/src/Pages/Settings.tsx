@@ -4,6 +4,7 @@ import ChangePasswordForm, { ChangePasswordState } from "@/components/pages/sett
 import StudentInfoForm, { StudentInfoState } from "@/components/pages/settings/StudentInfoForm"
 import UserInfoForm, { UserInfoState } from "@/components/pages/settings/UserInfoForm"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuthContext } from "@/context/AuthContext"
 import axiosFetch from "@/lib/axios"
 import useRefreshToken from "@/lib/useRefreshToken"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
@@ -12,6 +13,7 @@ import toast from "react-hot-toast"
 
 const Settings = () => {
     const queryClient = useQueryClient();
+    const { user } = useAuthContext();
     const { refreshToken } = useRefreshToken()
 
     const { data, isLoading } = useQuery({
@@ -103,7 +105,8 @@ const Settings = () => {
                     </CardContent>
                 </Card>
 
-                <Card>
+                {/* Admin can't have student information */}
+                {user.role === 'user' && <Card>
                     <CardHeader>
                         <CardTitle>
                             Student Information
@@ -116,7 +119,7 @@ const Settings = () => {
                             year_level: data?.year_level || '',
                         }} onsubmit={changeStudentInfo} />
                     </CardContent>
-                </Card>
+                </Card>}
 
                 <Card>
                     <CardHeader>

@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { EmailSenderService } from 'src/email-sender/email-sender.service';
 import { UserType } from 'src/lib/decorator/User.decorator';
 import { v4 as uuidv4 } from 'uuid';
-import { ForgotPasswordDto, LoginDto, RegistrationDto, ResetPasswordDto } from './dto/auth.dto';
+import { ForgotPasswordDto, LoginDto, RegistrationAdminDto, RegistrationUserDto, ResetPasswordDto } from './dto/auth.dto';
 import { Cache } from 'cache-manager';
 
 @Injectable()
@@ -91,30 +91,49 @@ export class AuthService {
         }
     }
 
-    async RegistrationUser(body: RegistrationDto) {
-        // check if email is valid
-        const Regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z]+\.sti\.edu\.ph$/;
+    async ValidateRegistration(body: RegistrationAdminDto | RegistrationUserDto) {
+        // check if email is valid for user and admin conditionally
+        const EMAIL_VALIDATION = {
+            USER: /^[a-zA-Z].+[0-9]+@[a-zA-Z]+\.sti\.edu\.ph$/,
+            ADMIN: /^[a-zA-Z].+[a-zA-Z]+@[a-zA-Z]+\.sti\.edu\.ph$/
+        }
+        
+        const Regex = body instanceof RegistrationUserDto ? EMAIL_VALIDATION.USER : EMAIL_VALIDATION.ADMIN;
         if(!Regex.test(body.email)) {
             throw new BadRequestException('Invalid email format');
         }
 
         const checkIfExist = await this.sql`
             SELECT username, email, student_id FROM users 
-            WHERE username = ${body.username} OR email = ${body.email} OR student_id = ${body.student_id};
+            WHERE username = ${body.username} 
+            OR email = ${body.email} 
+            -- if we are only checking for admin then we don't need this so just let it be because it's just an 
+            -- OR clause
+            OR student_id = ${body instanceof RegistrationUserDto && body.student_id}; 
         `
 
         for (const record of checkIfExist) {
             if(record?.username === body.username) {
                 throw new BadRequestException({ name: 'username', message: 'Username already exists' });
             }
-    
+
             if(record?.email === body.email) {
                 throw new BadRequestException({name: 'email', message: 'Email already exists'});
             }
-    
-            if(record?.student_id === body.student_id) {
+
+            if(body instanceof RegistrationUserDto && record?.student_id === body.student_id) {
                 throw new BadRequestException({ name: 'student_id', message: 'Student ID already exists'});
             }
+        }
+
+        return true
+    }
+
+    async RegistrationUser(body: RegistrationUserDto) {
+        const isValid = await this.ValidateRegistration(body);
+
+        if(!isValid) {
+            throw new GoneException("there is an invalid input (can't identify)")
         }
 
         const name = body.firstName + ' ' + body.lastName;
@@ -131,6 +150,36 @@ export class AuthService {
 
         if(!result.length) {
             throw new InternalServerErrorException('failed to create user try again')
+        }
+
+        return {
+            success: true,
+            message: 'successfully created account',
+            next_action: 'redirect',
+            redirect_url: `${process.env.CLIENT_BASE_URL}/verifyEmail?email=${result[0].email}`
+        }
+    }
+
+    async RegistrationAdmin(body: RegistrationAdminDto) {
+        const isValid = await this.ValidateRegistration(body);
+
+        if(!isValid) {
+            throw new GoneException("there is an invalid input (can't identify)")
+        }
+
+        const name = body.firstName + ' ' + body.lastName;
+        const hashedPassword = await bcrypt.hash(body.password, 10);
+        const branch = body.email.split('@')[1].split('.')[0]
+
+        const sendEmail = await this.createEmail(body.email);
+        const result = await this.sql`
+            INSERT INTO userplaceholder (username, name, email, password, branch, role)
+            VALUES (${body.username}, ${name}, ${body.email}, ${hashedPassword}, ${branch}, 'admin')
+            RETURNING *;
+        `
+
+        if(!result.length) {
+            throw new InternalServerErrorException("failed to create user try again")
         }
 
         return {
@@ -189,8 +238,8 @@ export class AuthService {
         const user = getUser[0]
 
         const createUser = await this.sql`
-            INSERT INTO users (username, name, email, password, branch, education_level, student_id, year_level, course)
-            VALUES (${user.username}, ${user.name}, ${user.email}, ${user.password}, ${user.branch}, 
+            INSERT INTO users (username, name, email, password, branch, role, education_level, student_id, year_level, course)
+            VALUES (${user.username}, ${user.name}, ${user.email}, ${user.password}, ${user.branch}, ${user.role},
             ${user.education_level}, ${user.student_id}, ${user.year_level}, ${user.course});
         `
 
@@ -304,6 +353,12 @@ export class AuthService {
 
         const code = Math.floor(100000 + Math.random() * 900000); // generate 6 digit code
 
+        // deleting all the existing password codes just in case
+        await this.sql`
+            DELETE FROM passwordcode
+            WHERE email = ${body.email}
+        `
+
         const createResetCode = await this.sql`
             INSERT INTO passwordcode (email, code)
             VALUES (${body.email}, ${code})
@@ -331,7 +386,7 @@ export class AuthService {
         if(!getCode.length) {
             throw new BadRequestException('No reset code found')
         }
-        console.log(getCode[0].code, body.token)
+
         if(getCode[0].code !== body.token) {
             throw new BadRequestException('Invalid reset code')
         }

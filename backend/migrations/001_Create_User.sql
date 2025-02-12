@@ -36,6 +36,7 @@ CREATE TABLE userplaceholder (
     password VARCHAR(255) NOT NULL,
     branch VARCHAR(255) NOT NULL,
     
+    role roles NOT NULL DEFAULT 'user'
     -- student information
     education_level VARCHAR(255),
     student_id VARCHAR(255) UNIQUE,
