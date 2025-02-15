@@ -91,16 +91,16 @@ export class AuthService {
         }
     }
 
-    async ValidateRegistration(body: RegistrationAdminDto | RegistrationUserDto) {
+    async ValidateRegistration(body: RegistrationAdminDto | RegistrationUserDto | any, type: 'admin' | 'user') {
         // check if email is valid for user and admin conditionally
         const EMAIL_VALIDATION = {
             USER: /^[a-zA-Z].+[0-9]+@[a-zA-Z]+\.sti\.edu\.ph$/,
             ADMIN: /^[a-zA-Z].+[a-zA-Z]+@[a-zA-Z]+\.sti\.edu\.ph$/
         }
-        
-        const Regex = body instanceof RegistrationUserDto ? EMAIL_VALIDATION.USER : EMAIL_VALIDATION.ADMIN;
-        if(!Regex.test(body.email)) {
-            throw new BadRequestException('Invalid email format');
+
+        const Regex = type === 'user' ? EMAIL_VALIDATION.USER : EMAIL_VALIDATION.ADMIN;
+        if(!body.email.match(Regex)) {
+            throw new BadRequestException({name: "email", message: 'Invalid email format'});
         }
 
         const checkIfExist = await this.sql`
@@ -109,7 +109,7 @@ export class AuthService {
             OR email = ${body.email} 
             -- if we are only checking for admin then we don't need this so just let it be because it's just an 
             -- OR clause
-            OR student_id = ${body instanceof RegistrationUserDto && body.student_id}; 
+            OR (CASE WHEN ${type} = 'user' THEN student_id = ${body.student_id} ELSE FALSE END)
         `
 
         for (const record of checkIfExist) {
@@ -130,7 +130,7 @@ export class AuthService {
     }
 
     async RegistrationUser(body: RegistrationUserDto) {
-        const isValid = await this.ValidateRegistration(body);
+        const isValid = await this.ValidateRegistration(body, 'user');
 
         if(!isValid) {
             throw new GoneException("there is an invalid input (can't identify)")
@@ -161,7 +161,7 @@ export class AuthService {
     }
 
     async RegistrationAdmin(body: RegistrationAdminDto) {
-        const isValid = await this.ValidateRegistration(body);
+        const isValid = await this.ValidateRegistration(body, 'admin');
 
         if(!isValid) {
             throw new GoneException("there is an invalid input (can't identify)")
