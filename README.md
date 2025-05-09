@@ -65,8 +65,3 @@ In here you would only need 1 terminal
 ```powershell
     npm run start
 ```
-
-## 📞 Contact
-👤 **Renato D. Santos Jr**  
-📧 Email: renatodsantosjr9@gmail.com  
-🔗 GitHub: [Renato D. Santos Jr](https://github.com/sheeshhhhhh)
