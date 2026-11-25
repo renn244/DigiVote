@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { IsPublic } from 'src/lib/decorator/isPublic.decorator';
 import { User, UserType } from 'src/lib/decorator/User.decorator';
 import { JwtAuthGuard } from 'src/lib/guards/jwt-auth.guard';
 import { CommunityQuestionsService } from './community-questions.service';
@@ -17,6 +18,7 @@ export class CommunityQuestionsController {
         return this.communityQuestionsService.createCommunityQuestion(user, body);
     }
 
+    @IsPublic()
     @Get('getQuestions')
     async getCommunityQuestions(@User() user: UserType, @Query() query: { search: string }) {
         return this.communityQuestionsService.getCommunityQuestions(user, query);

@@ -95,11 +95,7 @@ function App() {
             <VoteHistory />
           </AuthenticatedRoute>
         } />
-        <Route path="/help" element={
-          <AuthenticatedRoute>
-            <Help />
-          </AuthenticatedRoute>
-        } />
+        <Route path="/help" element={<Help />} />
         <Route path="/settings" element={
           <AuthenticatedRoute>
             <Settings />

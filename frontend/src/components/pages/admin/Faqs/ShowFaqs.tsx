@@ -41,8 +41,8 @@ const ShowFaqs = () => {
     return (
         <Card>
             <CardHeader className="flex-row justify-between">
-                <CardTitle>Frequenly Asked Questions</CardTitle>
-                {user.role === 'admin' && (
+                <CardTitle>Frequently Asked Questions</CardTitle>
+                {user?.role === 'admin' && (
                     <CreateFaq />
                 )}
             </CardHeader>
@@ -52,7 +52,7 @@ const ShowFaqs = () => {
                         <AccordionItem value={`item-${index}`} key={index}>
                             <AccordionTrigger className="flex-row">
                                 <div className="flex items-center">
-                                    {user.role === 'admin' && (
+                                    {user?.role === 'admin' && (
                                         <div onClick={(e) => e.stopPropagation()}>
                                             <FaqOption  id={faq.id} initialData={{
                                                 question: faq.question,
