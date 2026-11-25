@@ -95,11 +95,8 @@ function App() {
             <VoteHistory />
           </AuthenticatedRoute>
         } />
-        <Route path="/help" element={
-          <AuthenticatedRoute>
-            <Help />
-          </AuthenticatedRoute>
-        } />
+        {/* public so visitors can read; asking and answering still need an account */}
+        <Route path="/help" element={<Help />} />
         <Route path="/settings" element={
           <AuthenticatedRoute>
             <Settings />

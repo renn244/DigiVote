@@ -6,11 +6,13 @@ import toast from "react-hot-toast"
 import CreateQuestion from "./CreateQuestion"
 import QuestionCard from "./QuestionCard"
 import { useState } from "react"
-import { useSearchParams } from "react-router"
+import { Link, useSearchParams } from "react-router"
+import { useAuthContext } from "@/context/AuthContext"
 import { Card, CardContent } from "@/components/ui/card"
 import { Frown, FileQuestion } from "lucide-react"
 
 const ShowQuestions = () => {
+    const { user } = useAuthContext();
     const [searchParams] = useSearchParams();
     const search = searchParams.get('search') || '';
     const [showAnswerForm, setShowAnswerForm] = useState<number | null>(null);
@@ -39,7 +41,13 @@ const ShowQuestions = () => {
         <div>
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-semibold text-blue-800">Community Help</h2>
-                <CreateQuestion />
+                {user ? (
+                    <CreateQuestion />
+                ) : (
+                    <Link to="/login" className="text-sm text-blue-700 underline underline-offset-4">
+                        Log in to ask or answer
+                    </Link>
+                )}
             </div>
             {communityQuestions && communityQuestions?.length > 0 ? (
                 communityQuestions?.map((question) => (

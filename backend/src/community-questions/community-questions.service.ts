@@ -24,7 +24,8 @@ export class CommunityQuestionsService {
         return createdQuestion[0];
     }
 
-    async getCommunityQuestions(user: UserType, query: { search: string }) {
+    // user is undefined for visitors who are not logged in
+    async getCommunityQuestions(user: UserType | undefined, query: { search: string }) {
 
         // have pagination and search
 
@@ -53,7 +54,7 @@ export class CommunityQuestionsService {
                                     SELECT EXISTS (
                                         SELECT 1
                                         FROM likes
-                                        WHERE answer_id = ans.id AND user_id = ${user.id}
+                                        WHERE answer_id = ans.id AND user_id = ${user?.id ?? null}
                                     )
                                 ),
                                 'created_at', ans.created_at

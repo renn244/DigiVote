@@ -4,6 +4,7 @@ import { AdminGuard } from 'src/lib/guards/admin.guard';
 import { CreateFaqsDto } from './dto/faqs.dto';
 import { FaqsService } from './faqs.service';
 import { JwtAuthGuard } from 'src/lib/guards/jwt-auth.guard';
+import { IsPublic } from 'src/lib/decorator/isPublic.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('faqs')
@@ -18,6 +19,7 @@ export class FaqsController {
         return this.faqsService.createFaq(user, body);
     }
 
+    @IsPublic()
     @Get()
     async getFaqs() {
         return this.faqsService.getFaqs();

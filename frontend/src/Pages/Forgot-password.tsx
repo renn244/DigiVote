@@ -15,7 +15,8 @@ type ForgotPasswordForm = {
 
 const ForgotPassword = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('Please check your email for the reset link')
+    // stays empty until the reset email is actually sent
+    const [successMessage, setSuccessMessage] = useState('')
     const { register, handleSubmit, setError, formState: { errors } } = useForm<ForgotPasswordForm>()
 
     const onSubmit: SubmitHandler<ForgotPasswordForm> = async (data) => {
@@ -38,9 +39,9 @@ const ForgotPassword = () => {
             }
 
             // handle success
-            setSuccessMessage(response.data.message)
+            setSuccessMessage(response.data.message || 'Please check your email for the reset link')
         } catch (error) {
-            toast.error('An error occured')            
+            toast.error('An error occurred')
         } finally {
             setIsLoading(false)
         }
@@ -53,7 +54,7 @@ const ForgotPassword = () => {
                     <CardHeader>
                         <CardTitle>Forgot Password</CardTitle>
                         <CardDescription>
-                            Enter your email provided in your raf. we will send you a link to reset your password
+                            Enter the email on your RAF. We will send you a link to reset your password.
                         </CardDescription>
                         {successMessage && (
                             <p className="flex text-green-500 font-medium">

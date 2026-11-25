@@ -33,18 +33,18 @@ const Homepage = () => {
                 </div>
             </section>
     
-            {/* Statistics Section */}
+            {/* Highlights Section: things the app actually does, not usage numbers */}
             <section className="bg-blue-800 py-12">
                 <div className="container mx-auto px-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                         <Statistic data-aos="fade-up" data-duration="350" data-aos-delay=""
-                        value="10+" label="STI branches" />
+                        value="1" label="Vote per student per poll" />
                         <Statistic data-aos="fade-up" data-duration="350" data-aos-delay="200"
-                        value="10k" label="Student Voters" />
+                        value="Live" label="Results while voting is open" />
                         <Statistic data-aos="fade-up" data-duration="350" data-aos-delay="400"
-                        value="85+" label="Election Held" />
+                        value="OTP" label="Email-verified accounts" />
                         <Statistic data-aos="fade-up" data-duration="350" data-aos-delay="600"
-                        value="+40%" label="Voter Turnout Increase" />
+                        value="24/7" label="Vote from any device" />
                     </div>
                 </div>
             </section>
@@ -59,17 +59,17 @@ const Homepage = () => {
                         DigiVote In Action at STI
                     </h2>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <Step number={1} title="Secure Authentication">
-                            Log in with your STI credentials, verified through multi-factor authentication
+                        <Step number={1} title="Verified Sign-up">
+                            Sign up with your STI email and confirm it with a one-time code
                         </Step>
                         <Step number={2} title="Access STI Elections">
                             View and participate in elections specific to your department or institute-wide polls
                         </Step>
-                        <Step number={3} title="Cast Encrypted Votes">
-                            Submit your choices using our quantum-resistant encryption protocols
+                        <Step number={3} title="Cast Your Vote">
+                            Pick your candidates and submit. You can vote once per poll, and polls close on their end date
                         </Step>
-                        <Step number={4} title="Analyze Results">
-                            Explore detailed analytics and visualizations of election outcomes
+                        <Step number={4} title="See the Results">
+                            Follow live results while voting is open and check your vote history afterwards
                         </Step>
                     </div>
                 </div>
@@ -77,7 +77,7 @@ const Homepage = () => {
     
             {/* Footer */}
             <footer className="container mx-auto px-4 py-8 text-center">
-                <p>&copy; 2023 DigiVote for STI. All rights reserved.</p>
+                <p>&copy; {new Date().getFullYear()} DigiVote for STI. All rights reserved.</p>
                 <div className="mt-4">
                 <Link reloadDocument to="/about" className="text-yellow-400 hover:underline underline-offset-4 mr-4">
                     About
