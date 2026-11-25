@@ -71,10 +71,10 @@ const ShowQuestions = () => {
                             <>
                                 <FileQuestion className="w-16 h-16 text-yellow-400 mb-4" />
                                 <h2 className="text-2xl font-semibold text-yellow-800 mb-2">
-                                    There is no questions available.
+                                    No questions yet.
                                 </h2>
                                 <p className="text-yellow-600 text-center max-w-lg">
-                                    Sorry, There is no questions available you can start asking question to start!
+                                    Be the first to ask one.
                                 </p>
                             </>
                         )}

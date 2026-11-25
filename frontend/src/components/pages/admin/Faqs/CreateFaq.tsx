@@ -40,7 +40,7 @@ const CreateFaq = () => {
                         Create FAQ
                     </DialogTitle>
                     <DialogDescription>
-                        Add a new Frequenly asked question to the list
+                        Add a new frequently asked question to the list
                     </DialogDescription>
                 </DialogHeader>
                 <FaqsForm onsubmit={onSubmit} />

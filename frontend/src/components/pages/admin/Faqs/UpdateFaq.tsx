@@ -62,7 +62,7 @@ const UpdateFaq = ({
                         Edit FAQ
                     </DialogTitle>
                     <DialogDescription>
-                        Update the Frequenly asked question
+                        Update the frequently asked question
                     </DialogDescription>
                 </DialogHeader>
                 <FaqsForm initialData={initialData} onsubmit={onSubmit} />
