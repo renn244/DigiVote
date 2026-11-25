@@ -18,7 +18,6 @@ export class CommunityQuestionsController {
         return this.communityQuestionsService.createCommunityQuestion(user, body);
     }
 
-    // anyone can read the questions; asking, answering and liking still need an account
     @IsPublic()
     @Get('getQuestions')
     async getCommunityQuestions(@User() user: UserType, @Query() query: { search: string }) {

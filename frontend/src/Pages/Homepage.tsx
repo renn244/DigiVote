@@ -33,7 +33,7 @@ const Homepage = () => {
                 </div>
             </section>
     
-            {/* Highlights Section: things the app actually does, not usage numbers */}
+            {/* Highlights Section */}
             <section className="bg-blue-800 py-12">
                 <div className="container mx-auto px-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">

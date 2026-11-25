@@ -15,7 +15,6 @@ type ForgotPasswordForm = {
 
 const ForgotPassword = () => {
     const [isLoading, setIsLoading] = useState(false);
-    // stays empty until the reset email is actually sent
     const [successMessage, setSuccessMessage] = useState('')
     const { register, handleSubmit, setError, formState: { errors } } = useForm<ForgotPasswordForm>()
 

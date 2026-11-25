@@ -24,7 +24,6 @@ export class CommunityQuestionsService {
         return createdQuestion[0];
     }
 
-    // user is undefined for visitors who are not logged in
     async getCommunityQuestions(user: UserType | undefined, query: { search: string }) {
 
         // have pagination and search

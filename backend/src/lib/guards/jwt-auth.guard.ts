@@ -15,8 +15,7 @@ export class JwtAuthGuard extends AuthGuard(['jwt']) {
         ])
 
         if(isPublic) {
-            // let everyone in, but still read the token when there is one
-            // so the route knows who is asking (for example which answers you liked)
+            // populate the user when there is a token
             await (super.canActivate(context) as Promise<boolean>).catch(() => false);
             return true;
         }
